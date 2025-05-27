@@ -1,9 +1,9 @@
 package sqldb
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
-	"database/sql"
 
 	"github.com/go-sql-driver/mysql"
 )
@@ -11,11 +11,11 @@ import (
 var Db *sql.DB
 
 type Ksiazka struct {
-	Id		int64
-	Tytul	string
-	Rok		int64
-	Autor	int64
-	Gatunek	int64
+	Id      int64
+	Tytul   string
+	Rok     int64
+	Autor   int64
+	Gatunek int64
 }
 
 func ConnectToDB() {
@@ -26,7 +26,7 @@ func ConnectToDB() {
 	cfg.Net = "tcp"
 	cfg.Addr = "127.0.0.1:3306"
 	cfg.DBName = "paw"
-	
+
 	var err error
 	Db, err = sql.Open("mysql", cfg.FormatDSN())
 
@@ -55,14 +55,14 @@ func GetKsiazki() ([]Ksiazka, error) {
 		var ks Ksiazka
 
 		if err := rows.Scan(&ks.Id, &ks.Tytul, &ks.Rok, &ks.Autor, &ks.Gatunek); err != nil {
-			return nil, fmt.Errorf("GetKsiazki: %v", err)	
+			return nil, fmt.Errorf("GetKsiazki: %v", err)
 		}
 
 		ksiazki = append(ksiazki, ks)
 	}
 
 	if err := rows.Err(); err != nil {
-		return nil, fmt.Errorf("GetKsiazki: %v", err)	
+		return nil, fmt.Errorf("GetKsiazki: %v", err)
 	}
 
 	return ksiazki, nil
@@ -73,7 +73,7 @@ func GetKsiazka(id int64) (Ksiazka, error) {
 
 	row := Db.QueryRow("SELECT * FROM Ksiazka WHERE id = ?", id)
 	if err := row.Scan(&ks.Id, &ks.Tytul, &ks.Rok, &ks.Autor, &ks.Gatunek); err != nil {
-		if err ==  sql.ErrNoRows {
+		if err == sql.ErrNoRows {
 			return ks, fmt.Errorf("GetKsiazka: no book with id: %d", id)
 		}
 
@@ -94,10 +94,10 @@ func InsertKsiazka(ks Ksiazka) (int64, error) {
 		return 0, fmt.Errorf("InsertKsiazka: %v", err)
 	}
 
-	return id, nil;
+	return id, nil
 }
 
-func DelKsiazka(id int64) (error) {
+func DelKsiazka(id int64) error {
 	res, err := Db.Exec("DELETE FROM Ksiazka WHERE id = ?", id)
 	if err != nil {
 		return fmt.Errorf("DelKsiazka: %v", err)

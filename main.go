@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -10,10 +11,11 @@ import (
 )
 
 func getBooks(c *gin.Context) {
-	books, err := sqldb.GetKsiazki()
+	params := c.Request.URL.Query()
+
+	books, err := sqldb.GetKsiazki(params)
 	if err != nil {
-		//log.Fatal(err)
-		c.JSON(http.StatusNotFound, gin.H{"error": "Nie znaleziono książek"})
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -26,7 +28,7 @@ func getBook(c *gin.Context) {
 
 	book, err := sqldb.GetKsiazka(int64(id))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Nie znaleziono książki"})
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -38,14 +40,12 @@ func postBook(c *gin.Context) {
 
 	if err := c.BindJSON(&newBook); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Wystąpił problem z JSON"})
-		fmt.Println("BŁĄD bind:", err)
 		return
 	}
 
 	id, err := sqldb.InsertKsiazka(newBook)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Nie udało się dodać książki - sprawdź składnię danych"})
-		fmt.Println("BŁĄD insert:", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -54,12 +54,31 @@ func postBook(c *gin.Context) {
 	c.JSON(http.StatusCreated, newBook)
 }
 
+func putBook(c *gin.Context) {
+	idStr := c.Param("id")
+	id, _ := strconv.Atoi(idStr)
+
+	var newBook sqldb.Ksiazka
+
+	if err := c.BindJSON(&newBook); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Wystąpił problem z JSON"})
+		return
+	}
+
+	if err := sqldb.UpdateWholeKsiazka(int64(id), newBook); err != nil {
+		c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.Status(http.StatusNoContent)
+}
+
 func deleteBook(c *gin.Context) {
 	idStr := c.Param("id")
 	id, _ := strconv.Atoi(idStr)
 
 	if err := sqldb.DelKsiazka(int64(id)); err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Nie znaleziono książki"})
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -68,7 +87,9 @@ func deleteBook(c *gin.Context) {
 
 func main() {
 	fmt.Println("Łączenie z bazą danych...")
-	sqldb.ConnectToDB()
+	if err := sqldb.ConnectToDB(); err != nil {
+		log.Fatal(err)
+	}
 	defer sqldb.Db.Close()
 
 	fmt.Println("Uruchamianie serwera...")
@@ -83,6 +104,8 @@ func main() {
 			v1.GET("books/:id", getBook)
 
 			v1.POST("books", postBook)
+
+			v1.PUT("books/:id", putBook)
 
 			v1.DELETE("books/:id", deleteBook)
 		}

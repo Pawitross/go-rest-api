@@ -3,7 +3,8 @@ package sqldb
 import (
 	"database/sql"
 	"fmt"
-	"log"
+	"net/url"
+	"strings"
 
 	"github.com/go-sql-driver/mysql"
 )
@@ -11,14 +12,16 @@ import (
 var Db *sql.DB
 
 type Ksiazka struct {
-	Id      int64
-	Tytul   string
-	Rok     int64
-	Autor   int64
-	Gatunek int64
+	Id      int64  `json:"id"`
+	Tytul   string `json:"title"`
+	Rok     int64  `json:"year"`
+	Strony  int64  `json:"pages"`
+	Autor   int64  `json:"author"`
+	Gatunek int64  `json:"genre"`
+	Jezyk   int64  `json:"language"`
 }
 
-func ConnectToDB() {
+func ConnectToDB() error {
 	cfg := mysql.NewConfig()
 
 	cfg.User = "root"
@@ -29,87 +32,155 @@ func ConnectToDB() {
 
 	var err error
 	Db, err = sql.Open("mysql", cfg.FormatDSN())
-
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	if pingErr := Db.Ping(); pingErr != nil {
-		log.Fatal(pingErr)
+		return pingErr
 	}
 
-	fmt.Printf("Connected to database %q on %q", cfg.DBName, cfg.Addr)
+	fmt.Printf("Połączono z bazą danych %q on %q\n", cfg.DBName, cfg.Addr)
+	return nil
 }
 
-func GetKsiazki() ([]Ksiazka, error) {
+func GetKsiazki(params url.Values) ([]Ksiazka, error) {
 	var ksiazki []Ksiazka
 
-	rows, err := Db.Query("SELECT * FROM Ksiazka")
+	query := "SELECT id, tytul, rok_wydania, liczba_stron, id_autora, id_gatunku, id_jezyka FROM Ksiazka"
+	conditions := []string{}
+	args := []any{}
+
+	if len(params) != 0 {
+		allowedParams := map[string]string{
+			"id":       "id",
+			"title":    "tytul",
+			"year":     "rok_wydania",
+			"pages":    "liczba_stron",
+			"author":   "id_autora",
+			"genre":    "id_gatunku",
+			"language": "id_jezyka",
+		}
+
+		for k, v := range params {
+			_, allowed := allowedParams[k]
+			if !allowed || len(v) == 0 {
+				return nil, fmt.Errorf("Wprowadzono nieznany parametr.")
+			}
+
+			if len(v) > 1 {
+				return nil, fmt.Errorf("Wprowadzono za dużo parametrów dla jednej kolumny.")
+			}
+
+			conditions = append(conditions, allowedParams[k]+" = ?")
+			args = append(args, v[0])
+		}
+
+		query += " WHERE " + strings.Join(conditions, " AND ")
+	}
+
+	//fmt.Println("conditions:", conditions)
+	//fmt.Println("query:", query)
+	//fmt.Println("args:", args)
+	//fmt.Println()
+
+	rows, err := Db.Query(query, args...)
 	if err != nil {
-		return nil, fmt.Errorf("GetKsiazki: %v", err)
+		return nil, fmt.Errorf("Błąd zapytania (%v)", err)
 	}
 
 	defer rows.Close()
 
 	for rows.Next() {
-		var ks Ksiazka
+		var k Ksiazka
 
-		if err := rows.Scan(&ks.Id, &ks.Tytul, &ks.Rok, &ks.Autor, &ks.Gatunek); err != nil {
-			return nil, fmt.Errorf("GetKsiazki: %v", err)
+		if err := rows.Scan(&k.Id, &k.Tytul, &k.Rok, &k.Strony, &k.Autor, &k.Gatunek, &k.Jezyk); err != nil {
+			return nil, fmt.Errorf("Błąd odczytywania (%v)", err)
 		}
 
-		ksiazki = append(ksiazki, ks)
+		ksiazki = append(ksiazki, k)
 	}
 
 	if err := rows.Err(); err != nil {
-		return nil, fmt.Errorf("GetKsiazki: %v", err)
+		return nil, fmt.Errorf("Błąd (%v)", err)
 	}
 
 	return ksiazki, nil
 }
 
-func GetKsiazka(id int64) (Ksiazka, error) {
-	var ks Ksiazka
-
-	row := Db.QueryRow("SELECT * FROM Ksiazka WHERE id = ?", id)
-	if err := row.Scan(&ks.Id, &ks.Tytul, &ks.Rok, &ks.Autor, &ks.Gatunek); err != nil {
-		if err == sql.ErrNoRows {
-			return ks, fmt.Errorf("GetKsiazka: no book with id: %d", id)
-		}
-
-		return ks, fmt.Errorf("GetKsiazka: %v", err)
-	}
-
-	return ks, nil
+func ksiazkaExists(id int64) error {
+	// TODO
+	return fmt.Errorf("TODO")
 }
 
-func InsertKsiazka(ks Ksiazka) (int64, error) {
-	result, err := Db.Exec("INSERT INTO ksiazka (tytul, rok_wydania, id_autora, id_gatunku) VALUES (?, ?, ?, ?)", ks.Tytul, ks.Rok, ks.Autor, ks.Gatunek)
+func GetKsiazka(id int64) (Ksiazka, error) {
+	var k Ksiazka
+
+	query := "SELECT id, tytul, rok_wydania, liczba_stron, id_autora, id_gatunku, id_jezyka FROM Ksiazka WHERE id = ?"
+
+	row := Db.QueryRow(query, id)
+	if err := row.Scan(&k.Id, &k.Tytul, &k.Rok, &k.Strony, &k.Autor, &k.Gatunek, &k.Jezyk); err != nil {
+		if err == sql.ErrNoRows {
+			return k, fmt.Errorf("Brak książki o id %d", id)
+		}
+
+		return k, fmt.Errorf("Błąd odczytywania (%v)", err)
+	}
+
+	return k, nil
+}
+
+func InsertKsiazka(k Ksiazka) (int64, error) {
+	query := "INSERT INTO ksiazka (tytul, rok_wydania, liczba_stron, id_autora, id_gatunku, id_jezyka) VALUES (?, ?, ?, ?, ?, ?)"
+
+	result, err := Db.Exec(query, k.Tytul, k.Rok, k.Strony, k.Autor, k.Gatunek, k.Jezyk)
 	if err != nil {
-		return 0, fmt.Errorf("InsertKsiazka: %v", err)
+		return 0, fmt.Errorf("Nie udało się dodać rekordu (%v)", err)
 	}
 
 	id, err := result.LastInsertId()
 	if err != nil {
-		return 0, fmt.Errorf("InsertKsiazka: %v", err)
+		return 0, fmt.Errorf("Nie udało się pobrać id (%v)", err)
 	}
 
 	return id, nil
 }
 
-func DelKsiazka(id int64) error {
-	res, err := Db.Exec("DELETE FROM Ksiazka WHERE id = ?", id)
+func UpdateWholeKsiazka(id int64, k Ksiazka) error {
+	query := "UPDATE Ksiazka SET tytul = ?, rok_wydania = ?, liczba_stron = ?, id_autora = ?, id_gatunku = ?, id_jezyka = ? WHERE id = ?"
+
+	res, err := Db.Exec(query, k.Tytul, k.Rok, k.Strony, k.Autor, k.Gatunek, k.Jezyk, id)
 	if err != nil {
-		return fmt.Errorf("DelKsiazka: %v", err)
+		return fmt.Errorf("Nie udało się zaktualizować (%v)", err)
 	}
 
 	rows, err := res.RowsAffected()
 	if err != nil {
-		return fmt.Errorf("DelKsiazka, rows: %v", err)
+		return fmt.Errorf("Zmienione wiersze (%v)", err)
 	}
 
 	if rows == 0 {
-		return fmt.Errorf("DelKsiazka, no ksiazka with id: %v", id)
+		return fmt.Errorf("Nie znaleziono rekordu do aktualizacji lub nie zmieniono rekordu")
+	}
+
+	return nil
+}
+
+func DelKsiazka(id int64) error {
+	query := "DELETE FROM Ksiazka WHERE id = ?"
+
+	res, err := Db.Exec(query, id)
+	if err != nil {
+		return fmt.Errorf("Nie udało się usunąć (%v)", err)
+	}
+
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("Zmienione wiersze (%v)", err)
+	}
+
+	if rows == 0 {
+		return fmt.Errorf("Brak ksiązki o id %v", id)
 	}
 
 	return nil

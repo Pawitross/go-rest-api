@@ -44,12 +44,66 @@ func ConnectToDB() error {
 	return nil
 }
 
-func GetKsiazki(params url.Values) ([]Ksiazka, error) {
-	query := "SELECT id, tytul, rok_wydania, liczba_stron, id_autora, id_gatunku, id_jezyka FROM Ksiazka"
+func assembleFilter(params url.Values, allowedParams map[string]string) (string, []any, error) {
+	filter := ""
 	conditions := []string{}
 	args := []any{}
 
-	if len(params) != 0 {
+	limit, limitted := params["limit"]
+	if limitted {
+		delete(params, "limit")
+	}
+
+	offset, offsetted := params["offset"]
+	if offsetted {
+		delete(params, "offset")
+	}
+
+	if !limitted && offsetted {
+		return "", nil, fmt.Errorf("Nie podano limitu do podanego offsetu.")
+	}
+
+	for k, vsl := range params {
+		dbCol, allowed := allowedParams[k]
+		if !allowed || vsl[0] == "" || len(vsl) == 0 {
+			return "", nil, fmt.Errorf("Wprowadzono nieznany parametr lub jest pusty.")
+		}
+
+		if len(vsl) > 1 {
+			return "", nil, fmt.Errorf("Wprowadzono za dużo parametrów dla jednej kolumny.")
+		}
+
+		conditions = append(conditions, dbCol+" = ?")
+		args = append(args, vsl[0])
+	}
+
+	if len(conditions) > 0 {
+		filter += " WHERE " + strings.Join(conditions, " AND ")
+	}
+
+	if limitted {
+		filter += " LIMIT ?"
+		args = append(args, limit[0])
+	}
+
+	if offsetted {
+		filter += " OFFSET ?"
+		args = append(args, offset[0])
+	}
+
+	//fmt.Println("conditions:", conditions)
+	//fmt.Println("filter:", filter)
+	//fmt.Println("args:", args)
+	//fmt.Println()
+
+	return filter, args, nil
+}
+
+func GetKsiazki(params url.Values) ([]Ksiazka, error) {
+	query := "SELECT id, tytul, rok_wydania, liczba_stron, id_autora, id_gatunku, id_jezyka FROM Ksiazka"
+	args := []any{}
+
+	if len(params) > 0 {
 		allowedParams := map[string]string{
 			"id":       "id",
 			"title":    "tytul",
@@ -60,53 +114,14 @@ func GetKsiazki(params url.Values) ([]Ksiazka, error) {
 			"language": "id_jezyka",
 		}
 
-		limit, limitted := params["limit"]
-		if limitted {
-			delete(params, "limit")
+		filter, argsOut, err := assembleFilter(params, allowedParams)
+		if err != nil {
+			return nil, err
 		}
 
-		offset, offsetted := params["offset"]
-		if offsetted {
-			delete(params, "offset")
-		}
-
-		if !limitted && offsetted {
-			return nil, fmt.Errorf("Nie podano limitu do podanego offsetu.")
-		}
-
-		for k, vsl := range params {
-			dbCol, allowed := allowedParams[k]
-			if !allowed || len(vsl) == 0 {
-				return nil, fmt.Errorf("Wprowadzono nieznany parametr lub jest pusty.")
-			}
-
-			if len(vsl) > 1 {
-				return nil, fmt.Errorf("Wprowadzono za dużo parametrów dla jednej kolumny.")
-			}
-
-			conditions = append(conditions, dbCol+" = ?")
-			args = append(args, vsl[0])
-		}
-
-		if len(conditions) > 0 {
-			query += " WHERE " + strings.Join(conditions, " AND ")
-		}
-
-		if limitted {
-			query += " LIMIT ?"
-			args = append(args, limit[0])
-		}
-
-		if offsetted {
-			query += " OFFSET ?"
-			args = append(args, offset[0])
-		}
+		query += filter
+		args = argsOut
 	}
-
-	//fmt.Println("conditions:", conditions)
-	//fmt.Println("query:", query)
-	//fmt.Println("args:", args)
-	//fmt.Println()
 
 	var ksiazki []Ksiazka
 

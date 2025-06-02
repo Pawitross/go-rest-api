@@ -45,8 +45,6 @@ func ConnectToDB() error {
 }
 
 func GetKsiazki(params url.Values) ([]Ksiazka, error) {
-	var ksiazki []Ksiazka
-
 	query := "SELECT id, tytul, rok_wydania, liczba_stron, id_autora, id_gatunku, id_jezyka FROM Ksiazka"
 	conditions := []string{}
 	args := []any{}
@@ -62,21 +60,47 @@ func GetKsiazki(params url.Values) ([]Ksiazka, error) {
 			"language": "id_jezyka",
 		}
 
-		for k, v := range params {
-			_, allowed := allowedParams[k]
-			if !allowed || len(v) == 0 {
-				return nil, fmt.Errorf("Wprowadzono nieznany parametr.")
+		limit, limitted := params["limit"]
+		if limitted {
+			delete(params, "limit")
+		}
+
+		offset, offsetted := params["offset"]
+		if offsetted {
+			delete(params, "offset")
+		}
+
+		if !limitted && offsetted {
+			return nil, fmt.Errorf("Nie podano limitu do podanego offsetu.")
+		}
+
+		for k, vsl := range params {
+			dbCol, allowed := allowedParams[k]
+			if !allowed || len(vsl) == 0 {
+				return nil, fmt.Errorf("Wprowadzono nieznany parametr lub jest pusty.")
 			}
 
-			if len(v) > 1 {
+			if len(vsl) > 1 {
 				return nil, fmt.Errorf("Wprowadzono za dużo parametrów dla jednej kolumny.")
 			}
 
-			conditions = append(conditions, allowedParams[k]+" = ?")
-			args = append(args, v[0])
+			conditions = append(conditions, dbCol+" = ?")
+			args = append(args, vsl[0])
 		}
 
-		query += " WHERE " + strings.Join(conditions, " AND ")
+		if len(conditions) > 0 {
+			query += " WHERE " + strings.Join(conditions, " AND ")
+		}
+
+		if limitted {
+			query += " LIMIT ?"
+			args = append(args, limit[0])
+		}
+
+		if offsetted {
+			query += " OFFSET ?"
+			args = append(args, offset[0])
+		}
 	}
 
 	//fmt.Println("conditions:", conditions)
@@ -84,11 +108,12 @@ func GetKsiazki(params url.Values) ([]Ksiazka, error) {
 	//fmt.Println("args:", args)
 	//fmt.Println()
 
+	var ksiazki []Ksiazka
+
 	rows, err := Db.Query(query, args...)
 	if err != nil {
 		return nil, fmt.Errorf("Błąd zapytania (%v)", err)
 	}
-
 	defer rows.Close()
 
 	for rows.Next() {

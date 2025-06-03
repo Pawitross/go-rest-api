@@ -10,6 +10,15 @@ import (
 	"pawrest/sqldb"
 )
 
+func empty(b sqldb.Ksiazka) bool {
+	return b.Tytul == "" ||
+		b.Rok == 0 ||
+		b.Strony == 0 ||
+		b.Autor == 0 ||
+		b.Gatunek == 0 ||
+		b.Jezyk == 0
+}
+
 func getBooks(c *gin.Context) {
 	params := c.Request.URL.Query()
 
@@ -43,6 +52,11 @@ func postBook(c *gin.Context) {
 		return
 	}
 
+	if empty(newBook) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Podano pustą właściwość lub niepełny zasób"})
+		return
+	}
+
 	id, err := sqldb.InsertKsiazka(newBook)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -62,6 +76,11 @@ func putBook(c *gin.Context) {
 
 	if err := c.BindJSON(&newBook); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Wystąpił problem z JSON"})
+		return
+	}
+
+	if empty(newBook) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Podano pustą właściwość lub niepełny zasób"})
 		return
 	}
 

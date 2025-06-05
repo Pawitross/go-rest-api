@@ -100,7 +100,7 @@ func assembleFilter(params url.Values, allowedParams map[string]string) (string,
 }
 
 func GetKsiazki(params url.Values) ([]Ksiazka, error) {
-	query := "SELECT id, tytul, rok_wydania, liczba_stron, id_autora, id_gatunku, id_jezyka FROM Ksiazka"
+	query := "SELECT id, tytul, rok_wydania, liczba_stron, id_autora, id_gatunku, id_jezyka FROM ksiazka"
 	args := []any{}
 
 	if len(params) > 0 {
@@ -156,7 +156,7 @@ func ksiazkaExists(id int64) error {
 func GetKsiazka(id int64) (Ksiazka, error) {
 	var k Ksiazka
 
-	query := "SELECT id, tytul, rok_wydania, liczba_stron, id_autora, id_gatunku, id_jezyka FROM Ksiazka WHERE id = ?"
+	query := "SELECT id, tytul, rok_wydania, liczba_stron, id_autora, id_gatunku, id_jezyka FROM ksiazka WHERE id = ?"
 
 	row := Db.QueryRow(query, id)
 	if err := row.Scan(&k.Id, &k.Tytul, &k.Rok, &k.Strony, &k.Autor, &k.Gatunek, &k.Jezyk); err != nil {
@@ -173,12 +173,12 @@ func GetKsiazka(id int64) (Ksiazka, error) {
 func InsertKsiazka(k Ksiazka) (int64, error) {
 	query := "INSERT INTO ksiazka (tytul, rok_wydania, liczba_stron, id_autora, id_gatunku, id_jezyka) VALUES (?, ?, ?, ?, ?, ?)"
 
-	result, err := Db.Exec(query, k.Tytul, k.Rok, k.Strony, k.Autor, k.Gatunek, k.Jezyk)
+	res, err := Db.Exec(query, k.Tytul, k.Rok, k.Strony, k.Autor, k.Gatunek, k.Jezyk)
 	if err != nil {
 		return 0, fmt.Errorf("Nie udało się dodać rekordu (%v)", err)
 	}
 
-	id, err := result.LastInsertId()
+	id, err := res.LastInsertId()
 	if err != nil {
 		return 0, fmt.Errorf("Nie udało się pobrać id (%v)", err)
 	}
@@ -187,7 +187,7 @@ func InsertKsiazka(k Ksiazka) (int64, error) {
 }
 
 func UpdateWholeKsiazka(id int64, k Ksiazka) error {
-	query := "UPDATE Ksiazka SET tytul = ?, rok_wydania = ?, liczba_stron = ?, id_autora = ?, id_gatunku = ?, id_jezyka = ? WHERE id = ?"
+	query := "UPDATE ksiazka SET tytul = ?, rok_wydania = ?, liczba_stron = ?, id_autora = ?, id_gatunku = ?, id_jezyka = ? WHERE id = ?"
 
 	res, err := Db.Exec(query, k.Tytul, k.Rok, k.Strony, k.Autor, k.Gatunek, k.Jezyk, id)
 	if err != nil {
@@ -207,7 +207,7 @@ func UpdateWholeKsiazka(id int64, k Ksiazka) error {
 }
 
 func DelKsiazka(id int64) error {
-	query := "DELETE FROM Ksiazka WHERE id = ?"
+	query := "DELETE FROM ksiazka WHERE id = ?"
 
 	res, err := Db.Exec(query, id)
 	if err != nil {

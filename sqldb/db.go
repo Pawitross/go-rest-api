@@ -48,6 +48,14 @@ func assembleFilter(params url.Values, allowedParams map[string]string) (string,
 	filter := ""
 	conditions := []string{}
 	args := []any{}
+	operators := map[string]string{
+		".eq":  "=",
+		".gt":  ">",
+		".lt":  "<",
+		".gte": ">=",
+		".lte": "<=",
+		".neq": "<>",
+	}
 
 	limit, limitted := params["limit"]
 	if limitted {
@@ -64,6 +72,16 @@ func assembleFilter(params url.Values, allowedParams map[string]string) (string,
 	}
 
 	for k, vsl := range params {
+		op := "="
+
+		for kop, vop := range operators {
+			if before, queryop := strings.CutSuffix(k, kop); queryop {
+				k = before
+				op = vop
+				break
+			}
+		}
+
 		dbCol, allowed := allowedParams[k]
 		if !allowed || vsl[0] == "" || len(vsl) == 0 {
 			return "", nil, fmt.Errorf("Wprowadzono nieznany parametr lub jest pusty.")
@@ -73,7 +91,7 @@ func assembleFilter(params url.Values, allowedParams map[string]string) (string,
 			return "", nil, fmt.Errorf("Wprowadzono za dużo parametrów dla jednej kolumny.")
 		}
 
-		conditions = append(conditions, dbCol+" = ?")
+		conditions = append(conditions, dbCol+" "+op+" ?")
 		args = append(args, vsl[0])
 	}
 

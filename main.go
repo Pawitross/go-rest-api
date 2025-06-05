@@ -33,7 +33,11 @@ func getBooks(c *gin.Context) {
 
 func getBook(c *gin.Context) {
 	idStr := c.Param("id")
-	id, _ := strconv.Atoi(idStr)
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Podano nieodpowiedni identyfikator"})
+		return
+	}
 
 	book, err := sqldb.GetKsiazka(int64(id))
 	if err != nil {
@@ -73,7 +77,11 @@ func postBook(c *gin.Context) {
 
 func putBook(c *gin.Context) {
 	idStr := c.Param("id")
-	id, _ := strconv.Atoi(idStr)
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Podano nieodpowiedni identyfikator"})
+		return
+	}
 
 	var newBook sqldb.Ksiazka
 
@@ -97,7 +105,11 @@ func putBook(c *gin.Context) {
 
 func deleteBook(c *gin.Context) {
 	idStr := c.Param("id")
-	id, _ := strconv.Atoi(idStr)
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Podano nieodpowiedni identyfikator"})
+		return
+	}
 
 	if err := sqldb.DelKsiazka(int64(id)); err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})

@@ -7,10 +7,11 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"pawrest/sqldb"
+	"pawrest/internal/db"
+	m "pawrest/internal/models"
 )
 
-func validateBook(b sqldb.Ksiazka) bool {
+func validateBook(b m.Ksiazka) bool {
 	return b.Tytul == "" ||
 		b.Rok == 0 ||
 		b.Strony <= 0 ||
@@ -22,7 +23,7 @@ func validateBook(b sqldb.Ksiazka) bool {
 func getBooks(c *gin.Context) {
 	params := c.Request.URL.Query()
 
-	books, err := sqldb.GetKsiazki(params)
+	books, err := db.GetKsiazki(params)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
@@ -39,7 +40,7 @@ func getBook(c *gin.Context) {
 		return
 	}
 
-	book, err := sqldb.GetKsiazka(int64(id))
+	book, err := db.GetKsiazka(int64(id))
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
@@ -49,7 +50,7 @@ func getBook(c *gin.Context) {
 }
 
 func postBook(c *gin.Context) {
-	var newBook sqldb.Ksiazka
+	var newBook m.Ksiazka
 
 	if err := c.BindJSON(&newBook); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Wystąpił problem z JSON"})
@@ -61,7 +62,7 @@ func postBook(c *gin.Context) {
 		return
 	}
 
-	id, err := sqldb.InsertKsiazka(newBook)
+	id, err := db.InsertKsiazka(newBook)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -83,7 +84,7 @@ func putBook(c *gin.Context) {
 		return
 	}
 
-	var newBook sqldb.Ksiazka
+	var newBook m.Ksiazka
 
 	if err := c.BindJSON(&newBook); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Wystąpił problem z JSON"})
@@ -95,7 +96,7 @@ func putBook(c *gin.Context) {
 		return
 	}
 
-	if err := sqldb.UpdateWholeKsiazka(int64(id), newBook); err != nil {
+	if err := db.UpdateWholeKsiazka(int64(id), newBook); err != nil {
 		c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
 		return
 	}
@@ -111,7 +112,7 @@ func deleteBook(c *gin.Context) {
 		return
 	}
 
-	if err := sqldb.DelKsiazka(int64(id)); err != nil {
+	if err := db.DelKsiazka(int64(id)); err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
@@ -121,10 +122,10 @@ func deleteBook(c *gin.Context) {
 
 func main() {
 	fmt.Println("Łączenie z bazą danych...")
-	if err := sqldb.ConnectToDB(); err != nil {
+	if err := db.ConnectToDB(); err != nil {
 		log.Fatal(err)
 	}
-	defer sqldb.Db.Close()
+	defer db.Db.Close()
 
 	fmt.Println("Uruchamianie serwera...")
 	//gin.SetMode(gin.ReleaseMode)

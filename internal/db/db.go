@@ -1,4 +1,4 @@
-package sqldb
+package db
 
 import (
 	"database/sql"
@@ -7,19 +7,10 @@ import (
 	"strings"
 
 	"github.com/go-sql-driver/mysql"
+	m "pawrest/internal/models"
 )
 
 var Db *sql.DB
-
-type Ksiazka struct {
-	Id      int64  `json:"id"`
-	Tytul   string `json:"title"`
-	Rok     int64  `json:"year"`
-	Strony  int64  `json:"pages"`
-	Autor   int64  `json:"author"`
-	Gatunek int64  `json:"genre"`
-	Jezyk   int64  `json:"language"`
-}
 
 func ConnectToDB() error {
 	cfg := mysql.NewConfig()
@@ -117,7 +108,7 @@ func assembleFilter(params url.Values, allowedParams map[string]string) (string,
 	return filter, args, nil
 }
 
-func GetKsiazki(params url.Values) ([]Ksiazka, error) {
+func GetKsiazki(params url.Values) ([]m.Ksiazka, error) {
 	query := "SELECT id, tytul, rok_wydania, liczba_stron, id_autora, id_gatunku, id_jezyka FROM ksiazka"
 	args := []any{}
 
@@ -141,7 +132,7 @@ func GetKsiazki(params url.Values) ([]Ksiazka, error) {
 		args = argsOut
 	}
 
-	var ksiazki []Ksiazka
+	var ksiazki []m.Ksiazka
 
 	rows, err := Db.Query(query, args...)
 	if err != nil {
@@ -150,7 +141,7 @@ func GetKsiazki(params url.Values) ([]Ksiazka, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		var k Ksiazka
+		var k m.Ksiazka
 
 		if err := rows.Scan(&k.Id, &k.Tytul, &k.Rok, &k.Strony, &k.Autor, &k.Gatunek, &k.Jezyk); err != nil {
 			return nil, fmt.Errorf("Błąd odczytywania (%v)", err)
@@ -171,8 +162,8 @@ func ksiazkaExists(id int64) error {
 	return fmt.Errorf("TODO")
 }
 
-func GetKsiazka(id int64) (Ksiazka, error) {
-	var k Ksiazka
+func GetKsiazka(id int64) (m.Ksiazka, error) {
+	var k m.Ksiazka
 
 	query := "SELECT id, tytul, rok_wydania, liczba_stron, id_autora, id_gatunku, id_jezyka FROM ksiazka WHERE id = ?"
 
@@ -188,7 +179,7 @@ func GetKsiazka(id int64) (Ksiazka, error) {
 	return k, nil
 }
 
-func InsertKsiazka(k Ksiazka) (int64, error) {
+func InsertKsiazka(k m.Ksiazka) (int64, error) {
 	query := "INSERT INTO ksiazka (tytul, rok_wydania, liczba_stron, id_autora, id_gatunku, id_jezyka) VALUES (?, ?, ?, ?, ?, ?)"
 
 	res, err := Db.Exec(query, k.Tytul, k.Rok, k.Strony, k.Autor, k.Gatunek, k.Jezyk)
@@ -204,7 +195,7 @@ func InsertKsiazka(k Ksiazka) (int64, error) {
 	return id, nil
 }
 
-func UpdateWholeKsiazka(id int64, k Ksiazka) error {
+func UpdateWholeKsiazka(id int64, k m.Ksiazka) error {
 	query := "UPDATE ksiazka SET tytul = ?, rok_wydania = ?, liczba_stron = ?, id_autora = ?, id_gatunku = ?, id_jezyka = ? WHERE id = ?"
 
 	res, err := Db.Exec(query, k.Tytul, k.Rok, k.Strony, k.Autor, k.Gatunek, k.Jezyk, id)

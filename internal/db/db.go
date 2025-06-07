@@ -31,8 +31,14 @@ func ConnectToDB() error {
 		return pingErr
 	}
 
-	fmt.Printf("Połączono z bazą danych %q on %q\n", cfg.DBName, cfg.Addr)
+	//fmt.Printf("Połączono z bazą danych %q pod adresem %q\n", cfg.DBName, cfg.Addr)
 	return nil
+}
+
+func CloseDB() {
+	if Db != nil {
+		Db.Close()
+	}
 }
 
 func assembleFilter(params url.Values, allowedParams map[string]string) (string, []any, error) {

@@ -15,7 +15,7 @@ func main() {
 	if err := db.ConnectToDB(); err != nil {
 		log.Fatal(err)
 	}
-	defer db.Db.Close()
+	defer db.CloseDB()
 
 	if err := middleware.InitLogger(); err != nil {
 		log.Fatalf("Nie udało się zainicjalizować logowania żądań: %v\n", err)

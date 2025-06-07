@@ -43,7 +43,6 @@ func CloseDB() {
 }
 
 func assembleFilter(params url.Values, allowedParams map[string]string) (string, []any, error) {
-	filter := ""
 	conditions := []string{}
 	args := []any{}
 	operators := map[string]string{
@@ -55,62 +54,60 @@ func assembleFilter(params url.Values, allowedParams map[string]string) (string,
 		".neq": "<>",
 	}
 
-	limit, limitted := params["limit"]
-	if limitted {
-		delete(params, "limit")
-	}
+	limit, hasLimit := params["limit"]
+	offset, hasOffset := params["offset"]
 
-	offset, offsetted := params["offset"]
-	if offsetted {
-		delete(params, "offset")
-	}
-
-	if !limitted && offsetted {
+	if !hasLimit && hasOffset {
 		return "", nil, fmt.Errorf("Nie podano limitu do podanego offsetu.")
 	}
 
-	for k, vsl := range params {
-		op := "="
+	for key, valSlice := range params {
+		if key == "limit" || key == "offset" {
+			continue
+		}
 
-		for kop, vop := range operators {
-			if before, queryop := strings.CutSuffix(k, kop); queryop {
-				k = before
-				op = vop
+		operator := "="
+
+		for suffix, sqlOp := range operators {
+			if before, found := strings.CutSuffix(key, suffix); found {
+				key = before
+				operator = sqlOp
 				break
 			}
 		}
 
-		dbCol, allowed := allowedParams[k]
-		if !allowed || vsl[0] == "" || len(vsl) == 0 {
-			return "", nil, fmt.Errorf("Wprowadzono nieznany parametr lub jest pusty.")
+		columnName, allowed := allowedParams[key]
+		if !allowed {
+			return "", nil, fmt.Errorf("Wprowadzono nieznany parametr.")
 		}
 
-		if len(vsl) > 1 {
+		if len(valSlice) == 0 || valSlice[0] == "" {
+			return "", nil, fmt.Errorf("Wprowadzony parametr jest pusty.")
+		}
+
+		if len(valSlice) > 1 {
 			return "", nil, fmt.Errorf("Wprowadzono za dużo parametrów dla jednej kolumny.")
 		}
 
-		conditions = append(conditions, dbCol+" "+op+" ?")
-		args = append(args, vsl[0])
+		conditions = append(conditions, columnName+" "+operator+" ?")
+		args = append(args, valSlice[0])
 	}
+
+	filter := ""
 
 	if len(conditions) > 0 {
 		filter += " WHERE " + strings.Join(conditions, " AND ")
 	}
 
-	if limitted {
+	if hasLimit {
 		filter += " LIMIT ?"
 		args = append(args, limit[0])
 	}
 
-	if offsetted {
+	if hasOffset {
 		filter += " OFFSET ?"
 		args = append(args, offset[0])
 	}
-
-	//fmt.Println("conditions:", conditions)
-	//fmt.Println("filter:", filter)
-	//fmt.Println("args:", args)
-	//fmt.Println()
 
 	return filter, args, nil
 }

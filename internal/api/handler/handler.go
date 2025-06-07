@@ -102,6 +102,29 @@ func PutBook(c *gin.Context) {
 	c.Status(http.StatusNoContent)
 }
 
+func PatchBook(c *gin.Context) {
+	idStr := c.Param("id")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Podano nieodpowiedni identyfikator"})
+		return
+	}
+
+	var patchBook m.Ksiazka
+
+	if err := c.BindJSON(&patchBook); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Wystąpił problem z JSON"})
+		return
+	}
+
+	if err := db.UpdateKsiazka(int64(id), patchBook); err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.Status(http.StatusNoContent)
+}
+
 func DeleteBook(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)

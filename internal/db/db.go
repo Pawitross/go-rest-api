@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"net/url"
+	"reflect"
 	"strings"
 
 	"github.com/go-sql-driver/mysql"
@@ -205,6 +206,61 @@ func UpdateWholeKsiazka(id int64, k m.Ksiazka) error {
 	query := "UPDATE ksiazka SET tytul = ?, rok_wydania = ?, liczba_stron = ?, id_autora = ?, id_gatunku = ?, id_jezyka = ? WHERE id = ?"
 
 	res, err := Db.Exec(query, k.Tytul, k.Rok, k.Strony, k.Autor, k.Gatunek, k.Jezyk, id)
+	if err != nil {
+		return fmt.Errorf("Nie udało się zaktualizować (%v)", err)
+	}
+
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("Zmienione wiersze (%v)", err)
+	}
+
+	if rows == 0 {
+		return fmt.Errorf("Nie znaleziono rekordu do aktualizacji lub nie zmieniono rekordu")
+	}
+
+	return nil
+}
+
+func UpdateKsiazka(id int64, k m.Ksiazka) error {
+	fieldToDb := map[string]string{
+		"Tytul":   "tytul",
+		"Rok":     "rok_wydania",
+		"Strony":  "liczba_stron",
+		"Autor":   "id_autora",
+		"Gatunek": "id_gatunku",
+		"Jezyk":   "id_jezyka",
+	}
+
+	updates := []string{}
+	args := []any{}
+
+	valOfK := reflect.ValueOf(k)
+
+	fields := reflect.VisibleFields(reflect.TypeOf(k))
+	for i, field := range fields {
+		fValue := valOfK.Field(i)
+		if fValue.IsZero() {
+			continue
+		}
+
+		columnName, ok := fieldToDb[field.Name]
+		if !ok {
+			continue
+		}
+
+		updates = append(updates, columnName+" = ?")
+		args = append(args, fValue.Interface())
+	}
+
+	if len(updates) == 0 {
+		return fmt.Errorf("Brak kolumn do zaktualizowania")
+	}
+
+	query := "UPDATE ksiazka SET " + strings.Join(updates, ", ") + " WHERE id = ?"
+	args = append(args, id)
+
+	res, err := Db.Exec(query, args...)
 	if err != nil {
 		return fmt.Errorf("Nie udało się zaktualizować (%v)", err)
 	}

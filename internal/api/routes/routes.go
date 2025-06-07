@@ -17,6 +17,8 @@ func Router(router *gin.Engine) {
 
 			v1.PUT("books/:id", handler.PutBook)
 
+			v1.PATCH("books/:id", handler.PatchBook)
+
 			v1.DELETE("books/:id", handler.DeleteBook)
 		}
 	}

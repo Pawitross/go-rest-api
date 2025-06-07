@@ -5,9 +5,7 @@ import (
 	"pawrest/internal/api/handler"
 )
 
-func Router() *gin.Engine {
-	router := gin.Default()
-
+func Router(router *gin.Engine) {
 	api := router.Group("/api")
 	{
 		v1 := api.Group("/v1")
@@ -22,6 +20,4 @@ func Router() *gin.Engine {
 			v1.DELETE("books/:id", handler.DeleteBook)
 		}
 	}
-
-	return router
 }

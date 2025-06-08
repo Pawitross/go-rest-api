@@ -9,3 +9,12 @@ type Ksiazka struct {
 	Gatunek int64  `json:"genre"`
 	Jezyk   int64  `json:"language"`
 }
+
+func (b *Ksiazka) ValidateBook() bool {
+	return b.Tytul == "" ||
+		b.Rok == 0 ||
+		b.Strony <= 0 ||
+		b.Autor <= 0 ||
+		b.Gatunek <= 0 ||
+		b.Jezyk <= 0
+}

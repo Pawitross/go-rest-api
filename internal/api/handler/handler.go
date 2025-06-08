@@ -9,15 +9,6 @@ import (
 	m "pawrest/internal/models"
 )
 
-func validateBook(b m.Ksiazka) bool {
-	return b.Tytul == "" ||
-		b.Rok == 0 ||
-		b.Strony <= 0 ||
-		b.Autor <= 0 ||
-		b.Gatunek <= 0 ||
-		b.Jezyk <= 0
-}
-
 func GetBooks(c *gin.Context) {
 	params := c.Request.URL.Query()
 
@@ -55,7 +46,7 @@ func PostBook(c *gin.Context) {
 		return
 	}
 
-	if validateBook(newBook) {
+	if newBook.ValidateBook() {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Podano puste lub nieprawidłowe pola"})
 		return
 	}
@@ -89,7 +80,7 @@ func PutBook(c *gin.Context) {
 		return
 	}
 
-	if validateBook(newBook) {
+	if newBook.ValidateBook() {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Podano puste lub nieprawidłowe pola"})
 		return
 	}

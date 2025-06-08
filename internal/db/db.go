@@ -11,7 +11,7 @@ import (
 	m "pawrest/internal/models"
 )
 
-var Db *sql.DB
+var db *sql.DB
 
 func ConnectToDB() error {
 	cfg := mysql.NewConfig()
@@ -23,12 +23,12 @@ func ConnectToDB() error {
 	cfg.DBName = "paw"
 
 	var err error
-	Db, err = sql.Open("mysql", cfg.FormatDSN())
+	db, err = sql.Open("mysql", cfg.FormatDSN())
 	if err != nil {
 		return err
 	}
 
-	if pingErr := Db.Ping(); pingErr != nil {
+	if pingErr := db.Ping(); pingErr != nil {
 		return pingErr
 	}
 
@@ -37,8 +37,8 @@ func ConnectToDB() error {
 }
 
 func CloseDB() {
-	if Db != nil {
-		Db.Close()
+	if db != nil {
+		db.Close()
 	}
 }
 
@@ -138,7 +138,7 @@ func GetKsiazki(params url.Values) ([]m.Ksiazka, error) {
 
 	var ksiazki []m.Ksiazka
 
-	rows, err := Db.Query(query, args...)
+	rows, err := db.Query(query, args...)
 	if err != nil {
 		return nil, fmt.Errorf("Błąd zapytania (%v)", err)
 	}
@@ -171,7 +171,7 @@ func GetKsiazka(id int64) (m.Ksiazka, error) {
 
 	query := "SELECT id, tytul, rok_wydania, liczba_stron, id_autora, id_gatunku, id_jezyka FROM ksiazka WHERE id = ?"
 
-	row := Db.QueryRow(query, id)
+	row := db.QueryRow(query, id)
 	if err := row.Scan(&k.Id, &k.Tytul, &k.Rok, &k.Strony, &k.Autor, &k.Gatunek, &k.Jezyk); err != nil {
 		if err == sql.ErrNoRows {
 			return k, fmt.Errorf("Brak książki o id %d", id)
@@ -186,7 +186,7 @@ func GetKsiazka(id int64) (m.Ksiazka, error) {
 func InsertKsiazka(k m.Ksiazka) (int64, error) {
 	query := "INSERT INTO ksiazka (tytul, rok_wydania, liczba_stron, id_autora, id_gatunku, id_jezyka) VALUES (?, ?, ?, ?, ?, ?)"
 
-	res, err := Db.Exec(query, k.Tytul, k.Rok, k.Strony, k.Autor, k.Gatunek, k.Jezyk)
+	res, err := db.Exec(query, k.Tytul, k.Rok, k.Strony, k.Autor, k.Gatunek, k.Jezyk)
 	if err != nil {
 		return 0, fmt.Errorf("Nie udało się dodać rekordu (%v)", err)
 	}
@@ -202,7 +202,7 @@ func InsertKsiazka(k m.Ksiazka) (int64, error) {
 func UpdateWholeKsiazka(id int64, k m.Ksiazka) error {
 	query := "UPDATE ksiazka SET tytul = ?, rok_wydania = ?, liczba_stron = ?, id_autora = ?, id_gatunku = ?, id_jezyka = ? WHERE id = ?"
 
-	res, err := Db.Exec(query, k.Tytul, k.Rok, k.Strony, k.Autor, k.Gatunek, k.Jezyk, id)
+	res, err := db.Exec(query, k.Tytul, k.Rok, k.Strony, k.Autor, k.Gatunek, k.Jezyk, id)
 	if err != nil {
 		return fmt.Errorf("Nie udało się zaktualizować (%v)", err)
 	}
@@ -257,7 +257,7 @@ func UpdateKsiazka(id int64, k m.Ksiazka) error {
 	query := "UPDATE ksiazka SET " + strings.Join(updates, ", ") + " WHERE id = ?"
 	args = append(args, id)
 
-	res, err := Db.Exec(query, args...)
+	res, err := db.Exec(query, args...)
 	if err != nil {
 		return fmt.Errorf("Nie udało się zaktualizować (%v)", err)
 	}
@@ -277,7 +277,7 @@ func UpdateKsiazka(id int64, k m.Ksiazka) error {
 func DelKsiazka(id int64) error {
 	query := "DELETE FROM ksiazka WHERE id = ?"
 
-	res, err := Db.Exec(query, id)
+	res, err := db.Exec(query, id)
 	if err != nil {
 		return fmt.Errorf("Nie udało się usunąć (%v)", err)
 	}

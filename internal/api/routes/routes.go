@@ -3,6 +3,7 @@ package routes
 import (
 	"github.com/gin-gonic/gin"
 	"pawrest/internal/api/handler"
+	mware "pawrest/internal/api/middleware"
 )
 
 func Router(router *gin.Engine) {
@@ -22,6 +23,10 @@ func Router(router *gin.Engine) {
 			v1.DELETE("books/:id", handler.DeleteBook)
 
 			v1.GET("login", handler.ReturnToken)
+
+			v1.GET("auth", mware.Authenticate(), mware.Authorize(), func(c *gin.Context) {
+				c.JSON(200, gin.H{"message": "Witamy"})
+			})
 		}
 	}
 }

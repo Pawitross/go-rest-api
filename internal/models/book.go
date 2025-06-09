@@ -1,6 +1,6 @@
 package models
 
-type Ksiazka struct {
+type Book struct {
 	Id      int64  `json:"id"`
 	Tytul   string `json:"title"`
 	Rok     int64  `json:"year"`
@@ -10,7 +10,7 @@ type Ksiazka struct {
 	Jezyk   int64  `json:"language"`
 }
 
-func (b *Ksiazka) ValidateBook() bool {
+func (b *Book) ValidateBook() bool {
 	return b.Tytul == "" ||
 		b.Rok == 0 ||
 		b.Strony <= 0 ||

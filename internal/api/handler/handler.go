@@ -12,7 +12,7 @@ import (
 func GetBooks(c *gin.Context) {
 	params := c.Request.URL.Query()
 
-	books, err := db.GetKsiazki(params)
+	books, err := db.GetBooks(params)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
@@ -29,7 +29,7 @@ func GetBook(c *gin.Context) {
 		return
 	}
 
-	book, err := db.GetKsiazka(int64(id))
+	book, err := db.GetBook(int64(id))
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
@@ -39,7 +39,7 @@ func GetBook(c *gin.Context) {
 }
 
 func PostBook(c *gin.Context) {
-	var newBook m.Ksiazka
+	var newBook m.Book
 
 	if err := c.BindJSON(&newBook); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Wystąpił problem z JSON"})
@@ -51,7 +51,7 @@ func PostBook(c *gin.Context) {
 		return
 	}
 
-	id, err := db.InsertKsiazka(newBook)
+	id, err := db.InsertBook(newBook)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -73,7 +73,7 @@ func PutBook(c *gin.Context) {
 		return
 	}
 
-	var newBook m.Ksiazka
+	var newBook m.Book
 
 	if err := c.BindJSON(&newBook); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Wystąpił problem z JSON"})
@@ -85,7 +85,7 @@ func PutBook(c *gin.Context) {
 		return
 	}
 
-	if err := db.UpdateWholeKsiazka(int64(id), newBook); err != nil {
+	if err := db.UpdateWholeBook(int64(id), newBook); err != nil {
 		c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
 		return
 	}
@@ -101,14 +101,14 @@ func PatchBook(c *gin.Context) {
 		return
 	}
 
-	var patchBook m.Ksiazka
+	var patchBook m.Book
 
 	if err := c.BindJSON(&patchBook); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Wystąpił problem z JSON"})
 		return
 	}
 
-	if err := db.UpdateKsiazka(int64(id), patchBook); err != nil {
+	if err := db.UpdateBook(int64(id), patchBook); err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
@@ -124,7 +124,7 @@ func DeleteBook(c *gin.Context) {
 		return
 	}
 
-	if err := db.DelKsiazka(int64(id)); err != nil {
+	if err := db.DelBook(int64(id)); err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}

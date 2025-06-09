@@ -112,7 +112,7 @@ func assembleFilter(params url.Values, allowedParams map[string]string) (string,
 	return filter, args, nil
 }
 
-func GetKsiazki(params url.Values) ([]m.Ksiazka, error) {
+func GetBooks(params url.Values) ([]m.Book, error) {
 	query := "SELECT id, tytul, rok_wydania, liczba_stron, id_autora, id_gatunku, id_jezyka FROM ksiazka"
 	args := []any{}
 
@@ -136,7 +136,7 @@ func GetKsiazki(params url.Values) ([]m.Ksiazka, error) {
 		args = argsOut
 	}
 
-	var ksiazki []m.Ksiazka
+	var books []m.Book
 
 	rows, err := db.Query(query, args...)
 	if err != nil {
@@ -145,48 +145,48 @@ func GetKsiazki(params url.Values) ([]m.Ksiazka, error) {
 	defer rows.Close()
 
 	for rows.Next() {
-		var k m.Ksiazka
+		var b m.Book
 
-		if err := rows.Scan(&k.Id, &k.Tytul, &k.Rok, &k.Strony, &k.Autor, &k.Gatunek, &k.Jezyk); err != nil {
+		if err := rows.Scan(&b.Id, &b.Tytul, &b.Rok, &b.Strony, &b.Autor, &b.Gatunek, &b.Jezyk); err != nil {
 			return nil, fmt.Errorf("Błąd odczytywania (%v)", err)
 		}
 
-		ksiazki = append(ksiazki, k)
+		books = append(books, b)
 	}
 
 	if err := rows.Err(); err != nil {
 		return nil, fmt.Errorf("Błąd (%v)", err)
 	}
 
-	return ksiazki, nil
+	return books, nil
 }
 
-func ksiazkaExists(id int64) error {
+func bookExists(id int64) error {
 	// TODO
 	return fmt.Errorf("TODO")
 }
 
-func GetKsiazka(id int64) (m.Ksiazka, error) {
-	var k m.Ksiazka
+func GetBook(id int64) (m.Book, error) {
+	var b m.Book
 
 	query := "SELECT id, tytul, rok_wydania, liczba_stron, id_autora, id_gatunku, id_jezyka FROM ksiazka WHERE id = ?"
 
 	row := db.QueryRow(query, id)
-	if err := row.Scan(&k.Id, &k.Tytul, &k.Rok, &k.Strony, &k.Autor, &k.Gatunek, &k.Jezyk); err != nil {
+	if err := row.Scan(&b.Id, &b.Tytul, &b.Rok, &b.Strony, &b.Autor, &b.Gatunek, &b.Jezyk); err != nil {
 		if err == sql.ErrNoRows {
-			return k, fmt.Errorf("Brak książki o id %d", id)
+			return b, fmt.Errorf("Brak książki o id %d", id)
 		}
 
-		return k, fmt.Errorf("Błąd odczytywania (%v)", err)
+		return b, fmt.Errorf("Błąd odczytywania (%v)", err)
 	}
 
-	return k, nil
+	return b, nil
 }
 
-func InsertKsiazka(k m.Ksiazka) (int64, error) {
+func InsertBook(b m.Book) (int64, error) {
 	query := "INSERT INTO ksiazka (tytul, rok_wydania, liczba_stron, id_autora, id_gatunku, id_jezyka) VALUES (?, ?, ?, ?, ?, ?)"
 
-	res, err := db.Exec(query, k.Tytul, k.Rok, k.Strony, k.Autor, k.Gatunek, k.Jezyk)
+	res, err := db.Exec(query, b.Tytul, b.Rok, b.Strony, b.Autor, b.Gatunek, b.Jezyk)
 	if err != nil {
 		return 0, fmt.Errorf("Nie udało się dodać rekordu (%v)", err)
 	}
@@ -199,10 +199,10 @@ func InsertKsiazka(k m.Ksiazka) (int64, error) {
 	return id, nil
 }
 
-func UpdateWholeKsiazka(id int64, k m.Ksiazka) error {
+func UpdateWholeBook(id int64, b m.Book) error {
 	query := "UPDATE ksiazka SET tytul = ?, rok_wydania = ?, liczba_stron = ?, id_autora = ?, id_gatunku = ?, id_jezyka = ? WHERE id = ?"
 
-	res, err := db.Exec(query, k.Tytul, k.Rok, k.Strony, k.Autor, k.Gatunek, k.Jezyk, id)
+	res, err := db.Exec(query, b.Tytul, b.Rok, b.Strony, b.Autor, b.Gatunek, b.Jezyk, id)
 	if err != nil {
 		return fmt.Errorf("Nie udało się zaktualizować (%v)", err)
 	}
@@ -219,7 +219,7 @@ func UpdateWholeKsiazka(id int64, k m.Ksiazka) error {
 	return nil
 }
 
-func UpdateKsiazka(id int64, k m.Ksiazka) error {
+func UpdateBook(id int64, b m.Book) error {
 	fieldToDb := map[string]string{
 		"Tytul":   "tytul",
 		"Rok":     "rok_wydania",
@@ -232,9 +232,9 @@ func UpdateKsiazka(id int64, k m.Ksiazka) error {
 	updates := []string{}
 	args := []any{}
 
-	valOfK := reflect.ValueOf(k)
+	valOfK := reflect.ValueOf(b)
 
-	fields := reflect.VisibleFields(reflect.TypeOf(k))
+	fields := reflect.VisibleFields(reflect.TypeOf(b))
 	for i, field := range fields {
 		fValue := valOfK.Field(i)
 		if fValue.IsZero() {
@@ -274,7 +274,7 @@ func UpdateKsiazka(id int64, k m.Ksiazka) error {
 	return nil
 }
 
-func DelKsiazka(id int64) error {
+func DelBook(id int64) error {
 	query := "DELETE FROM ksiazka WHERE id = ?"
 
 	res, err := db.Exec(query, id)

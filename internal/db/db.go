@@ -43,8 +43,11 @@ func CloseDB() {
 }
 
 func assembleFilter(params url.Values, allowedParams map[string]string) (string, []any, error) {
-	conditions := []string{}
-	args := []any{}
+	var (
+		conditions []string
+		args       []any
+	)
+
 	operators := map[string]string{
 		".eq":  "=",
 		".gt":  ">",
@@ -114,7 +117,7 @@ func assembleFilter(params url.Values, allowedParams map[string]string) (string,
 
 func GetBooks(params url.Values) ([]m.Book, error) {
 	query := "SELECT id, tytul, rok_wydania, liczba_stron, id_autora, id_gatunku, id_jezyka FROM ksiazka"
-	args := []any{}
+	var args []any
 
 	if len(params) > 0 {
 		allowedParams := map[string]string{
@@ -229,19 +232,21 @@ func UpdateBook(id int64, b m.Book) error {
 		"Jezyk":   "id_jezyka",
 	}
 
-	updates := []string{}
-	args := []any{}
+	var (
+		updates []string
+		args    []any
+	)
 
-	valOfK := reflect.ValueOf(b)
+	valOfB := reflect.ValueOf(b)
 
 	fields := reflect.VisibleFields(reflect.TypeOf(b))
-	for i, field := range fields {
-		fValue := valOfK.Field(i)
+	for i, f := range fields {
+		fValue := valOfB.Field(i)
 		if fValue.IsZero() {
 			continue
 		}
 
-		columnName, ok := fieldToDb[field.Name]
+		columnName, ok := fieldToDb[f.Name]
 		if !ok {
 			continue
 		}

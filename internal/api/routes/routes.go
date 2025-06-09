@@ -20,6 +20,8 @@ func Router(router *gin.Engine) {
 			v1.PATCH("books/:id", handler.PatchBook)
 
 			v1.DELETE("books/:id", handler.DeleteBook)
+
+			v1.GET("login", handler.ReturnToken)
 		}
 	}
 }

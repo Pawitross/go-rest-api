@@ -41,20 +41,13 @@ func bookExists(id int64) error {
 }
 
 func GetBook(id int64) (m.Book, error) {
-	var b m.Book
-
 	query := "SELECT id, tytul, rok_wydania, liczba_stron, id_autora, id_gatunku, id_jezyka FROM ksiazka WHERE id = ?"
 
-	row := db.QueryRow(query, id)
-	if err := row.Scan(&b.Id, &b.Tytul, &b.Rok, &b.Strony, &b.Autor, &b.Gatunek, &b.Jezyk); err != nil {
-		if err == sql.ErrNoRows {
-			return b, fmt.Errorf("Brak książki o id %d", id)
-		}
-
-		return b, fmt.Errorf("Błąd odczytywania (%v)", err)
+	bookFunc := func(b *m.Book, row *sql.Row) error {
+		return row.Scan(&b.Id, &b.Tytul, &b.Rok, &b.Strony, &b.Autor, &b.Gatunek, &b.Jezyk)
 	}
 
-	return b, nil
+	return queryId[m.Book](query, id, bookFunc)
 }
 
 func InsertBook(b m.Book) (int64, error) {

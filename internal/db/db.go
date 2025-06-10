@@ -155,3 +155,22 @@ func queryWithParams[T any](
 
 	return data, nil
 }
+
+func queryId[T any](
+	query string,
+	id int64,
+	scanFunc func(*T, *sql.Row) error,
+) (T, error) {
+	var d T
+
+	row := db.QueryRow(query, id)
+	if err := scanFunc(&d, row); err != nil {
+		if err == sql.ErrNoRows {
+			return d, fmt.Errorf("Brak zasobu o id %d", id)
+		}
+
+		return d, fmt.Errorf("Błąd odczytywania (%v)", err)
+	}
+
+	return d, nil
+}

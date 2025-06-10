@@ -112,3 +112,46 @@ func assembleFilter(params url.Values, allowedParams map[string]string) (string,
 
 	return filter, args, nil
 }
+
+func queryWithParams[T any](
+	query string,
+	params url.Values,
+	allowPar map[string]string,
+	scanFunc func(*T, *sql.Rows) error,
+) ([]T, error) {
+	var args []any
+
+	if len(params) > 0 {
+		filter, argsOut, err := assembleFilter(params, allowPar)
+		if err != nil {
+			return nil, err
+		}
+
+		query += filter
+		args = argsOut
+	}
+
+	var data []T
+
+	rows, err := db.Query(query, args...)
+	if err != nil {
+		return nil, fmt.Errorf("Błąd zapytania (%v)", err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var d T
+
+		if err := scanFunc(&d, rows); err != nil {
+			return nil, fmt.Errorf("Błąd odczytywania (%v)", err)
+		}
+
+		data = append(data, d)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("Błąd (%v)", err)
+	}
+
+	return data, nil
+}

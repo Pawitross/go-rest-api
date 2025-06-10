@@ -12,51 +12,27 @@ import (
 
 func GetBooks(params url.Values) ([]m.Book, error) {
 	query := "SELECT id, tytul, rok_wydania, liczba_stron, id_autora, id_gatunku, id_jezyka FROM ksiazka"
-	var args []any
 
-	if len(params) > 0 {
-		allowedParams := map[string]string{
-			"id":       "id",
-			"title":    "tytul",
-			"year":     "rok_wydania",
-			"pages":    "liczba_stron",
-			"author":   "id_autora",
-			"genre":    "id_gatunku",
-			"language": "id_jezyka",
-		}
-
-		filter, argsOut, err := assembleFilter(params, allowedParams)
-		if err != nil {
-			return nil, err
-		}
-
-		query += filter
-		args = argsOut
+	allowedParams := map[string]string{
+		"id":       "id",
+		"title":    "tytul",
+		"year":     "rok_wydania",
+		"pages":    "liczba_stron",
+		"author":   "id_autora",
+		"genre":    "id_gatunku",
+		"language": "id_jezyka",
 	}
 
-	var books []m.Book
-
-	rows, err := db.Query(query, args...)
-	if err != nil {
-		return nil, fmt.Errorf("Błąd zapytania (%v)", err)
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var b m.Book
-
-		if err := rows.Scan(&b.Id, &b.Tytul, &b.Rok, &b.Strony, &b.Autor, &b.Gatunek, &b.Jezyk); err != nil {
-			return nil, fmt.Errorf("Błąd odczytywania (%v)", err)
-		}
-
-		books = append(books, b)
+	bookFunc := func(b *m.Book, rows *sql.Rows) error {
+		return rows.Scan(&b.Id, &b.Tytul, &b.Rok, &b.Strony, &b.Autor, &b.Gatunek, &b.Jezyk)
 	}
 
-	if err := rows.Err(); err != nil {
-		return nil, fmt.Errorf("Błąd (%v)", err)
-	}
-
-	return books, nil
+	return queryWithParams[m.Book](
+		query,
+		params,
+		allowedParams,
+		bookFunc,
+	)
 }
 
 func bookExists(id int64) error {

@@ -9,7 +9,16 @@ import (
 )
 
 func GetBooks(params url.Values) ([]m.Book, error) {
-	query := "SELECT id, tytul, rok_wydania, liczba_stron, id_autora, id_gatunku, id_jezyka FROM ksiazka"
+	query := `
+	SELECT
+		id,
+		tytul,
+		rok_wydania,
+		liczba_stron,
+		id_autora,
+		id_gatunku,
+		id_jezyka
+	FROM ksiazka`
 
 	allowedParams := map[string]string{
 		"id":       "id",
@@ -39,7 +48,17 @@ func bookExists(id int64) error {
 }
 
 func GetBook(id int64) (m.Book, error) {
-	query := "SELECT id, tytul, rok_wydania, liczba_stron, id_autora, id_gatunku, id_jezyka FROM ksiazka WHERE id = ?"
+	query := `
+	SELECT
+		id,
+		tytul,
+		rok_wydania,
+		liczba_stron,
+		id_autora,
+		id_gatunku,
+		id_jezyka
+	FROM ksiazka
+	WHERE id = ?`
 
 	bookFunc := func(b *m.Book, row *sql.Row) error {
 		return row.Scan(&b.Id, &b.Tytul, &b.Rok, &b.Strony, &b.Autor, &b.Gatunek, &b.Jezyk)
@@ -49,13 +68,31 @@ func GetBook(id int64) (m.Book, error) {
 }
 
 func InsertBook(b m.Book) (int64, error) {
-	query := "INSERT INTO ksiazka (tytul, rok_wydania, liczba_stron, id_autora, id_gatunku, id_jezyka) VALUES (?, ?, ?, ?, ?, ?)"
+	query := `
+	INSERT INTO ksiazka (
+		tytul,
+		rok_wydania,
+		liczba_stron,
+		id_autora,
+		id_gatunku,
+		id_jezyka
+	)
+	VALUES (?, ?, ?, ?, ?, ?)`
 
 	return insert(query, b.Tytul, b.Rok, b.Strony, b.Autor, b.Gatunek, b.Jezyk)
 }
 
 func UpdateWholeBook(id int64, b m.Book) error {
-	query := "UPDATE ksiazka SET tytul = ?, rok_wydania = ?, liczba_stron = ?, id_autora = ?, id_gatunku = ?, id_jezyka = ? WHERE id = ?"
+	query := `
+	UPDATE ksiazka
+	SET
+		tytul = ?,
+		rok_wydania = ?,
+		liczba_stron = ?,
+		id_autora = ?,
+		id_gatunku = ?,
+		id_jezyka = ?
+	WHERE id = ?`
 
 	return updateWholeId(query, b.Tytul, b.Rok, b.Strony, b.Autor, b.Gatunek, b.Jezyk, id)
 }

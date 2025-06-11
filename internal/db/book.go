@@ -53,17 +53,7 @@ func GetBook(id int64) (m.Book, error) {
 func InsertBook(b m.Book) (int64, error) {
 	query := "INSERT INTO ksiazka (tytul, rok_wydania, liczba_stron, id_autora, id_gatunku, id_jezyka) VALUES (?, ?, ?, ?, ?, ?)"
 
-	res, err := db.Exec(query, b.Tytul, b.Rok, b.Strony, b.Autor, b.Gatunek, b.Jezyk)
-	if err != nil {
-		return 0, fmt.Errorf("Nie udało się dodać rekordu (%v)", err)
-	}
-
-	id, err := res.LastInsertId()
-	if err != nil {
-		return 0, fmt.Errorf("Nie udało się pobrać id (%v)", err)
-	}
-
-	return id, nil
+	return insert(query, b.Tytul, b.Rok, b.Strony, b.Autor, b.Gatunek, b.Jezyk)
 }
 
 func UpdateWholeBook(id int64, b m.Book) error {

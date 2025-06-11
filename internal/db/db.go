@@ -174,3 +174,17 @@ func queryId[T any](
 
 	return d, nil
 }
+
+func insert(query string, args ...any) (int64, error) {
+	res, err := db.Exec(query, args...)
+	if err != nil {
+		return 0, fmt.Errorf("Nie udało się dodać rekordu (%v)", err)
+	}
+
+	id, err := res.LastInsertId()
+	if err != nil {
+		return 0, fmt.Errorf("Nie udało się pobrać id (%v)", err)
+	}
+
+	return id, nil
+}

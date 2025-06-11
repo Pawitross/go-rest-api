@@ -2,11 +2,16 @@ package routes
 
 import (
 	"github.com/gin-gonic/gin"
+	filesswag "github.com/swaggo/files"
+	ginswag "github.com/swaggo/gin-swagger"
+
+	"pawrest/docs"
 	"pawrest/internal/api/handler"
 	mware "pawrest/internal/api/middleware"
 )
 
 func Router(router *gin.Engine) {
+	docs.SwaggerInfo.BasePath = "/api/v1"
 	api := router.Group("/api")
 	{
 		v1 := api.Group("/v1")
@@ -29,4 +34,6 @@ func Router(router *gin.Engine) {
 			})
 		}
 	}
+
+	router.GET("/swagger/*any", ginswag.WrapHandler(filesswag.Handler))
 }

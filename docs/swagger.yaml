@@ -1,0 +1,37 @@
+definitions:
+  models.Book:
+    properties:
+      author:
+        type: integer
+      genre:
+        type: integer
+      id:
+        type: integer
+      language:
+        type: integer
+      pages:
+        type: integer
+      title:
+        type: string
+      year:
+        type: integer
+    type: object
+info:
+  contact: {}
+paths:
+  /books:
+    get:
+      description: Responds with the list of all books as JSON.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Book'
+            type: array
+      summary: Get list of books in an array
+      tags:
+      - Books
+swagger: "2.0"

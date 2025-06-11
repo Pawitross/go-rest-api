@@ -9,6 +9,12 @@ import (
 	m "pawrest/internal/models"
 )
 
+//	@Summary		Get list of books in an array
+//	@Description	Responds with the list of all books as JSON.
+//	@Tags			Books
+//	@Produce		json
+//	@Success		200	{array}	models.Book
+//	@Router			/books [get]
 func GetBooks(c *gin.Context) {
 	params := c.Request.URL.Query()
 

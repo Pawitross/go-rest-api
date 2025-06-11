@@ -59,21 +59,7 @@ func InsertBook(b m.Book) (int64, error) {
 func UpdateWholeBook(id int64, b m.Book) error {
 	query := "UPDATE ksiazka SET tytul = ?, rok_wydania = ?, liczba_stron = ?, id_autora = ?, id_gatunku = ?, id_jezyka = ? WHERE id = ?"
 
-	res, err := db.Exec(query, b.Tytul, b.Rok, b.Strony, b.Autor, b.Gatunek, b.Jezyk, id)
-	if err != nil {
-		return fmt.Errorf("Nie udało się zaktualizować (%v)", err)
-	}
-
-	rows, err := res.RowsAffected()
-	if err != nil {
-		return fmt.Errorf("Zmienione wiersze (%v)", err)
-	}
-
-	if rows == 0 {
-		return fmt.Errorf("Nie znaleziono rekordu do aktualizacji lub nie zmieniono rekordu")
-	}
-
-	return nil
+	return updateWholeId(query, b.Tytul, b.Rok, b.Strony, b.Autor, b.Gatunek, b.Jezyk, id)
 }
 
 func UpdateBook(id int64, b m.Book) error {

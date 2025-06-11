@@ -189,6 +189,24 @@ func insert(query string, args ...any) (int64, error) {
 	return id, nil
 }
 
+func updateWholeId(query string, args ...any) error {
+	res, err := db.Exec(query, args...)
+	if err != nil {
+		return fmt.Errorf("Nie udało się zaktualizować (%v)", err)
+	}
+
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("Zmienione wiersze (%v)", err)
+	}
+
+	if rows == 0 {
+		return fmt.Errorf("Nie znaleziono rekordu do aktualizacji lub nie zmieniono rekordu")
+	}
+
+	return nil
+}
+
 func deleteId(query string, id int64) error {
 	res, err := db.Exec(query, id)
 	if err != nil {

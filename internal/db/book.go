@@ -4,8 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"net/url"
-	"reflect"
-	"strings"
 
 	m "pawrest/internal/models"
 )
@@ -72,51 +70,7 @@ func UpdateBook(id int64, b m.Book) error {
 		"Jezyk":   "id_jezyka",
 	}
 
-	var (
-		updates []string
-		args    []any
-	)
-
-	valOfB := reflect.ValueOf(b)
-
-	fields := reflect.VisibleFields(reflect.TypeOf(b))
-	for i, f := range fields {
-		fValue := valOfB.Field(i)
-		if fValue.IsZero() {
-			continue
-		}
-
-		columnName, ok := fieldToDb[f.Name]
-		if !ok {
-			continue
-		}
-
-		updates = append(updates, columnName+" = ?")
-		args = append(args, fValue.Interface())
-	}
-
-	if len(updates) == 0 {
-		return fmt.Errorf("Brak kolumn do zaktualizowania")
-	}
-
-	query := "UPDATE ksiazka SET " + strings.Join(updates, ", ") + " WHERE id = ?"
-	args = append(args, id)
-
-	res, err := db.Exec(query, args...)
-	if err != nil {
-		return fmt.Errorf("Nie udało się zaktualizować (%v)", err)
-	}
-
-	rows, err := res.RowsAffected()
-	if err != nil {
-		return fmt.Errorf("Zmienione wiersze (%v)", err)
-	}
-
-	if rows == 0 {
-		return fmt.Errorf("Nie znaleziono rekordu do aktualizacji lub nie zmieniono rekordu")
-	}
-
-	return nil
+	return updatePartId(b, "ksiazka", id, fieldToDb)
 }
 
 func DelBook(id int64) error {

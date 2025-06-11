@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"net/url"
+	"reflect"
 	"strings"
 
 	"github.com/go-sql-driver/mysql"
@@ -190,6 +191,54 @@ func insert(query string, args ...any) (int64, error) {
 }
 
 func updateWholeId(query string, args ...any) error {
+	res, err := db.Exec(query, args...)
+	if err != nil {
+		return fmt.Errorf("Nie udało się zaktualizować (%v)", err)
+	}
+
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("Zmienione wiersze (%v)", err)
+	}
+
+	if rows == 0 {
+		return fmt.Errorf("Nie znaleziono rekordu do aktualizacji lub nie zmieniono rekordu")
+	}
+
+	return nil
+}
+
+func updatePartId(d any, table string, id int64, fToDb map[string]string) error {
+	var (
+		updates []string
+		args    []any
+	)
+
+	valOfD := reflect.ValueOf(d)
+
+	fields := reflect.VisibleFields(reflect.TypeOf(d))
+	for i, f := range fields {
+		fValue := valOfD.Field(i)
+		if fValue.IsZero() {
+			continue
+		}
+
+		columnName, ok := fToDb[f.Name]
+		if !ok {
+			continue
+		}
+
+		updates = append(updates, columnName+" = ?")
+		args = append(args, fValue.Interface())
+	}
+
+	if len(updates) == 0 {
+		return fmt.Errorf("Brak kolumn do zaktualizowania")
+	}
+
+	query := "UPDATE " + table + " SET " + strings.Join(updates, ", ") + " WHERE id = ?"
+	args = append(args, id)
+
 	res, err := db.Exec(query, args...)
 	if err != nil {
 		return fmt.Errorf("Nie udało się zaktualizować (%v)", err)

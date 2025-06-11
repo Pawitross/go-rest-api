@@ -136,19 +136,5 @@ func UpdateBook(id int64, b m.Book) error {
 func DelBook(id int64) error {
 	query := "DELETE FROM ksiazka WHERE id = ?"
 
-	res, err := db.Exec(query, id)
-	if err != nil {
-		return fmt.Errorf("Nie udało się usunąć (%v)", err)
-	}
-
-	rows, err := res.RowsAffected()
-	if err != nil {
-		return fmt.Errorf("Zmienione wiersze (%v)", err)
-	}
-
-	if rows == 0 {
-		return fmt.Errorf("Brak ksiązki o id %v", id)
-	}
-
-	return nil
+	return deleteId(query, id)
 }

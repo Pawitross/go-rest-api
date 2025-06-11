@@ -188,3 +188,21 @@ func insert(query string, args ...any) (int64, error) {
 
 	return id, nil
 }
+
+func deleteId(query string, id int64) error {
+	res, err := db.Exec(query, id)
+	if err != nil {
+		return fmt.Errorf("Nie udało się usunąć (%v)", err)
+	}
+
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("Zmienione wiersze (%v)", err)
+	}
+
+	if rows == 0 {
+		return fmt.Errorf("Brak zasobu o id %v", id)
+	}
+
+	return nil
+}

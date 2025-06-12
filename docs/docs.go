@@ -94,10 +94,7 @@ const docTemplate = `{
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/models.Error"
                         }
                     }
                 }
@@ -141,10 +138,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request - Invalid input or JSON",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/models.Error"
                         }
                     }
                 }
@@ -179,19 +173,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request - Invalid book id",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/models.Error"
                         }
                     },
                     "404": {
                         "description": "Not Found",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/models.Error"
                         }
                     }
                 }
@@ -230,19 +218,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request - Invalid input or JSON",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/models.Error"
                         }
                     },
                     "409": {
                         "description": "Conflict -  No resource found or didn't change resource",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/models.Error"
                         }
                     }
                 }
@@ -269,10 +251,7 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request - Invalid book id",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/models.Error"
                         }
                     }
                 }
@@ -311,19 +290,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request - Invalid input or JSON",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/models.Error"
                         }
                     },
                     "404": {
                         "description": "Not Found -  No resource found or didn't change resource",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/models.Error"
                         }
                     }
                 }
@@ -339,7 +312,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "boolean",
-                        "description": "Return a admin token",
+                        "description": "Return an admin token",
                         "name": "admin",
                         "in": "query"
                     }
@@ -348,28 +321,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK - Response body contains JWT token",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/models.Token"
                         }
                     },
                     "400": {
-                        "description": "Bad Request - Invalid parameter valuet",
+                        "description": "Bad Request - Invalid parameter value",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/models.Error"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error - Failed to create JWT token",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "$ref": "#/definitions/models.Error"
                         }
                     }
                 }
@@ -400,6 +364,22 @@ const docTemplate = `{
                 },
                 "year": {
                     "type": "integer"
+                }
+            }
+        },
+        "models.Error": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Token": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string"
                 }
             }
         }

@@ -16,6 +16,16 @@ definitions:
       year:
         type: integer
     type: object
+  models.Error:
+    properties:
+      error:
+        type: string
+    type: object
+  models.Token:
+    properties:
+      token:
+        type: string
+    type: object
 info:
   contact: {}
 paths:
@@ -72,9 +82,7 @@ paths:
         "404":
           description: Not Found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/models.Error'
       summary: Get a list of all books
       tags:
       - Books
@@ -104,9 +112,7 @@ paths:
         "400":
           description: Bad Request - Invalid input or JSON
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/models.Error'
       summary: Create a new book
       tags:
       - Books
@@ -126,9 +132,7 @@ paths:
         "400":
           description: Bad Request - Invalid book id
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/models.Error'
       summary: Delete an existing book
       tags:
       - Books
@@ -150,15 +154,11 @@ paths:
         "400":
           description: Bad Request - Invalid book id
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/models.Error'
         "404":
           description: Not Found
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/models.Error'
       summary: Get one book
       tags:
       - Books
@@ -186,15 +186,11 @@ paths:
         "400":
           description: Bad Request - Invalid input or JSON
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/models.Error'
         "404":
           description: Not Found -  No resource found or didn't change resource
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/models.Error'
       summary: Patch an existing book
       tags:
       - Books
@@ -221,15 +217,11 @@ paths:
         "400":
           description: Bad Request - Invalid input or JSON
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/models.Error'
         "409":
           description: Conflict -  No resource found or didn't change resource
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/models.Error'
       summary: Update an existing book
       tags:
       - Books
@@ -238,7 +230,7 @@ paths:
       description: Return a valid JWT token used for authentication and authorization.
         Optional boolean admin parameter provides creation of admin access token.
       parameters:
-      - description: Return a admin token
+      - description: Return an admin token
         in: query
         name: admin
         type: boolean
@@ -246,21 +238,15 @@ paths:
         "200":
           description: OK - Response body contains JWT token
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/models.Token'
         "400":
-          description: Bad Request - Invalid parameter valuet
+          description: Bad Request - Invalid parameter value
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/models.Error'
         "500":
           description: Internal Server Error - Failed to create JWT token
           schema:
-            additionalProperties:
-              type: string
-            type: object
+            $ref: '#/definitions/models.Error'
       summary: Get a JWT token
       tags:
       - Auth

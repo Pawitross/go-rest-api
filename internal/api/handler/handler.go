@@ -13,24 +13,24 @@ import (
 // @Description	Responds with a list of all books as JSON. Optional filtering and pagination is available through parameters.
 // @Tags			Books
 // @Produce		json
-// @Param			id			query		string				false	"Book id"
-// @Param			title		query		string				false	"Book title"
-// @Param			year		query		int					false	"Year of publishing of the book"
-// @Param			pages		query		int					false	"Number of pages in the book"
-// @Param			author		query		int					false	"Author id"
-// @Param			genre		query		int					false	"Genre id"
-// @Param			language	query		int					false	"Language id"
-// @Param			limit		query		int					false	"Limit returned number of resources"
-// @Param			offset		query		int					false	"Offset returned resources"
-// @Success		200			{array}		models.Book			"OK - Fetched books"
-// @Failure		404			{object}	map[string]string	"Not Found"
+// @Param			id			query		string			false	"Book id"
+// @Param			title		query		string			false	"Book title"
+// @Param			year		query		int				false	"Year of publishing of the book"
+// @Param			pages		query		int				false	"Number of pages in the book"
+// @Param			author		query		int				false	"Author id"
+// @Param			genre		query		int				false	"Genre id"
+// @Param			language	query		int				false	"Language id"
+// @Param			limit		query		int				false	"Limit returned number of resources"
+// @Param			offset		query		int				false	"Offset returned resources"
+// @Success		200			{array}		models.Book		"OK - Fetched books"
+// @Failure		404			{object}	models.Error	"Not Found"
 // @Router			/books [get]
 func GetBooks(c *gin.Context) {
 	params := c.Request.URL.Query()
 
 	books, err := db.GetBooks(params)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusNotFound, m.Error{Error: err.Error()})
 		return
 	}
 
@@ -41,22 +41,22 @@ func GetBooks(c *gin.Context) {
 // @Description	Responds with the queried book as JSON or an error message.
 // @Tags			Books
 // @Produce		json
-// @Param			id	path		int					true	"Book id"
-// @Success		200	{object}	models.Book			"OK - Fetched book"
-// @Failure		400	{object}	map[string]string	"Bad Request - Invalid book id"
-// @Failure		404	{object}	map[string]string	"Not Found"
+// @Param			id	path		int				true	"Book id"
+// @Success		200	{object}	models.Book		"OK - Fetched book"
+// @Failure		400	{object}	models.Error	"Bad Request - Invalid book id"
+// @Failure		404	{object}	models.Error	"Not Found"
 // @Router			/books/{id} [get]
 func GetBook(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Podano nieodpowiedni identyfikator"})
+		c.JSON(http.StatusBadRequest, m.Error{Error: "Podano nieodpowiedni identyfikator"})
 		return
 	}
 
 	book, err := db.GetBook(int64(id))
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusNotFound, m.Error{Error: err.Error()})
 		return
 	}
 
@@ -68,27 +68,27 @@ func GetBook(c *gin.Context) {
 // @Tags			Books
 // @Accept			json
 // @Produce		json
-// @Param			book	body		models.Book			true	"New Book"
-// @Success		201		{object}	models.Book			"Created - Added new book"
-// @Failure		400		{object}	map[string]string	"Bad Request - Invalid input or JSON"
-// @Header			201		{string}	Location			"Path of the newly created book"
+// @Param			book	body		models.Book		true	"New Book"
+// @Success		201		{object}	models.Book		"Created - Added new book"
+// @Failure		400		{object}	models.Error	"Bad Request - Invalid input or JSON"
+// @Header			201		{string}	Location		"Path of the newly created book"
 // @Router			/books [post]
 func PostBook(c *gin.Context) {
 	var newBook m.Book
 
 	if err := c.BindJSON(&newBook); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Wystąpił problem z JSON"})
+		c.JSON(http.StatusBadRequest, m.Error{Error: "Wystąpił problem z JSON"})
 		return
 	}
 
 	if newBook.ValidateBook() {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Podano puste lub nieprawidłowe pola"})
+		c.JSON(http.StatusBadRequest, m.Error{Error: "Podano puste lub nieprawidłowe pola"})
 		return
 	}
 
 	id, err := db.InsertBook(newBook)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, m.Error{Error: err.Error()})
 		return
 	}
 
@@ -107,31 +107,31 @@ func PostBook(c *gin.Context) {
 // @Param			id		path	int			true	"Existing Book id"
 // @Param			book	body	models.Book	true	"Updated Book"
 // @Success		204		"Updated the book"
-// @Failure		400		{object}	map[string]string	"Bad Request - Invalid input or JSON"
-// @Failure		409		{object}	map[string]string	"Conflict -  No resource found or didn't change resource"
+// @Failure		400		{object}	models.Error	"Bad Request - Invalid input or JSON"
+// @Failure		409		{object}	models.Error	"Conflict -  No resource found or didn't change resource"
 // @Router			/books/{id} [put]
 func PutBook(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Podano nieodpowiedni identyfikator"})
+		c.JSON(http.StatusBadRequest, m.Error{Error: "Podano nieodpowiedni identyfikator"})
 		return
 	}
 
 	var newBook m.Book
 
 	if err := c.BindJSON(&newBook); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Wystąpił problem z JSON"})
+		c.JSON(http.StatusBadRequest, m.Error{Error: "Wystąpił problem z JSON"})
 		return
 	}
 
 	if newBook.ValidateBook() {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Podano puste lub nieprawidłowe pola"})
+		c.JSON(http.StatusBadRequest, m.Error{Error: "Podano puste lub nieprawidłowe pola"})
 		return
 	}
 
 	if err := db.UpdateWholeBook(int64(id), newBook); err != nil {
-		c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
+		c.JSON(http.StatusConflict, m.Error{Error: err.Error()})
 		return
 	}
 
@@ -145,26 +145,26 @@ func PutBook(c *gin.Context) {
 // @Param			id		path	int			true	"Existing Book id"
 // @Param			book	body	models.Book	true	"Patches to the book"
 // @Success		204		"No Content - Successfully patched the book"
-// @Failure		400		{object}	map[string]string	"Bad Request - Invalid input or JSON"
-// @Failure		404		{object}	map[string]string	"Not Found -  No resource found or didn't change resource"
+// @Failure		400		{object}	models.Error	"Bad Request - Invalid input or JSON"
+// @Failure		404		{object}	models.Error	"Not Found -  No resource found or didn't change resource"
 // @Router			/books/{id} [patch]
 func PatchBook(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Podano nieodpowiedni identyfikator"})
+		c.JSON(http.StatusBadRequest, m.Error{Error: "Podano nieodpowiedni identyfikator"})
 		return
 	}
 
 	var patchBook m.Book
 
 	if err := c.BindJSON(&patchBook); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Wystąpił problem z JSON"})
+		c.JSON(http.StatusBadRequest, m.Error{Error: "Wystąpił problem z JSON"})
 		return
 	}
 
 	if err := db.UpdateBook(int64(id), patchBook); err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusNotFound, m.Error{Error: err.Error()})
 		return
 	}
 
@@ -176,18 +176,18 @@ func PatchBook(c *gin.Context) {
 // @Tags			Books
 // @Param			id	path	int	true	"Book id"
 // @Success		204	"No Content - Successfully deleted the book"
-// @Failure		400	{object}	map[string]string	"Bad Request - Invalid book id"
+// @Failure		400	{object}	models.Error	"Bad Request - Invalid book id"
 // @Router			/books/{id} [delete]
 func DeleteBook(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Podano nieodpowiedni identyfikator"})
+		c.JSON(http.StatusBadRequest, m.Error{Error: "Podano nieodpowiedni identyfikator"})
 		return
 	}
 
 	if err := db.DelBook(int64(id)); err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		c.JSON(http.StatusNotFound, m.Error{Error: err.Error()})
 		return
 	}
 

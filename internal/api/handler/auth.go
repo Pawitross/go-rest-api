@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
+	m "pawrest/internal/models"
 )
 
 func createToken(isAdmin bool) (string, error) {
@@ -33,16 +34,16 @@ func createToken(isAdmin bool) (string, error) {
 // @Summary		Get a JWT token
 // @Description	Return a valid JWT token used for authentication and authorization. Optional boolean admin parameter provides creation of admin access token.
 // @Tags			Auth
-// @Param			admin	query		bool				false	"Return an admin token"
-// @Success		200		{object}	map[string]string	"OK - Response body contains JWT token"
-// @Failure		400		{object}	map[string]string	"Bad Request - Invalid parameter value"
-// @Failure		500		{object}	map[string]string	"Internal Server Error - Failed to create JWT token"
+// @Param			admin	query		bool			false	"Return an admin token"
+// @Success		200		{object}	models.Token	"OK - Response body contains JWT token"
+// @Failure		400		{object}	models.Error	"Bad Request - Invalid parameter value"
+// @Failure		500		{object}	models.Error	"Internal Server Error - Failed to create JWT token"
 // @Router			/login [get]
 func ReturnToken(c *gin.Context) {
 	wantAdmin := c.DefaultQuery("admin", "false")
 
 	if wantAdmin != "false" && wantAdmin != "true" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Podano błędną wartość parametru"})
+		c.JSON(http.StatusBadRequest, m.Error{Error: "Podano błędną wartość parametru"})
 		return
 	}
 
@@ -53,9 +54,9 @@ func ReturnToken(c *gin.Context) {
 
 	token, err := createToken(boolAdmin)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Błąd przy tworzeniu tokenu"})
+		c.JSON(http.StatusInternalServerError, m.Error{Error: "Błąd przy tworzeniu tokenu"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"token": token})
+	c.JSON(http.StatusOK, m.Token{Token: token})
 }

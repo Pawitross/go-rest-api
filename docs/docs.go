@@ -92,7 +92,7 @@ const docTemplate = `{
                         }
                     },
                     "404": {
-                        "description": "Not found",
+                        "description": "Not Found",
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
@@ -186,7 +186,7 @@ const docTemplate = `{
                         }
                     },
                     "404": {
-                        "description": "Not found",
+                        "description": "Not Found",
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
@@ -318,7 +318,53 @@ const docTemplate = `{
                         }
                     },
                     "404": {
-                        "description": "Not found -  No resource found or didn't change resource",
+                        "description": "Not Found -  No resource found or didn't change resource",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/login": {
+            "get": {
+                "description": "Return a valid JWT token used for authentication and authorization. Optional boolean admin parameter provides creation of admin access token.",
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Get a JWT token",
+                "parameters": [
+                    {
+                        "type": "boolean",
+                        "description": "Return a admin token",
+                        "name": "admin",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK - Response body contains JWT token",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request - Invalid parameter valuet",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error - Failed to create JWT token",
                         "schema": {
                             "type": "object",
                             "additionalProperties": {

@@ -70,7 +70,7 @@ paths:
               $ref: '#/definitions/models.Book'
             type: array
         "404":
-          description: Not found
+          description: Not Found
           schema:
             additionalProperties:
               type: string
@@ -154,7 +154,7 @@ paths:
               type: string
             type: object
         "404":
-          description: Not found
+          description: Not Found
           schema:
             additionalProperties:
               type: string
@@ -190,7 +190,7 @@ paths:
               type: string
             type: object
         "404":
-          description: Not found -  No resource found or didn't change resource
+          description: Not Found -  No resource found or didn't change resource
           schema:
             additionalProperties:
               type: string
@@ -233,4 +233,35 @@ paths:
       summary: Update an existing book
       tags:
       - Books
+  /login:
+    get:
+      description: Return a valid JWT token used for authentication and authorization.
+        Optional boolean admin parameter provides creation of admin access token.
+      parameters:
+      - description: Return a admin token
+        in: query
+        name: admin
+        type: boolean
+      responses:
+        "200":
+          description: OK - Response body contains JWT token
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Bad Request - Invalid parameter valuet
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal Server Error - Failed to create JWT token
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get a JWT token
+      tags:
+      - Auth
 swagger: "2.0"

@@ -23,7 +23,7 @@ import (
 // @Param			limit		query		int					false	"Limit returned number of resources"
 // @Param			offset		query		int					false	"Offset returned resources"
 // @Success		200			{array}		models.Book			"OK - Fetched books"
-// @Failure		404			{object}	map[string]string	"Not found"
+// @Failure		404			{object}	map[string]string	"Not Found"
 // @Router			/books [get]
 func GetBooks(c *gin.Context) {
 	params := c.Request.URL.Query()
@@ -44,7 +44,7 @@ func GetBooks(c *gin.Context) {
 // @Param			id	path		int					true	"Book id"
 // @Success		200	{object}	models.Book			"OK - Fetched book"
 // @Failure		400	{object}	map[string]string	"Bad Request - Invalid book id"
-// @Failure		404	{object}	map[string]string	"Not found"
+// @Failure		404	{object}	map[string]string	"Not Found"
 // @Router			/books/{id} [get]
 func GetBook(c *gin.Context) {
 	idStr := c.Param("id")
@@ -146,7 +146,7 @@ func PutBook(c *gin.Context) {
 // @Param			book	body	models.Book	true	"Patches to the book"
 // @Success		204		"No Content - Successfully patched the book"
 // @Failure		400		{object}	map[string]string	"Bad Request - Invalid input or JSON"
-// @Failure		404		{object}	map[string]string	"Not found -  No resource found or didn't change resource"
+// @Failure		404		{object}	map[string]string	"Not Found -  No resource found or didn't change resource"
 // @Router			/books/{id} [patch]
 func PatchBook(c *gin.Context) {
 	idStr := c.Param("id")

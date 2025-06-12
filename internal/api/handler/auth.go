@@ -30,6 +30,14 @@ func createToken(isAdmin bool) (string, error) {
 	return s, nil
 }
 
+// @Summary		Get a JWT token
+// @Description	Return a valid JWT token used for authentication and authorization. Optional boolean admin parameter provides creation of admin access token.
+// @Tags			Auth
+// @Param			admin	query		bool				false	"Return an admin token"
+// @Success		200		{object}	map[string]string	"OK - Response body contains JWT token"
+// @Failure		400		{object}	map[string]string	"Bad Request - Invalid parameter value"
+// @Failure		500		{object}	map[string]string	"Internal Server Error - Failed to create JWT token"
+// @Router			/login [get]
 func ReturnToken(c *gin.Context) {
 	wantAdmin := c.DefaultQuery("admin", "false")
 

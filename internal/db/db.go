@@ -20,6 +20,7 @@ func ConnectToDB() error {
 	cfg.Net = "tcp"
 	cfg.Addr = "127.0.0.1:3306"
 	cfg.DBName = "paw"
+	cfg.ClientFoundRows = true
 
 	var err error
 	db, err = sql.Open("mysql", cfg.FormatDSN())

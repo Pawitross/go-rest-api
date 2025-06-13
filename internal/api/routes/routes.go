@@ -16,16 +16,19 @@ func Router(router *gin.Engine) {
 	{
 		v1 := api.Group("/v1")
 		{
-			v1.GET("books", handler.GetBooks)
-			v1.GET("books/:id", handler.GetBook)
+			books := v1.Group("/books")
+			{
+				books.GET("", handler.GetBooks)
+				books.GET("/:id", handler.GetBook)
 
-			v1.POST("books", handler.PostBook)
+				books.POST("", handler.PostBook)
 
-			v1.PUT("books/:id", handler.PutBook)
+				books.PUT("/:id", handler.PutBook)
 
-			v1.PATCH("books/:id", handler.PatchBook)
+				books.PATCH("/:id", handler.PatchBook)
 
-			v1.DELETE("books/:id", handler.DeleteBook)
+				books.DELETE("/:id", handler.DeleteBook)
+			}
 
 			v1.GET("login", handler.ReturnToken)
 

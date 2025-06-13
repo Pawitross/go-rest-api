@@ -108,7 +108,7 @@ func PostBook(c *gin.Context) {
 // @Param			book	body	models.Book	true	"Updated Book"
 // @Success		204		"Updated the book"
 // @Failure		400		{object}	models.Error	"Bad Request - Invalid input or JSON"
-// @Failure		409		{object}	models.Error	"Conflict -  No resource found or didn't change resource"
+// @Failure		404		{object}	models.Error	"Not Found -  No resource found"
 // @Router			/books/{id} [put]
 func PutBook(c *gin.Context) {
 	idStr := c.Param("id")
@@ -131,7 +131,7 @@ func PutBook(c *gin.Context) {
 	}
 
 	if err := db.UpdateWholeBook(int64(id), newBook); err != nil {
-		c.JSON(http.StatusConflict, m.Error{Error: err.Error()})
+		c.JSON(http.StatusNotFound, m.Error{Error: err.Error()})
 		return
 	}
 
@@ -146,7 +146,7 @@ func PutBook(c *gin.Context) {
 // @Param			book	body	models.Book	true	"Patches to the book"
 // @Success		204		"No Content - Successfully patched the book"
 // @Failure		400		{object}	models.Error	"Bad Request - Invalid input or JSON"
-// @Failure		404		{object}	models.Error	"Not Found -  No resource found or didn't change resource"
+// @Failure		404		{object}	models.Error	"Not Found -  No resource found"
 // @Router			/books/{id} [patch]
 func PatchBook(c *gin.Context) {
 	idStr := c.Param("id")

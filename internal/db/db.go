@@ -203,7 +203,7 @@ func updateWholeId(query string, args ...any) error {
 	}
 
 	if rows == 0 {
-		return fmt.Errorf("Nie znaleziono rekordu do aktualizacji lub nie zmieniono rekordu")
+		return fmt.Errorf("Nie znaleziono rekordu do aktualizacji")
 	}
 
 	return nil
@@ -251,7 +251,7 @@ func updatePartId(d any, table string, id int64, fToDb map[string]string) error 
 	}
 
 	if rows == 0 {
-		return fmt.Errorf("Nie znaleziono rekordu do aktualizacji lub nie zmieniono rekordu")
+		return fmt.Errorf("Nie znaleziono rekordu do aktualizacji")
 	}
 
 	return nil

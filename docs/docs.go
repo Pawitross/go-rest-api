@@ -221,8 +221,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/models.Error"
                         }
                     },
-                    "409": {
-                        "description": "Conflict -  No resource found or didn't change resource",
+                    "404": {
+                        "description": "Not Found -  No resource found",
                         "schema": {
                             "$ref": "#/definitions/models.Error"
                         }
@@ -294,7 +294,7 @@ const docTemplate = `{
                         }
                     },
                     "404": {
-                        "description": "Not Found -  No resource found or didn't change resource",
+                        "description": "Not Found -  No resource found",
                         "schema": {
                             "$ref": "#/definitions/models.Error"
                         }

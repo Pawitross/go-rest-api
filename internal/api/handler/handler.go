@@ -94,7 +94,7 @@ func PostBook(c *gin.Context) {
 
 	newBook.Id = id
 
-	location := "/books/" + strconv.FormatInt(newBook.Id, 10)
+	location := c.FullPath() + "/" + strconv.FormatInt(newBook.Id, 10)
 	c.Header("Location", location)
 
 	c.JSON(http.StatusCreated, newBook)

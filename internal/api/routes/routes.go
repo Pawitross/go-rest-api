@@ -33,7 +33,7 @@ func Router(router *gin.Engine) {
 			v1.GET("login", handler.ReturnToken)
 
 			v1.GET("auth", mware.Authenticate(), mware.Authorize(), func(c *gin.Context) {
-				c.JSON(200, gin.H{"message": "Witamy"})
+				c.JSON(200, "Welcome")
 			})
 		}
 	}

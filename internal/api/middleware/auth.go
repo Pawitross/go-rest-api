@@ -14,13 +14,13 @@ func Authenticate() gin.HandlerFunc {
 		headerToken := c.GetHeader("Authorization")
 
 		if headerToken == "" {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Nie podano tokenu"})
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "No token provided"})
 			return
 		}
 
 		userToken, ok := strings.CutPrefix(headerToken, "Bearer ")
 		if !ok {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Brak Bearer w nagłówku Authorization"})
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "No Bearer prefix in Authorization header"})
 			return
 		}
 
@@ -33,13 +33,13 @@ func Authenticate() gin.HandlerFunc {
 
 			switch {
 			case errors.Is(err, jwt.ErrTokenMalformed):
-				errorMsg = "Zniekształcony token"
+				errorMsg = "Malformed token"
 			case errors.Is(err, jwt.ErrTokenSignatureInvalid):
-				errorMsg = "Nieprawidłowy podpis tokenu"
+				errorMsg = "Invalid token signature"
 			case errors.Is(err, jwt.ErrTokenExpired):
-				errorMsg = "Token wygasł"
+				errorMsg = "Token has expired"
 			default:
-				errorMsg = "Błąd weryfikacji"
+				errorMsg = "Token verification failed"
 			}
 
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": errorMsg})
@@ -48,7 +48,7 @@ func Authenticate() gin.HandlerFunc {
 
 		claims, ok := token.Claims.(jwt.MapClaims)
 		if !ok {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Błąd z uzyskiwaniem ładunku"})
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unable to parse token claims"})
 			return
 		}
 
@@ -61,18 +61,18 @@ func Authorize() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		userClaims, ok := c.Get("user")
 		if !ok {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Nie można uzyskać danych użytkownika"})
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "User authentication data not found"})
 			return
 		}
 
 		claims, ok := userClaims.(jwt.MapClaims)
 		if !ok {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Błąd z uzyskiwaniem ładunku"})
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unable to parse token claims"})
 			return
 		}
 
 		if isAdmin := claims["admin"]; isAdmin != true {
-			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "Nie masz wystarczających uprawnień, aby przeglądać ten zasób"})
+			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "You do not have sufficient permissions to access this resource"})
 			return
 		}
 

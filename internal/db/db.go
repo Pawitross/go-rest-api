@@ -32,7 +32,6 @@ func ConnectToDB() error {
 		return pingErr
 	}
 
-	//fmt.Printf("Połączono z bazą danych %q pod adresem %q\n", cfg.DBName, cfg.Addr)
 	return nil
 }
 
@@ -61,7 +60,7 @@ func assembleFilter(params url.Values, allowedParams map[string]string) (string,
 	offset, hasOffset := params["offset"]
 
 	if !hasLimit && hasOffset {
-		return "", nil, fmt.Errorf("Nie podano limitu do podanego offsetu.")
+		return "", nil, fmt.Errorf("A limit must be provided when using an offset")
 	}
 
 	for key, valSlice := range params {
@@ -81,15 +80,15 @@ func assembleFilter(params url.Values, allowedParams map[string]string) (string,
 
 		columnName, allowed := allowedParams[key]
 		if !allowed {
-			return "", nil, fmt.Errorf("Wprowadzono nieznany parametr.")
+			return "", nil, fmt.Errorf("An unknown parameter was provided")
 		}
 
 		if len(valSlice) == 0 || valSlice[0] == "" {
-			return "", nil, fmt.Errorf("Wprowadzony parametr jest pusty.")
+			return "", nil, fmt.Errorf("Provided parameter is empty")
 		}
 
 		if len(valSlice) > 1 {
-			return "", nil, fmt.Errorf("Wprowadzono za dużo parametrów dla jednej kolumny.")
+			return "", nil, fmt.Errorf("Too many parameters were provided for a single column")
 		}
 
 		conditions = append(conditions, columnName+" "+operator+" ?")
@@ -137,7 +136,7 @@ func queryWithParams[T any](
 
 	rows, err := db.Query(query, args...)
 	if err != nil {
-		return nil, fmt.Errorf("Błąd zapytania (%v)", err)
+		return nil, fmt.Errorf("Query error (%v)", err)
 	}
 	defer rows.Close()
 
@@ -145,14 +144,14 @@ func queryWithParams[T any](
 		var d T
 
 		if err := scanFunc(&d, rows); err != nil {
-			return nil, fmt.Errorf("Błąd odczytywania (%v)", err)
+			return nil, fmt.Errorf("Scan error (%v)", err)
 		}
 
 		data = append(data, d)
 	}
 
 	if err := rows.Err(); err != nil {
-		return nil, fmt.Errorf("Błąd (%v)", err)
+		return nil, fmt.Errorf("Rows error (%v)", err)
 	}
 
 	return data, nil
@@ -168,10 +167,10 @@ func queryId[T any](
 	row := db.QueryRow(query, id)
 	if err := scanFunc(&d, row); err != nil {
 		if err == sql.ErrNoRows {
-			return d, fmt.Errorf("Brak zasobu o id %d", id)
+			return d, fmt.Errorf("No resource found with id %v", id)
 		}
 
-		return d, fmt.Errorf("Błąd odczytywania (%v)", err)
+		return d, fmt.Errorf("Scan error (%v)", err)
 	}
 
 	return d, nil
@@ -180,12 +179,12 @@ func queryId[T any](
 func insert(query string, args ...any) (int64, error) {
 	res, err := db.Exec(query, args...)
 	if err != nil {
-		return 0, fmt.Errorf("Nie udało się dodać rekordu (%v)", err)
+		return 0, fmt.Errorf("Failed to insert record (%v)", err)
 	}
 
 	id, err := res.LastInsertId()
 	if err != nil {
-		return 0, fmt.Errorf("Nie udało się pobrać id (%v)", err)
+		return 0, fmt.Errorf("Failed to retrieve id (%v)", err)
 	}
 
 	return id, nil
@@ -194,16 +193,16 @@ func insert(query string, args ...any) (int64, error) {
 func updateWholeId(query string, args ...any) error {
 	res, err := db.Exec(query, args...)
 	if err != nil {
-		return fmt.Errorf("Nie udało się zaktualizować (%v)", err)
+		return fmt.Errorf("Failed to update (%v)", err)
 	}
 
 	rows, err := res.RowsAffected()
 	if err != nil {
-		return fmt.Errorf("Zmienione wiersze (%v)", err)
+		return fmt.Errorf("Rows affected error (%v)", err)
 	}
 
 	if rows == 0 {
-		return fmt.Errorf("Nie znaleziono rekordu do aktualizacji")
+		return fmt.Errorf("No record found to update")
 	}
 
 	return nil
@@ -234,7 +233,7 @@ func updatePartId(d any, table string, id int64, fToDb map[string]string) error 
 	}
 
 	if len(updates) == 0 {
-		return fmt.Errorf("Brak kolumn do zaktualizowania")
+		return fmt.Errorf("No columns to update")
 	}
 
 	query := "UPDATE " + table + " SET " + strings.Join(updates, ", ") + " WHERE id = ?"
@@ -242,16 +241,16 @@ func updatePartId(d any, table string, id int64, fToDb map[string]string) error 
 
 	res, err := db.Exec(query, args...)
 	if err != nil {
-		return fmt.Errorf("Nie udało się zaktualizować (%v)", err)
+		return fmt.Errorf("Failed to update (%v)", err)
 	}
 
 	rows, err := res.RowsAffected()
 	if err != nil {
-		return fmt.Errorf("Zmienione wiersze (%v)", err)
+		return fmt.Errorf("Rows affected error (%v)", err)
 	}
 
 	if rows == 0 {
-		return fmt.Errorf("Nie znaleziono rekordu do aktualizacji")
+		return fmt.Errorf("No record found to update")
 	}
 
 	return nil
@@ -260,16 +259,16 @@ func updatePartId(d any, table string, id int64, fToDb map[string]string) error 
 func deleteId(query string, id int64) error {
 	res, err := db.Exec(query, id)
 	if err != nil {
-		return fmt.Errorf("Nie udało się usunąć (%v)", err)
+		return fmt.Errorf("Failed to delete (%v)", err)
 	}
 
 	rows, err := res.RowsAffected()
 	if err != nil {
-		return fmt.Errorf("Zmienione wiersze (%v)", err)
+		return fmt.Errorf("Rows affected error (%v)", err)
 	}
 
 	if rows == 0 {
-		return fmt.Errorf("Brak zasobu o id %v", id)
+		return fmt.Errorf("No resource found with id %v", id)
 	}
 
 	return nil

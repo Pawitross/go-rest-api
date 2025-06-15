@@ -50,7 +50,7 @@ func GetBook(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, m.Error{Error: "Podano nieodpowiedni identyfikator"})
+		c.JSON(http.StatusBadRequest, m.Error{Error: "Provided incorrect identifier"})
 		return
 	}
 
@@ -77,12 +77,12 @@ func PostBook(c *gin.Context) {
 	var newBook m.Book
 
 	if err := c.BindJSON(&newBook); err != nil {
-		c.JSON(http.StatusBadRequest, m.Error{Error: "Wystąpił problem z JSON"})
+		c.JSON(http.StatusBadRequest, m.Error{Error: "Invalid JSON in request body"})
 		return
 	}
 
 	if newBook.ValidateBook() {
-		c.JSON(http.StatusBadRequest, m.Error{Error: "Podano puste lub nieprawidłowe pola"})
+		c.JSON(http.StatusBadRequest, m.Error{Error: "One or more required fields are missing or invalid"})
 		return
 	}
 
@@ -114,19 +114,19 @@ func PutBook(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, m.Error{Error: "Podano nieodpowiedni identyfikator"})
+		c.JSON(http.StatusBadRequest, m.Error{Error: "Provided incorrect identifier"})
 		return
 	}
 
 	var newBook m.Book
 
 	if err := c.BindJSON(&newBook); err != nil {
-		c.JSON(http.StatusBadRequest, m.Error{Error: "Wystąpił problem z JSON"})
+		c.JSON(http.StatusBadRequest, m.Error{Error: "Invalid JSON in request body"})
 		return
 	}
 
 	if newBook.ValidateBook() {
-		c.JSON(http.StatusBadRequest, m.Error{Error: "Podano puste lub nieprawidłowe pola"})
+		c.JSON(http.StatusBadRequest, m.Error{Error: "One or more required fields are missing or invalid"})
 		return
 	}
 
@@ -152,14 +152,14 @@ func PatchBook(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, m.Error{Error: "Podano nieodpowiedni identyfikator"})
+		c.JSON(http.StatusBadRequest, m.Error{Error: "Provided incorrect identifier"})
 		return
 	}
 
 	var patchBook m.Book
 
 	if err := c.BindJSON(&patchBook); err != nil {
-		c.JSON(http.StatusBadRequest, m.Error{Error: "Wystąpił problem z JSON"})
+		c.JSON(http.StatusBadRequest, m.Error{Error: "Invalid JSON in request body"})
 		return
 	}
 
@@ -182,7 +182,7 @@ func DeleteBook(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, m.Error{Error: "Podano nieodpowiedni identyfikator"})
+		c.JSON(http.StatusBadRequest, m.Error{Error: "Provided incorrect identifier"})
 		return
 	}
 

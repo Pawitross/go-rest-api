@@ -11,18 +11,18 @@ import (
 )
 
 func main() {
-	fmt.Println("Łączenie z bazą danych...")
+	fmt.Println("Connecting to the database...")
 	if err := db.ConnectToDB(); err != nil {
 		log.Fatal(err)
 	}
 	defer db.CloseDB()
 
 	if err := middleware.InitLogger(); err != nil {
-		log.Fatalf("Nie udało się zainicjalizować logowania żądań: %v\n", err)
+		log.Fatalf("Failed to initialize logging middleware: %v\n", err)
 	}
 	defer middleware.CloseLogger()
 
-	fmt.Println("Uruchamianie serwera...")
+	fmt.Println("Starting up the server...")
 	//gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()
 

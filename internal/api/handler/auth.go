@@ -43,7 +43,7 @@ func ReturnToken(c *gin.Context) {
 	wantAdmin := c.DefaultQuery("admin", "false")
 
 	if wantAdmin != "false" && wantAdmin != "true" {
-		c.JSON(http.StatusBadRequest, m.Error{Error: "Podano błędną wartość parametru"})
+		c.JSON(http.StatusBadRequest, m.Error{Error: "Invalid parameter value"})
 		return
 	}
 
@@ -54,7 +54,7 @@ func ReturnToken(c *gin.Context) {
 
 	token, err := createToken(boolAdmin)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, m.Error{Error: "Błąd przy tworzeniu tokenu"})
+		c.JSON(http.StatusInternalServerError, m.Error{Error: "Failed to create token"})
 		return
 	}
 

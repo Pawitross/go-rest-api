@@ -31,7 +31,7 @@ func GetBooks(params url.Values) ([]m.Book, error) {
 	}
 
 	bookFunc := func(b *m.Book, rows *sql.Rows) error {
-		return rows.Scan(&b.Id, &b.Tytul, &b.Rok, &b.Strony, &b.Autor, &b.Gatunek, &b.Jezyk)
+		return rows.Scan(&b.Id, &b.Title, &b.Year, &b.Pages, &b.Author, &b.Genre, &b.Language)
 	}
 
 	return queryWithParams[m.Book](
@@ -78,16 +78,16 @@ func GetBooksExt(params url.Values) ([]m.BookExt, error) {
 	bookFunc := func(b *m.BookExt, rows *sql.Rows) error {
 		return rows.Scan(
 			&b.Id,
-			&b.Tytul,
-			&b.Rok,
-			&b.Strony,
-			&b.Autor.Id,
-			&b.Autor.Imie,
-			&b.Autor.Nazwisko,
-			&b.Gatunek.Id,
-			&b.Gatunek.Nazwa,
-			&b.Jezyk.Id,
-			&b.Jezyk.Nazwa,
+			&b.Title,
+			&b.Year,
+			&b.Pages,
+			&b.Author.Id,
+			&b.Author.FirstName,
+			&b.Author.LastName,
+			&b.Genre.Id,
+			&b.Genre.Name,
+			&b.Language.Id,
+			&b.Language.Name,
 		)
 	}
 
@@ -118,7 +118,7 @@ func GetBook(id int64) (m.Book, error) {
 	WHERE id = ?`
 
 	bookFunc := func(b *m.Book, row *sql.Row) error {
-		return row.Scan(&b.Id, &b.Tytul, &b.Rok, &b.Strony, &b.Autor, &b.Gatunek, &b.Jezyk)
+		return row.Scan(&b.Id, &b.Title, &b.Year, &b.Pages, &b.Author, &b.Genre, &b.Language)
 	}
 
 	return queryId[m.Book](query, id, bookFunc)
@@ -136,7 +136,7 @@ func InsertBook(b m.Book) (int64, error) {
 	)
 	VALUES (?, ?, ?, ?, ?, ?)`
 
-	return insert(query, b.Tytul, b.Rok, b.Strony, b.Autor, b.Gatunek, b.Jezyk)
+	return insert(query, b.Title, b.Year, b.Pages, b.Author, b.Genre, b.Language)
 }
 
 func UpdateWholeBook(id int64, b m.Book) error {
@@ -151,17 +151,17 @@ func UpdateWholeBook(id int64, b m.Book) error {
 		id_jezyka = ?
 	WHERE id = ?`
 
-	return updateWholeId(query, b.Tytul, b.Rok, b.Strony, b.Autor, b.Gatunek, b.Jezyk, id)
+	return updateWholeId(query, b.Title, b.Year, b.Pages, b.Author, b.Genre, b.Language, id)
 }
 
 func UpdateBook(id int64, b m.Book) error {
 	fieldToDb := map[string]string{
-		"Tytul":   "tytul",
-		"Rok":     "rok_wydania",
-		"Strony":  "liczba_stron",
-		"Autor":   "id_autora",
-		"Gatunek": "id_gatunku",
-		"Jezyk":   "id_jezyka",
+		"Title":    "tytul",
+		"Year":     "rok_wydania",
+		"Pages":    "liczba_stron",
+		"Author":   "id_autora",
+		"Genre":    "id_gatunku",
+		"Language": "id_jezyka",
 	}
 
 	return updatePartId(b, "ksiazka", id, fieldToDb)

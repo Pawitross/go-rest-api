@@ -68,10 +68,10 @@ func TestGetBookSuccess(t *testing.T) {
 	assert.NoError(t, err, "Error decoding response data")
 
 	assert.NotEmpty(t, rBook, "Book in the response body should not be empty")
-	assert.NotEmpty(t, rBook.Tytul, "Tytul should not be empty")
-	assert.NotEmpty(t, rBook.Autor, "Autor should not be empty")
-	assert.NotEmpty(t, rBook.Gatunek, "Gatunek should not be empty")
-	assert.NotEmpty(t, rBook.Jezyk, "Jezyk should not be empty")
+	assert.NotEmpty(t, rBook.Title, "Title should not be empty")
+	assert.NotEmpty(t, rBook.Author, "Author should not be empty")
+	assert.NotEmpty(t, rBook.Genre, "Genre should not be empty")
+	assert.NotEmpty(t, rBook.Language, "Language should not be empty")
 }
 
 func TestGetBookNotFound(t *testing.T) {
@@ -102,12 +102,12 @@ func TestPostBookSuccess(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	testBook := models.Book{
-		Tytul:   "Post test book",
-		Rok:     1996,
-		Strony:  200,
-		Autor:   1,
-		Gatunek: 1,
-		Jezyk:   1,
+		Title:    "Post test book",
+		Year:     1996,
+		Pages:    200,
+		Author:   1,
+		Genre:    1,
+		Language: 1,
 	}
 
 	jsonBook, err := json.Marshal(testBook)
@@ -129,12 +129,12 @@ func TestPostBookSuccess(t *testing.T) {
 	assert.Equal(t, expLoc, w.Result().Header.Get("Location"))
 
 	assert.NotZero(t, rBook.Id, "Auto generatated, non zero ID")
-	assert.Equal(t, testBook.Tytul, rBook.Tytul)
-	assert.Equal(t, testBook.Rok, rBook.Rok)
-	assert.Equal(t, testBook.Strony, rBook.Strony)
-	assert.Equal(t, testBook.Autor, rBook.Autor)
-	assert.Equal(t, testBook.Gatunek, rBook.Gatunek)
-	assert.Equal(t, testBook.Jezyk, rBook.Jezyk)
+	assert.Equal(t, testBook.Title, rBook.Title)
+	assert.Equal(t, testBook.Year, rBook.Year)
+	assert.Equal(t, testBook.Pages, rBook.Pages)
+	assert.Equal(t, testBook.Author, rBook.Author)
+	assert.Equal(t, testBook.Genre, rBook.Genre)
+	assert.Equal(t, testBook.Language, rBook.Language)
 }
 
 func TestPostBookValidationErr(t *testing.T) {
@@ -142,12 +142,12 @@ func TestPostBookValidationErr(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	testBook := models.Book{
-		Tytul:   "",
-		Rok:     1996,
-		Strony:  200,
-		Autor:   1,
-		Gatunek: 1,
-		Jezyk:   1,
+		Title:    "",
+		Year:     1996,
+		Pages:    200,
+		Author:   1,
+		Genre:    1,
+		Language: 1,
 	}
 
 	jsonBook, err := json.Marshal(testBook)
@@ -172,12 +172,12 @@ func TestPutBookSuccess(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	testBook := models.Book{
-		Tytul:   "Książka PUT",
-		Rok:     1996,
-		Strony:  593,
-		Autor:   1,
-		Gatunek: 1,
-		Jezyk:   1,
+		Title:    "Książka PUT",
+		Year:     1996,
+		Pages:    593,
+		Author:   1,
+		Genre:    1,
+		Language: 1,
 	}
 
 	jsonBook, err := json.Marshal(testBook)
@@ -195,12 +195,12 @@ func TestPutBookNotFoundBigId(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	testBook := models.Book{
-		Tytul:   "Książka PUT",
-		Rok:     1996,
-		Strony:  593,
-		Autor:   1,
-		Gatunek: 1,
-		Jezyk:   1,
+		Title:    "Książka PUT",
+		Year:     1996,
+		Pages:    593,
+		Author:   1,
+		Genre:    1,
+		Language: 1,
 	}
 
 	jsonBook, err := json.Marshal(testBook)
@@ -224,12 +224,12 @@ func TestPutBookBadRequestStringId(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	testBook := models.Book{
-		Tytul:   "Książka PUT",
-		Rok:     1996,
-		Strony:  593,
-		Autor:   1,
-		Gatunek: 1,
-		Jezyk:   1,
+		Title:    "Książka PUT",
+		Year:     1996,
+		Pages:    593,
+		Author:   1,
+		Genre:    1,
+		Language: 1,
 	}
 
 	jsonBook, err := json.Marshal(testBook)
@@ -253,10 +253,10 @@ func TestPutBookBadRequestBadJSON(t *testing.T) {
 	w := httptest.NewRecorder()
 
 	testBook := models.Book{
-		Tytul:   "Książka PUT",
-		Rok:     1996,
-		Strony:  593,
-		Gatunek: 1,
+		Title: "Książka PUT",
+		Year:  1996,
+		Pages: 593,
+		Genre: 1,
 	}
 
 	jsonBook, err := json.Marshal(testBook)

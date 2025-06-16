@@ -1,40 +1,40 @@
 package models
 
 type Book struct {
-	Id      int64  `json:"id"`
-	Tytul   string `json:"title"`
-	Rok     int64  `json:"year"`
-	Strony  int64  `json:"pages"`
-	Autor   int64  `json:"author"`
-	Gatunek int64  `json:"genre"`
-	Jezyk   int64  `json:"language"`
+	Id       int64  `json:"id"`
+	Title    string `json:"title"`
+	Year     int64  `json:"year"`
+	Pages    int64  `json:"pages"`
+	Author   int64  `json:"author"`
+	Genre    int64  `json:"genre"`
+	Language int64  `json:"language"`
 }
 
 func (b *Book) ValidateBook() bool {
-	return b.Tytul == "" ||
-		b.Rok == 0 ||
-		b.Strony <= 0 ||
-		b.Autor <= 0 ||
-		b.Gatunek <= 0 ||
-		b.Jezyk <= 0
+	return b.Title == "" ||
+		b.Year == 0 ||
+		b.Pages <= 0 ||
+		b.Author <= 0 ||
+		b.Genre <= 0 ||
+		b.Language <= 0
 }
 
 type BookExt struct {
 	Id     int64  `json:"id"`
-	Tytul  string `json:"title"`
-	Rok    int64  `json:"year"`
-	Strony int64  `json:"pages"`
-	Autor  struct {
-		Id       int64  `json:"id"`
-		Imie     string `json:"first_name"`
-		Nazwisko string `json:"last_name"`
+	Title  string `json:"title"`
+	Year   int64  `json:"year"`
+	Pages  int64  `json:"pages"`
+	Author struct {
+		Id        int64  `json:"id"`
+		FirstName string `json:"first_name"`
+		LastName  string `json:"last_name"`
 	} `json:"author"`
-	Gatunek struct {
-		Id    int64  `json:"id"`
-		Nazwa string `json:"name"`
+	Genre struct {
+		Id   int64  `json:"id"`
+		Name string `json:"name"`
 	} `json:"genre"`
-	Jezyk struct {
-		Id    int64  `json:"id"`
-		Nazwa string `json:"name"`
+	Language struct {
+		Id   int64  `json:"id"`
+		Name string `json:"name"`
 	} `json:"language"`
 }

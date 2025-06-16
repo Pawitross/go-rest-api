@@ -27,8 +27,19 @@ import (
 // @Router			/books [get]
 func GetBooks(c *gin.Context) {
 	params := c.Request.URL.Query()
+	extend := c.DefaultQuery("extend", "false")
 
-	books, err := db.GetBooks(params)
+	var (
+		books any
+		err   error
+	)
+
+	if extend == "true" {
+		books, err = db.GetBooksExt(params)
+	} else {
+		books, err = db.GetBooks(params)
+	}
+
 	if err != nil {
 		c.JSON(http.StatusNotFound, m.Error{Error: err.Error()})
 		return

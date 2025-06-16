@@ -42,6 +42,63 @@ func GetBooks(params url.Values) ([]m.Book, error) {
 	)
 }
 
+func GetBooksExt(params url.Values) ([]m.BookExt, error) {
+	query := `
+	SELECT
+		k.id,
+		tytul,
+		rok_wydania,
+		liczba_stron,
+		id_autora,
+		a.imie,
+		a.nazwisko,
+		id_gatunku,
+		g.nazwa,
+		id_jezyka,
+		j.nazwa
+	FROM ksiazka k
+		JOIN autor a ON k.id_autora = a.id
+		JOIN gatunek g ON k.id_gatunku = g.id
+		JOIN jezyk j ON k.id_jezyka = j.id`
+
+	allowedParams := map[string]string{
+		"id":                "k.id",
+		"title":             "tytul",
+		"year":              "rok_wydania",
+		"pages":             "liczba_stron",
+		"author.id":         "id_autora",
+		"author.first_name": "a.imie",
+		"author.last_name":  "a.nazwisko",
+		"genre.id":          "id_gatunku",
+		"genre.name":        "g.nazwa",
+		"language.id":       "id_jezyka",
+		"language.name":     "j.nazwa",
+	}
+
+	bookFunc := func(b *m.BookExt, rows *sql.Rows) error {
+		return rows.Scan(
+			&b.Id,
+			&b.Tytul,
+			&b.Rok,
+			&b.Strony,
+			&b.Autor.Id,
+			&b.Autor.Imie,
+			&b.Autor.Nazwisko,
+			&b.Gatunek.Id,
+			&b.Gatunek.Nazwa,
+			&b.Jezyk.Id,
+			&b.Jezyk.Nazwa,
+		)
+	}
+
+	return queryWithParams[m.BookExt](
+		query,
+		params,
+		allowedParams,
+		bookFunc,
+	)
+}
+
 func bookExists(id int64) error {
 	// TODO
 	return fmt.Errorf("TODO")

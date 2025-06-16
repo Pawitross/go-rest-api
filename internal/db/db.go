@@ -64,7 +64,7 @@ func assembleFilter(params url.Values, allowedParams map[string]string) (string,
 	}
 
 	for key, valSlice := range params {
-		if key == "limit" || key == "offset" {
+		if key == "limit" || key == "offset" || key == "extend" {
 			continue
 		}
 

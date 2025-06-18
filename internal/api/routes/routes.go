@@ -8,9 +8,12 @@ import (
 	"pawrest/docs"
 	"pawrest/internal/api/handler"
 	mware "pawrest/internal/api/middleware"
+	"pawrest/internal/db"
 )
 
-func Router(router *gin.Engine) {
+func Router(router *gin.Engine, db *db.Database) {
+	h := handler.Handlers{DB: db}
+
 	docs.SwaggerInfo.BasePath = "/api/v1"
 	api := router.Group("/api")
 	{
@@ -18,16 +21,16 @@ func Router(router *gin.Engine) {
 		{
 			books := v1.Group("/books")
 			{
-				books.GET("", handler.GetBooks)
-				books.GET("/:id", handler.GetBook)
+				books.GET("", h.GetBooks)
+				books.GET("/:id", h.GetBook)
 
-				books.POST("", handler.PostBook)
+				books.POST("", h.PostBook)
 
-				books.PUT("/:id", handler.PutBook)
+				books.PUT("/:id", h.PutBook)
 
-				books.PATCH("/:id", handler.PatchBook)
+				books.PATCH("/:id", h.PatchBook)
 
-				books.DELETE("/:id", handler.DeleteBook)
+				books.DELETE("/:id", h.DeleteBook)
 			}
 
 			v1.GET("login", handler.ReturnToken)

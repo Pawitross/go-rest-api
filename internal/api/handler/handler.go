@@ -9,6 +9,10 @@ import (
 	m "pawrest/internal/models"
 )
 
+type Handlers struct {
+	DB *db.Database
+}
+
 // @Summary		Get a list of all books
 // @Description	Responds with a list of all books as JSON. Optional filtering and pagination is available through parameters.
 // @Tags			Books
@@ -25,7 +29,7 @@ import (
 // @Success		200			{array}		models.Book		"OK - Fetched books"
 // @Failure		404			{object}	models.Error	"Not Found"
 // @Router			/books [get]
-func GetBooks(c *gin.Context) {
+func (h *Handlers) GetBooks(c *gin.Context) {
 	params := c.Request.URL.Query()
 	extend := c.DefaultQuery("extend", "false")
 
@@ -35,9 +39,9 @@ func GetBooks(c *gin.Context) {
 	)
 
 	if extend == "true" {
-		books, err = db.GetBooksExt(params)
+		books, err = h.DB.GetBooksExt(params)
 	} else {
-		books, err = db.GetBooks(params)
+		books, err = h.DB.GetBooks(params)
 	}
 
 	if err != nil {
@@ -57,7 +61,7 @@ func GetBooks(c *gin.Context) {
 // @Failure		400	{object}	models.Error	"Bad Request - Invalid book id"
 // @Failure		404	{object}	models.Error	"Not Found"
 // @Router			/books/{id} [get]
-func GetBook(c *gin.Context) {
+func (h *Handlers) GetBook(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
@@ -65,7 +69,7 @@ func GetBook(c *gin.Context) {
 		return
 	}
 
-	book, err := db.GetBook(int64(id))
+	book, err := h.DB.GetBook(int64(id))
 	if err != nil {
 		c.JSON(http.StatusNotFound, m.Error{Error: err.Error()})
 		return
@@ -84,7 +88,7 @@ func GetBook(c *gin.Context) {
 // @Failure		400		{object}	models.Error	"Bad Request - Invalid input or JSON"
 // @Header			201		{string}	Location		"Path of the newly created book"
 // @Router			/books [post]
-func PostBook(c *gin.Context) {
+func (h *Handlers) PostBook(c *gin.Context) {
 	var newBook m.Book
 
 	if err := c.BindJSON(&newBook); err != nil {
@@ -97,7 +101,7 @@ func PostBook(c *gin.Context) {
 		return
 	}
 
-	id, err := db.InsertBook(newBook)
+	id, err := h.DB.InsertBook(newBook)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, m.Error{Error: err.Error()})
 		return
@@ -121,7 +125,7 @@ func PostBook(c *gin.Context) {
 // @Failure		400		{object}	models.Error	"Bad Request - Invalid input or JSON"
 // @Failure		404		{object}	models.Error	"Not Found -  No resource found"
 // @Router			/books/{id} [put]
-func PutBook(c *gin.Context) {
+func (h *Handlers) PutBook(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
@@ -141,7 +145,7 @@ func PutBook(c *gin.Context) {
 		return
 	}
 
-	if err := db.UpdateWholeBook(int64(id), newBook); err != nil {
+	if err := h.DB.UpdateWholeBook(int64(id), newBook); err != nil {
 		c.JSON(http.StatusNotFound, m.Error{Error: err.Error()})
 		return
 	}
@@ -159,7 +163,7 @@ func PutBook(c *gin.Context) {
 // @Failure		400		{object}	models.Error	"Bad Request - Invalid input or JSON"
 // @Failure		404		{object}	models.Error	"Not Found -  No resource found"
 // @Router			/books/{id} [patch]
-func PatchBook(c *gin.Context) {
+func (h *Handlers) PatchBook(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
@@ -174,7 +178,7 @@ func PatchBook(c *gin.Context) {
 		return
 	}
 
-	if err := db.UpdateBook(int64(id), patchBook); err != nil {
+	if err := h.DB.UpdateBook(int64(id), patchBook); err != nil {
 		c.JSON(http.StatusNotFound, m.Error{Error: err.Error()})
 		return
 	}
@@ -189,7 +193,7 @@ func PatchBook(c *gin.Context) {
 // @Success		204	"No Content - Successfully deleted the book"
 // @Failure		400	{object}	models.Error	"Bad Request - Invalid book id"
 // @Router			/books/{id} [delete]
-func DeleteBook(c *gin.Context) {
+func (h *Handlers) DeleteBook(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
@@ -197,7 +201,7 @@ func DeleteBook(c *gin.Context) {
 		return
 	}
 
-	if err := db.DelBook(int64(id)); err != nil {
+	if err := h.DB.DelBook(int64(id)); err != nil {
 		c.JSON(http.StatusNotFound, m.Error{Error: err.Error()})
 		return
 	}

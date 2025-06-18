@@ -16,27 +16,31 @@ import (
 	"pawrest/internal/models"
 )
 
+var database *db.Database
+
 func TestMain(m *testing.M) {
-	if err := db.ConnectToDB(); err != nil {
+	var err error
+	database, err = db.ConnectToDB()
+	if err != nil {
 		log.Fatal(err)
 	}
-	defer db.CloseDB()
+	defer database.CloseDB()
 
 	m.Run()
 }
 
-func SetupTestRouter() *gin.Engine {
+func SetupTestRouter(db *db.Database) *gin.Engine {
 	gin.SetMode(gin.TestMode)
 	router := gin.New()
 
-	routes.Router(router)
+	routes.Router(router, db)
 
 	return router
 }
 
 // GET /books
 func TestListBooksSuccess(t *testing.T) {
-	router := SetupTestRouter()
+	router := SetupTestRouter(database)
 	w := httptest.NewRecorder()
 
 	req := httptest.NewRequest("GET", "/api/v1/books", nil)
@@ -54,7 +58,7 @@ func TestListBooksSuccess(t *testing.T) {
 
 // GET /books/id
 func TestGetBookSuccess(t *testing.T) {
-	router := SetupTestRouter()
+	router := SetupTestRouter(database)
 	w := httptest.NewRecorder()
 
 	req := httptest.NewRequest("GET", "/api/v1/books/1", nil)
@@ -75,7 +79,7 @@ func TestGetBookSuccess(t *testing.T) {
 }
 
 func TestGetBookNotFound(t *testing.T) {
-	router := SetupTestRouter()
+	router := SetupTestRouter(database)
 	w := httptest.NewRecorder()
 
 	req := httptest.NewRequest("GET", "/api/v1/books/9999", nil)
@@ -86,7 +90,7 @@ func TestGetBookNotFound(t *testing.T) {
 }
 
 func TestGetBookBadRequest(t *testing.T) {
-	router := SetupTestRouter()
+	router := SetupTestRouter(database)
 	w := httptest.NewRecorder()
 
 	req := httptest.NewRequest("GET", "/api/v1/books/string", nil)
@@ -98,7 +102,7 @@ func TestGetBookBadRequest(t *testing.T) {
 
 // POST /books
 func TestPostBookSuccess(t *testing.T) {
-	router := SetupTestRouter()
+	router := SetupTestRouter(database)
 	w := httptest.NewRecorder()
 
 	testBook := models.Book{
@@ -122,7 +126,7 @@ func TestPostBookSuccess(t *testing.T) {
 	var rBook models.Book
 	err = json.NewDecoder(w.Body).Decode(&rBook)
 	assert.NoError(t, err, "Error decoding response data")
-	defer db.DelBook(rBook.Id)
+	defer database.DelBook(rBook.Id)
 
 	expLoc := fmt.Sprintf("/api/v1/books/%v", rBook.Id)
 
@@ -138,7 +142,7 @@ func TestPostBookSuccess(t *testing.T) {
 }
 
 func TestPostBookValidationErr(t *testing.T) {
-	router := SetupTestRouter()
+	router := SetupTestRouter(database)
 	w := httptest.NewRecorder()
 
 	testBook := models.Book{
@@ -168,7 +172,7 @@ func TestPostBookValidationErr(t *testing.T) {
 
 // PUT /books
 func TestPutBookSuccess(t *testing.T) {
-	router := SetupTestRouter()
+	router := SetupTestRouter(database)
 	w := httptest.NewRecorder()
 
 	testBook := models.Book{
@@ -191,7 +195,7 @@ func TestPutBookSuccess(t *testing.T) {
 }
 
 func TestPutBookNotFoundBigId(t *testing.T) {
-	router := SetupTestRouter()
+	router := SetupTestRouter(database)
 	w := httptest.NewRecorder()
 
 	testBook := models.Book{
@@ -220,7 +224,7 @@ func TestPutBookNotFoundBigId(t *testing.T) {
 }
 
 func TestPutBookBadRequestStringId(t *testing.T) {
-	router := SetupTestRouter()
+	router := SetupTestRouter(database)
 	w := httptest.NewRecorder()
 
 	testBook := models.Book{
@@ -249,7 +253,7 @@ func TestPutBookBadRequestStringId(t *testing.T) {
 }
 
 func TestPutBookBadRequestBadJSON(t *testing.T) {
-	router := SetupTestRouter()
+	router := SetupTestRouter(database)
 	w := httptest.NewRecorder()
 
 	testBook := models.Book{

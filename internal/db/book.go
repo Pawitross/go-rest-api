@@ -8,7 +8,7 @@ import (
 	m "pawrest/internal/models"
 )
 
-func GetBooks(params url.Values) ([]m.Book, error) {
+func (d *Database) GetBooks(params url.Values) ([]m.Book, error) {
 	query := `
 	SELECT
 		id,
@@ -35,6 +35,7 @@ func GetBooks(params url.Values) ([]m.Book, error) {
 	}
 
 	return queryWithParams[m.Book](
+		d,
 		query,
 		params,
 		allowedParams,
@@ -42,7 +43,7 @@ func GetBooks(params url.Values) ([]m.Book, error) {
 	)
 }
 
-func GetBooksExt(params url.Values) ([]m.BookExt, error) {
+func (d *Database) GetBooksExt(params url.Values) ([]m.BookExt, error) {
 	query := `
 	SELECT
 		k.id,
@@ -92,6 +93,7 @@ func GetBooksExt(params url.Values) ([]m.BookExt, error) {
 	}
 
 	return queryWithParams[m.BookExt](
+		d,
 		query,
 		params,
 		allowedParams,
@@ -99,12 +101,12 @@ func GetBooksExt(params url.Values) ([]m.BookExt, error) {
 	)
 }
 
-func bookExists(id int64) error {
+func (d *Database) bookExists(id int64) error {
 	// TODO
 	return fmt.Errorf("TODO")
 }
 
-func GetBook(id int64) (m.Book, error) {
+func (d *Database) GetBook(id int64) (m.Book, error) {
 	query := `
 	SELECT
 		id,
@@ -121,10 +123,10 @@ func GetBook(id int64) (m.Book, error) {
 		return row.Scan(&b.Id, &b.Title, &b.Year, &b.Pages, &b.Author, &b.Genre, &b.Language)
 	}
 
-	return queryId[m.Book](query, id, bookFunc)
+	return queryId[m.Book](d, query, id, bookFunc)
 }
 
-func InsertBook(b m.Book) (int64, error) {
+func (d *Database) InsertBook(b m.Book) (int64, error) {
 	query := `
 	INSERT INTO ksiazka (
 		tytul,
@@ -136,10 +138,10 @@ func InsertBook(b m.Book) (int64, error) {
 	)
 	VALUES (?, ?, ?, ?, ?, ?)`
 
-	return insert(query, b.Title, b.Year, b.Pages, b.Author, b.Genre, b.Language)
+	return d.insert(query, b.Title, b.Year, b.Pages, b.Author, b.Genre, b.Language)
 }
 
-func UpdateWholeBook(id int64, b m.Book) error {
+func (d *Database) UpdateWholeBook(id int64, b m.Book) error {
 	query := `
 	UPDATE ksiazka
 	SET
@@ -151,10 +153,10 @@ func UpdateWholeBook(id int64, b m.Book) error {
 		id_jezyka = ?
 	WHERE id = ?`
 
-	return updateWholeId(query, b.Title, b.Year, b.Pages, b.Author, b.Genre, b.Language, id)
+	return d.updateWholeId(query, b.Title, b.Year, b.Pages, b.Author, b.Genre, b.Language, id)
 }
 
-func UpdateBook(id int64, b m.Book) error {
+func (d *Database) UpdateBook(id int64, b m.Book) error {
 	fieldToDb := map[string]string{
 		"Title":    "tytul",
 		"Year":     "rok_wydania",
@@ -164,11 +166,11 @@ func UpdateBook(id int64, b m.Book) error {
 		"Language": "id_jezyka",
 	}
 
-	return updatePartId(b, "ksiazka", id, fieldToDb)
+	return d.updatePartId(b, "ksiazka", id, fieldToDb)
 }
 
-func DelBook(id int64) error {
+func (d *Database) DelBook(id int64) error {
 	query := "DELETE FROM ksiazka WHERE id = ?"
 
-	return deleteId(query, id)
+	return d.deleteId(query, id)
 }

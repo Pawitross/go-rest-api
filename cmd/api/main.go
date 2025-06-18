@@ -12,10 +12,11 @@ import (
 
 func main() {
 	fmt.Println("Connecting to the database...")
-	if err := db.ConnectToDB(); err != nil {
+	database, err := db.ConnectToDB()
+	if err != nil {
 		log.Fatal(err)
 	}
-	defer db.CloseDB()
+	defer database.CloseDB()
 
 	if err := middleware.InitLogger(); err != nil {
 		log.Fatalf("Failed to initialize logging middleware: %v\n", err)
@@ -27,7 +28,7 @@ func main() {
 	router := gin.Default()
 
 	router.Use(middleware.FileLogger())
-	routes.Router(router)
+	routes.Router(router, database)
 
 	if err := router.Run(":8080"); err != nil {
 		log.Fatal(err)

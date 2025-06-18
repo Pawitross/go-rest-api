@@ -10,9 +10,11 @@ import (
 	"github.com/go-sql-driver/mysql"
 )
 
-var db *sql.DB
+type Database struct {
+	pool *sql.DB
+}
 
-func ConnectToDB() error {
+func ConnectToDB() (*Database, error) {
 	cfg := mysql.NewConfig()
 
 	cfg.User = "root"
@@ -22,26 +24,25 @@ func ConnectToDB() error {
 	cfg.DBName = "paw"
 	cfg.ClientFoundRows = true
 
-	var err error
-	db, err = sql.Open("mysql", cfg.FormatDSN())
+	db, err := sql.Open("mysql", cfg.FormatDSN())
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	if pingErr := db.Ping(); pingErr != nil {
-		return pingErr
+	if err := db.Ping(); err != nil {
+		return nil, err
 	}
 
-	return nil
+	return &Database{pool: db}, nil
 }
 
-func CloseDB() {
-	if db != nil {
-		db.Close()
+func (d *Database) CloseDB() {
+	if d.pool != nil {
+		d.pool.Close()
 	}
 }
 
-func assembleFilter(params url.Values, allowedParams map[string]string) (string, []any, error) {
+func (d *Database) assembleFilter(params url.Values, allowedParams map[string]string) (string, []any, error) {
 	var (
 		conditions []string
 		args       []any
@@ -115,6 +116,7 @@ func assembleFilter(params url.Values, allowedParams map[string]string) (string,
 }
 
 func queryWithParams[T any](
+	d *Database,
 	query string,
 	params url.Values,
 	allowPar map[string]string,
@@ -123,7 +125,7 @@ func queryWithParams[T any](
 	var args []any
 
 	if len(params) > 0 {
-		filter, argsOut, err := assembleFilter(params, allowPar)
+		filter, argsOut, err := d.assembleFilter(params, allowPar)
 		if err != nil {
 			return nil, err
 		}
@@ -132,52 +134,53 @@ func queryWithParams[T any](
 		args = argsOut
 	}
 
-	var data []T
+	var records []T
 
-	rows, err := db.Query(query, args...)
+	rows, err := d.pool.Query(query, args...)
 	if err != nil {
 		return nil, fmt.Errorf("Query error (%v)", err)
 	}
 	defer rows.Close()
 
 	for rows.Next() {
-		var d T
+		var r T
 
-		if err := scanFunc(&d, rows); err != nil {
+		if err := scanFunc(&r, rows); err != nil {
 			return nil, fmt.Errorf("Scan error (%v)", err)
 		}
 
-		data = append(data, d)
+		records = append(records, r)
 	}
 
 	if err := rows.Err(); err != nil {
 		return nil, fmt.Errorf("Rows error (%v)", err)
 	}
 
-	return data, nil
+	return records, nil
 }
 
 func queryId[T any](
+	d *Database,
 	query string,
 	id int64,
 	scanFunc func(*T, *sql.Row) error,
 ) (T, error) {
-	var d T
+	var r T
 
-	row := db.QueryRow(query, id)
-	if err := scanFunc(&d, row); err != nil {
+	row := d.pool.QueryRow(query, id)
+	if err := scanFunc(&r, row); err != nil {
 		if err == sql.ErrNoRows {
-			return d, fmt.Errorf("No resource found with id %v", id)
+			return r, fmt.Errorf("No resource found with id %v", id)
 		}
 
-		return d, fmt.Errorf("Scan error (%v)", err)
+		return r, fmt.Errorf("Scan error (%v)", err)
 	}
 
-	return d, nil
+	return r, nil
 }
 
-func insert(query string, args ...any) (int64, error) {
-	res, err := db.Exec(query, args...)
+func (d *Database) insert(query string, args ...any) (int64, error) {
+	res, err := d.pool.Exec(query, args...)
 	if err != nil {
 		return 0, fmt.Errorf("Failed to insert record (%v)", err)
 	}
@@ -190,8 +193,8 @@ func insert(query string, args ...any) (int64, error) {
 	return id, nil
 }
 
-func updateWholeId(query string, args ...any) error {
-	res, err := db.Exec(query, args...)
+func (d *Database) updateWholeId(query string, args ...any) error {
+	res, err := d.pool.Exec(query, args...)
 	if err != nil {
 		return fmt.Errorf("Failed to update (%v)", err)
 	}
@@ -208,17 +211,17 @@ func updateWholeId(query string, args ...any) error {
 	return nil
 }
 
-func updatePartId(d any, table string, id int64, fToDb map[string]string) error {
+func (d *Database) updatePartId(r any, table string, id int64, fToDb map[string]string) error {
 	var (
 		updates []string
 		args    []any
 	)
 
-	valOfD := reflect.ValueOf(d)
+	valOfR := reflect.ValueOf(r)
 
-	fields := reflect.VisibleFields(reflect.TypeOf(d))
+	fields := reflect.VisibleFields(reflect.TypeOf(r))
 	for i, f := range fields {
-		fValue := valOfD.Field(i)
+		fValue := valOfR.Field(i)
 		if fValue.IsZero() {
 			continue
 		}
@@ -239,7 +242,7 @@ func updatePartId(d any, table string, id int64, fToDb map[string]string) error 
 	query := "UPDATE " + table + " SET " + strings.Join(updates, ", ") + " WHERE id = ?"
 	args = append(args, id)
 
-	res, err := db.Exec(query, args...)
+	res, err := d.pool.Exec(query, args...)
 	if err != nil {
 		return fmt.Errorf("Failed to update (%v)", err)
 	}
@@ -256,8 +259,8 @@ func updatePartId(d any, table string, id int64, fToDb map[string]string) error 
 	return nil
 }
 
-func deleteId(query string, id int64) error {
-	res, err := db.Exec(query, id)
+func (d *Database) deleteId(query string, id int64) error {
+	res, err := d.pool.Exec(query, id)
 	if err != nil {
 		return fmt.Errorf("Failed to delete (%v)", err)
 	}

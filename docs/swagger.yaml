@@ -79,8 +79,8 @@ paths:
             items:
               $ref: '#/definitions/models.Book'
             type: array
-        "404":
-          description: Not Found
+        "500":
+          description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Error'
       summary: Get a list of all books
@@ -113,6 +113,10 @@ paths:
           description: Bad Request - Invalid input or JSON
           schema:
             $ref: '#/definitions/models.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
       summary: Create a new book
       tags:
       - Books
@@ -131,6 +135,14 @@ paths:
           description: No Content - Successfully deleted the book
         "400":
           description: Bad Request - Invalid book id
+          schema:
+            $ref: '#/definitions/models.Error'
+        "404":
+          description: Not Found -  No resource found
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Error'
       summary: Delete an existing book
@@ -156,7 +168,11 @@ paths:
           schema:
             $ref: '#/definitions/models.Error'
         "404":
-          description: Not Found
+          description: Not Found - No resource found
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Error'
       summary: Get one book
@@ -191,6 +207,10 @@ paths:
           description: Not Found -  No resource found
           schema:
             $ref: '#/definitions/models.Error'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.Error'
       summary: Patch an existing book
       tags:
       - Books
@@ -220,6 +240,10 @@ paths:
             $ref: '#/definitions/models.Error'
         "404":
           description: Not Found -  No resource found
+          schema:
+            $ref: '#/definitions/models.Error'
+        "500":
+          description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Error'
       summary: Update an existing book

@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"net/url"
 	"reflect"
@@ -9,6 +10,9 @@ import (
 
 	"github.com/go-sql-driver/mysql"
 )
+
+var ErrNotFound = errors.New("No resource found")
+var ErrForeignKey = errors.New("Foreign key constraint error")
 
 type Database struct {
 	pool *sql.DB
@@ -40,6 +44,16 @@ func (d *Database) CloseDB() {
 	if d.pool != nil {
 		d.pool.Close()
 	}
+}
+
+func isErrForeignKey(err error) bool {
+	var mysqlerr *mysql.MySQLError
+
+	if errors.As(err, &mysqlerr) {
+		return mysqlerr.Number == 1452
+	}
+
+	return false
 }
 
 func (d *Database) assembleFilter(params url.Values, allowedParams map[string]string) (string, []any, error) {
@@ -169,8 +183,8 @@ func queryId[T any](
 
 	row := d.pool.QueryRow(query, id)
 	if err := scanFunc(&r, row); err != nil {
-		if err == sql.ErrNoRows {
-			return r, fmt.Errorf("No resource found with id %v", id)
+		if errors.Is(err, sql.ErrNoRows) {
+			return r, fmt.Errorf("%w with id %v", ErrNotFound, id)
 		}
 
 		return r, fmt.Errorf("Scan error (%v)", err)
@@ -182,6 +196,10 @@ func queryId[T any](
 func (d *Database) insert(query string, args ...any) (int64, error) {
 	res, err := d.pool.Exec(query, args...)
 	if err != nil {
+		if isErrForeignKey(err) {
+			return 0, ErrForeignKey
+		}
+
 		return 0, fmt.Errorf("Failed to insert record (%v)", err)
 	}
 
@@ -196,6 +214,10 @@ func (d *Database) insert(query string, args ...any) (int64, error) {
 func (d *Database) updateWholeId(query string, args ...any) error {
 	res, err := d.pool.Exec(query, args...)
 	if err != nil {
+		if isErrForeignKey(err) {
+			return ErrForeignKey
+		}
+
 		return fmt.Errorf("Failed to update (%v)", err)
 	}
 
@@ -205,7 +227,7 @@ func (d *Database) updateWholeId(query string, args ...any) error {
 	}
 
 	if rows == 0 {
-		return fmt.Errorf("No record found to update")
+		return ErrNotFound
 	}
 
 	return nil
@@ -244,6 +266,10 @@ func (d *Database) updatePartId(r any, table string, id int64, fToDb map[string]
 
 	res, err := d.pool.Exec(query, args...)
 	if err != nil {
+		if isErrForeignKey(err) {
+			return ErrForeignKey
+		}
+
 		return fmt.Errorf("Failed to update (%v)", err)
 	}
 
@@ -253,7 +279,7 @@ func (d *Database) updatePartId(r any, table string, id int64, fToDb map[string]
 	}
 
 	if rows == 0 {
-		return fmt.Errorf("No record found to update")
+		return ErrNotFound
 	}
 
 	return nil
@@ -271,7 +297,7 @@ func (d *Database) deleteId(query string, id int64) error {
 	}
 
 	if rows == 0 {
-		return fmt.Errorf("No resource found with id %v", id)
+		return fmt.Errorf("%w with id %v", ErrNotFound, id)
 	}
 
 	return nil

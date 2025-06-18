@@ -91,8 +91,8 @@ const docTemplate = `{
                             }
                         }
                     },
-                    "404": {
-                        "description": "Not Found",
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/models.Error"
                         }
@@ -140,6 +140,12 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/models.Error"
                         }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
                     }
                 }
             }
@@ -177,7 +183,13 @@ const docTemplate = `{
                         }
                     },
                     "404": {
-                        "description": "Not Found",
+                        "description": "Not Found - No resource found",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/models.Error"
                         }
@@ -226,6 +238,12 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/models.Error"
                         }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
                     }
                 }
             },
@@ -250,6 +268,18 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request - Invalid book id",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found -  No resource found",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/models.Error"
                         }
@@ -295,6 +325,12 @@ const docTemplate = `{
                     },
                     "404": {
                         "description": "Not Found -  No resource found",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/models.Error"
                         }

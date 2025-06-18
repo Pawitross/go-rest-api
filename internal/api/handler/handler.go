@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"errors"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -11,6 +13,18 @@ import (
 
 type Handlers struct {
 	DB *db.Database
+}
+
+func handleDBError(c *gin.Context, err error) {
+	switch {
+	case errors.Is(err, db.ErrNotFound):
+		c.JSON(http.StatusNotFound, m.Error{Error: err.Error()})
+	case errors.Is(err, db.ErrForeignKey):
+		c.JSON(http.StatusBadRequest, m.Error{Error: err.Error()})
+	default:
+		log.Println(err.Error())
+		c.JSON(http.StatusInternalServerError, m.Error{Error: "An Internal Server Error occurred"})
+	}
 }
 
 // @Summary		Get a list of all books
@@ -27,7 +41,7 @@ type Handlers struct {
 // @Param			limit		query		int				false	"Limit returned number of resources"
 // @Param			offset		query		int				false	"Offset returned resources"
 // @Success		200			{array}		models.Book		"OK - Fetched books"
-// @Failure		404			{object}	models.Error	"Not Found"
+// @Failure		500			{object}	models.Error	"Internal Server Error"
 // @Router			/books [get]
 func (h *Handlers) GetBooks(c *gin.Context) {
 	params := c.Request.URL.Query()
@@ -45,7 +59,8 @@ func (h *Handlers) GetBooks(c *gin.Context) {
 	}
 
 	if err != nil {
-		c.JSON(http.StatusNotFound, m.Error{Error: err.Error()})
+		log.Println(err.Error())
+		c.JSON(http.StatusInternalServerError, m.Error{Error: "An Internal Server Error occurred"})
 		return
 	}
 
@@ -59,7 +74,8 @@ func (h *Handlers) GetBooks(c *gin.Context) {
 // @Param			id	path		int				true	"Book id"
 // @Success		200	{object}	models.Book		"OK - Fetched book"
 // @Failure		400	{object}	models.Error	"Bad Request - Invalid book id"
-// @Failure		404	{object}	models.Error	"Not Found"
+// @Failure		404	{object}	models.Error	"Not Found - No resource found"
+// @Failure		500	{object}	models.Error	"Internal Server Error"
 // @Router			/books/{id} [get]
 func (h *Handlers) GetBook(c *gin.Context) {
 	idStr := c.Param("id")
@@ -70,8 +86,14 @@ func (h *Handlers) GetBook(c *gin.Context) {
 	}
 
 	book, err := h.DB.GetBook(int64(id))
-	if err != nil {
+	if errors.Is(err, db.ErrNotFound) {
 		c.JSON(http.StatusNotFound, m.Error{Error: err.Error()})
+		return
+	}
+
+	if err != nil {
+		log.Println(err.Error())
+		c.JSON(http.StatusInternalServerError, m.Error{Error: "An Internal Server Error occurred"})
 		return
 	}
 
@@ -86,6 +108,7 @@ func (h *Handlers) GetBook(c *gin.Context) {
 // @Param			book	body		models.Book		true	"New Book"
 // @Success		201		{object}	models.Book		"Created - Added new book"
 // @Failure		400		{object}	models.Error	"Bad Request - Invalid input or JSON"
+// @Failure		500		{object}	models.Error	"Internal Server Error"
 // @Header			201		{string}	Location		"Path of the newly created book"
 // @Router			/books [post]
 func (h *Handlers) PostBook(c *gin.Context) {
@@ -102,8 +125,14 @@ func (h *Handlers) PostBook(c *gin.Context) {
 	}
 
 	id, err := h.DB.InsertBook(newBook)
-	if err != nil {
+	if errors.Is(err, db.ErrForeignKey) {
 		c.JSON(http.StatusBadRequest, m.Error{Error: err.Error()})
+		return
+	}
+
+	if err != nil {
+		log.Println(err.Error())
+		c.JSON(http.StatusInternalServerError, m.Error{Error: "An Internal Server Error occurred"})
 		return
 	}
 
@@ -124,6 +153,7 @@ func (h *Handlers) PostBook(c *gin.Context) {
 // @Success		204		"Updated the book"
 // @Failure		400		{object}	models.Error	"Bad Request - Invalid input or JSON"
 // @Failure		404		{object}	models.Error	"Not Found -  No resource found"
+// @Failure		500		{object}	models.Error	"Internal Server Error"
 // @Router			/books/{id} [put]
 func (h *Handlers) PutBook(c *gin.Context) {
 	idStr := c.Param("id")
@@ -146,7 +176,7 @@ func (h *Handlers) PutBook(c *gin.Context) {
 	}
 
 	if err := h.DB.UpdateWholeBook(int64(id), newBook); err != nil {
-		c.JSON(http.StatusNotFound, m.Error{Error: err.Error()})
+		handleDBError(c, err)
 		return
 	}
 
@@ -162,6 +192,7 @@ func (h *Handlers) PutBook(c *gin.Context) {
 // @Success		204		"No Content - Successfully patched the book"
 // @Failure		400		{object}	models.Error	"Bad Request - Invalid input or JSON"
 // @Failure		404		{object}	models.Error	"Not Found -  No resource found"
+// @Failure		500		{object}	models.Error	"Internal Server Error"
 // @Router			/books/{id} [patch]
 func (h *Handlers) PatchBook(c *gin.Context) {
 	idStr := c.Param("id")
@@ -179,7 +210,7 @@ func (h *Handlers) PatchBook(c *gin.Context) {
 	}
 
 	if err := h.DB.UpdateBook(int64(id), patchBook); err != nil {
-		c.JSON(http.StatusNotFound, m.Error{Error: err.Error()})
+		handleDBError(c, err)
 		return
 	}
 
@@ -192,6 +223,8 @@ func (h *Handlers) PatchBook(c *gin.Context) {
 // @Param			id	path	int	true	"Book id"
 // @Success		204	"No Content - Successfully deleted the book"
 // @Failure		400	{object}	models.Error	"Bad Request - Invalid book id"
+// @Failure		404	{object}	models.Error	"Not Found -  No resource found"
+// @Failure		500	{object}	models.Error	"Internal Server Error"
 // @Router			/books/{id} [delete]
 func (h *Handlers) DeleteBook(c *gin.Context) {
 	idStr := c.Param("id")
@@ -202,7 +235,13 @@ func (h *Handlers) DeleteBook(c *gin.Context) {
 	}
 
 	if err := h.DB.DelBook(int64(id)); err != nil {
-		c.JSON(http.StatusNotFound, m.Error{Error: err.Error()})
+		if errors.Is(err, db.ErrNotFound) {
+			c.JSON(http.StatusNotFound, m.Error{Error: err.Error()})
+			return
+		}
+
+		log.Println(err.Error())
+		c.JSON(http.StatusInternalServerError, m.Error{Error: "An Internal Server Error occurred"})
 		return
 	}
 

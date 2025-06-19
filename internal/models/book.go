@@ -10,7 +10,7 @@ type Book struct {
 	Language int64  `json:"language"`
 }
 
-func (b *Book) ValidateBook() bool {
+func (b *Book) IsNotValid() bool {
 	return b.Title == "" ||
 		b.Year == 0 ||
 		b.Pages <= 0 ||

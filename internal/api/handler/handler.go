@@ -125,7 +125,7 @@ func (h *Handlers) PostBook(c *gin.Context) {
 		return
 	}
 
-	if newBook.ValidateBook() {
+	if newBook.IsNotValid() {
 		c.JSON(http.StatusBadRequest, models.Error{Error: "One or more required fields are missing or invalid"})
 		return
 	}
@@ -176,7 +176,7 @@ func (h *Handlers) PutBook(c *gin.Context) {
 		return
 	}
 
-	if newBook.ValidateBook() {
+	if newBook.IsNotValid() {
 		c.JSON(http.StatusBadRequest, models.Error{Error: "One or more required fields are missing or invalid"})
 		return
 	}

@@ -148,7 +148,7 @@ func queryWithParams[T any](
 		args = argsOut
 	}
 
-	var records []T
+	records := []T{}
 
 	rows, err := d.pool.Query(query, args...)
 	if err != nil {

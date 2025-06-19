@@ -13,6 +13,7 @@ import (
 
 var ErrNotFound = errors.New("No resource found")
 var ErrForeignKey = errors.New("Foreign key constraint error")
+var ErrParam = errors.New("Parameter error")
 
 type Database struct {
 	pool *sql.DB
@@ -75,7 +76,7 @@ func (d *Database) assembleFilter(params url.Values, allowedParams map[string]st
 	offset, hasOffset := params["offset"]
 
 	if !hasLimit && hasOffset {
-		return "", nil, fmt.Errorf("A limit must be provided when using an offset")
+		return "", nil, fmt.Errorf("%w: a limit must be provided when using an offset", ErrParam)
 	}
 
 	for key, valSlice := range params {
@@ -95,15 +96,15 @@ func (d *Database) assembleFilter(params url.Values, allowedParams map[string]st
 
 		columnName, allowed := allowedParams[key]
 		if !allowed {
-			return "", nil, fmt.Errorf("An unknown parameter was provided")
+			return "", nil, fmt.Errorf("%w: an unknown parameter was provided", ErrParam)
 		}
 
 		if len(valSlice) == 0 || valSlice[0] == "" {
-			return "", nil, fmt.Errorf("Provided parameter is empty")
+			return "", nil, fmt.Errorf("%w: provided parameter is empty", ErrParam)
 		}
 
 		if len(valSlice) > 1 {
-			return "", nil, fmt.Errorf("Too many parameters were provided for a single column")
+			return "", nil, fmt.Errorf("%w: too many parameters were provided for a single column", ErrParam)
 		}
 
 		conditions = append(conditions, columnName+" "+operator+" ?")

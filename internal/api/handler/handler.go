@@ -41,6 +41,7 @@ func handleDBError(c *gin.Context, err error) {
 // @Param			limit		query		int				false	"Limit returned number of resources"
 // @Param			offset		query		int				false	"Offset returned resources"
 // @Success		200			{array}		models.Book		"OK - Fetched books"
+// @Failure		400			{object}	models.Error	"Bad Request - Invalid input"
 // @Failure		500			{object}	models.Error	"Internal Server Error"
 // @Router			/books [get]
 func (h *Handlers) GetBooks(c *gin.Context) {
@@ -56,6 +57,11 @@ func (h *Handlers) GetBooks(c *gin.Context) {
 		books, err = h.DB.GetBooksExt(params)
 	} else {
 		books, err = h.DB.GetBooks(params)
+	}
+
+	if errors.Is(err, db.ErrParam) {
+		c.JSON(http.StatusBadRequest, models.Error{Error: err.Error()})
+		return
 	}
 
 	if err != nil {

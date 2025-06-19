@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"net/url"
 
-	m "pawrest/internal/models"
+	"pawrest/internal/models"
 )
 
-func (d *Database) GetBooks(params url.Values) ([]m.Book, error) {
+func (d *Database) GetBooks(params url.Values) ([]models.Book, error) {
 	query := `
 	SELECT
 		id,
@@ -30,11 +30,11 @@ func (d *Database) GetBooks(params url.Values) ([]m.Book, error) {
 		"language": "id_jezyka",
 	}
 
-	bookFunc := func(b *m.Book, rows *sql.Rows) error {
+	bookFunc := func(b *models.Book, rows *sql.Rows) error {
 		return rows.Scan(&b.Id, &b.Title, &b.Year, &b.Pages, &b.Author, &b.Genre, &b.Language)
 	}
 
-	return queryWithParams[m.Book](
+	return queryWithParams[models.Book](
 		d,
 		query,
 		params,
@@ -43,7 +43,7 @@ func (d *Database) GetBooks(params url.Values) ([]m.Book, error) {
 	)
 }
 
-func (d *Database) GetBooksExt(params url.Values) ([]m.BookExt, error) {
+func (d *Database) GetBooksExt(params url.Values) ([]models.BookExt, error) {
 	query := `
 	SELECT
 		k.id,
@@ -76,7 +76,7 @@ func (d *Database) GetBooksExt(params url.Values) ([]m.BookExt, error) {
 		"language.name":     "j.nazwa",
 	}
 
-	bookFunc := func(b *m.BookExt, rows *sql.Rows) error {
+	bookFunc := func(b *models.BookExt, rows *sql.Rows) error {
 		return rows.Scan(
 			&b.Id,
 			&b.Title,
@@ -92,7 +92,7 @@ func (d *Database) GetBooksExt(params url.Values) ([]m.BookExt, error) {
 		)
 	}
 
-	return queryWithParams[m.BookExt](
+	return queryWithParams[models.BookExt](
 		d,
 		query,
 		params,
@@ -106,7 +106,7 @@ func (d *Database) bookExists(id int64) error {
 	return fmt.Errorf("TODO")
 }
 
-func (d *Database) GetBook(id int64) (m.Book, error) {
+func (d *Database) GetBook(id int64) (models.Book, error) {
 	query := `
 	SELECT
 		id,
@@ -119,14 +119,14 @@ func (d *Database) GetBook(id int64) (m.Book, error) {
 	FROM ksiazka
 	WHERE id = ?`
 
-	bookFunc := func(b *m.Book, row *sql.Row) error {
+	bookFunc := func(b *models.Book, row *sql.Row) error {
 		return row.Scan(&b.Id, &b.Title, &b.Year, &b.Pages, &b.Author, &b.Genre, &b.Language)
 	}
 
-	return queryId[m.Book](d, query, id, bookFunc)
+	return queryId[models.Book](d, query, id, bookFunc)
 }
 
-func (d *Database) InsertBook(b m.Book) (int64, error) {
+func (d *Database) InsertBook(b models.Book) (int64, error) {
 	query := `
 	INSERT INTO ksiazka (
 		tytul,
@@ -141,7 +141,7 @@ func (d *Database) InsertBook(b m.Book) (int64, error) {
 	return d.insert(query, b.Title, b.Year, b.Pages, b.Author, b.Genre, b.Language)
 }
 
-func (d *Database) UpdateWholeBook(id int64, b m.Book) error {
+func (d *Database) UpdateWholeBook(id int64, b models.Book) error {
 	query := `
 	UPDATE ksiazka
 	SET
@@ -156,7 +156,7 @@ func (d *Database) UpdateWholeBook(id int64, b m.Book) error {
 	return d.updateWholeId(query, b.Title, b.Year, b.Pages, b.Author, b.Genre, b.Language, id)
 }
 
-func (d *Database) UpdateBook(id int64, b m.Book) error {
+func (d *Database) UpdateBook(id int64, b models.Book) error {
 	fieldToDb := map[string]string{
 		"Title":    "tytul",
 		"Year":     "rok_wydania",

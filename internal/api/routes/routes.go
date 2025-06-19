@@ -7,7 +7,7 @@ import (
 
 	"pawrest/docs"
 	"pawrest/internal/api/handler"
-	mware "pawrest/internal/api/middleware"
+	"pawrest/internal/api/middleware"
 	"pawrest/internal/db"
 )
 
@@ -35,7 +35,7 @@ func Router(router *gin.Engine, db *db.Database) {
 
 			v1.GET("login", handler.ReturnToken)
 
-			v1.GET("auth", mware.Authenticate(), mware.Authorize(), func(c *gin.Context) {
+			v1.GET("auth", middleware.Authenticate(), middleware.Authorize(), func(c *gin.Context) {
 				c.JSON(200, "Welcome")
 			})
 		}

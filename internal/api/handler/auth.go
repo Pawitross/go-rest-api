@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
-	m "pawrest/internal/models"
+	"pawrest/internal/models"
 )
 
 func createToken(isAdmin bool) (string, error) {
@@ -43,7 +43,7 @@ func ReturnToken(c *gin.Context) {
 	wantAdmin := c.DefaultQuery("admin", "false")
 
 	if wantAdmin != "false" && wantAdmin != "true" {
-		c.JSON(http.StatusBadRequest, m.Error{Error: "Invalid parameter value"})
+		c.JSON(http.StatusBadRequest, models.Error{Error: "Invalid parameter value"})
 		return
 	}
 
@@ -54,9 +54,9 @@ func ReturnToken(c *gin.Context) {
 
 	token, err := createToken(boolAdmin)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, m.Error{Error: "Failed to create token"})
+		c.JSON(http.StatusInternalServerError, models.Error{Error: "Failed to create token"})
 		return
 	}
 
-	c.JSON(http.StatusOK, m.Token{Token: token})
+	c.JSON(http.StatusOK, models.Token{Token: token})
 }

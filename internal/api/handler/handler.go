@@ -8,7 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"pawrest/internal/db"
-	m "pawrest/internal/models"
+	"pawrest/internal/models"
 )
 
 type Handlers struct {
@@ -18,12 +18,12 @@ type Handlers struct {
 func handleDBError(c *gin.Context, err error) {
 	switch {
 	case errors.Is(err, db.ErrNotFound):
-		c.JSON(http.StatusNotFound, m.Error{Error: err.Error()})
+		c.JSON(http.StatusNotFound, models.Error{Error: err.Error()})
 	case errors.Is(err, db.ErrForeignKey):
-		c.JSON(http.StatusBadRequest, m.Error{Error: err.Error()})
+		c.JSON(http.StatusBadRequest, models.Error{Error: err.Error()})
 	default:
 		log.Println(err.Error())
-		c.JSON(http.StatusInternalServerError, m.Error{Error: "An Internal Server Error occurred"})
+		c.JSON(http.StatusInternalServerError, models.Error{Error: "An Internal Server Error occurred"})
 	}
 }
 
@@ -60,7 +60,7 @@ func (h *Handlers) GetBooks(c *gin.Context) {
 
 	if err != nil {
 		log.Println(err.Error())
-		c.JSON(http.StatusInternalServerError, m.Error{Error: "An Internal Server Error occurred"})
+		c.JSON(http.StatusInternalServerError, models.Error{Error: "An Internal Server Error occurred"})
 		return
 	}
 
@@ -81,19 +81,19 @@ func (h *Handlers) GetBook(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, m.Error{Error: "Provided incorrect identifier"})
+		c.JSON(http.StatusBadRequest, models.Error{Error: "Provided incorrect identifier"})
 		return
 	}
 
 	book, err := h.DB.GetBook(int64(id))
 	if errors.Is(err, db.ErrNotFound) {
-		c.JSON(http.StatusNotFound, m.Error{Error: err.Error()})
+		c.JSON(http.StatusNotFound, models.Error{Error: err.Error()})
 		return
 	}
 
 	if err != nil {
 		log.Println(err.Error())
-		c.JSON(http.StatusInternalServerError, m.Error{Error: "An Internal Server Error occurred"})
+		c.JSON(http.StatusInternalServerError, models.Error{Error: "An Internal Server Error occurred"})
 		return
 	}
 
@@ -112,27 +112,27 @@ func (h *Handlers) GetBook(c *gin.Context) {
 // @Header			201		{string}	Location		"Path of the newly created book"
 // @Router			/books [post]
 func (h *Handlers) PostBook(c *gin.Context) {
-	var newBook m.Book
+	var newBook models.Book
 
 	if err := c.BindJSON(&newBook); err != nil {
-		c.JSON(http.StatusBadRequest, m.Error{Error: "Invalid JSON in request body"})
+		c.JSON(http.StatusBadRequest, models.Error{Error: "Invalid JSON in request body"})
 		return
 	}
 
 	if newBook.ValidateBook() {
-		c.JSON(http.StatusBadRequest, m.Error{Error: "One or more required fields are missing or invalid"})
+		c.JSON(http.StatusBadRequest, models.Error{Error: "One or more required fields are missing or invalid"})
 		return
 	}
 
 	id, err := h.DB.InsertBook(newBook)
 	if errors.Is(err, db.ErrForeignKey) {
-		c.JSON(http.StatusBadRequest, m.Error{Error: err.Error()})
+		c.JSON(http.StatusBadRequest, models.Error{Error: err.Error()})
 		return
 	}
 
 	if err != nil {
 		log.Println(err.Error())
-		c.JSON(http.StatusInternalServerError, m.Error{Error: "An Internal Server Error occurred"})
+		c.JSON(http.StatusInternalServerError, models.Error{Error: "An Internal Server Error occurred"})
 		return
 	}
 
@@ -159,19 +159,19 @@ func (h *Handlers) PutBook(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, m.Error{Error: "Provided incorrect identifier"})
+		c.JSON(http.StatusBadRequest, models.Error{Error: "Provided incorrect identifier"})
 		return
 	}
 
-	var newBook m.Book
+	var newBook models.Book
 
 	if err := c.BindJSON(&newBook); err != nil {
-		c.JSON(http.StatusBadRequest, m.Error{Error: "Invalid JSON in request body"})
+		c.JSON(http.StatusBadRequest, models.Error{Error: "Invalid JSON in request body"})
 		return
 	}
 
 	if newBook.ValidateBook() {
-		c.JSON(http.StatusBadRequest, m.Error{Error: "One or more required fields are missing or invalid"})
+		c.JSON(http.StatusBadRequest, models.Error{Error: "One or more required fields are missing or invalid"})
 		return
 	}
 
@@ -198,14 +198,14 @@ func (h *Handlers) PatchBook(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, m.Error{Error: "Provided incorrect identifier"})
+		c.JSON(http.StatusBadRequest, models.Error{Error: "Provided incorrect identifier"})
 		return
 	}
 
-	var patchBook m.Book
+	var patchBook models.Book
 
 	if err := c.BindJSON(&patchBook); err != nil {
-		c.JSON(http.StatusBadRequest, m.Error{Error: "Invalid JSON in request body"})
+		c.JSON(http.StatusBadRequest, models.Error{Error: "Invalid JSON in request body"})
 		return
 	}
 
@@ -230,18 +230,18 @@ func (h *Handlers) DeleteBook(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, m.Error{Error: "Provided incorrect identifier"})
+		c.JSON(http.StatusBadRequest, models.Error{Error: "Provided incorrect identifier"})
 		return
 	}
 
 	if err := h.DB.DelBook(int64(id)); err != nil {
 		if errors.Is(err, db.ErrNotFound) {
-			c.JSON(http.StatusNotFound, m.Error{Error: err.Error()})
+			c.JSON(http.StatusNotFound, models.Error{Error: err.Error()})
 			return
 		}
 
 		log.Println(err.Error())
-		c.JSON(http.StatusInternalServerError, m.Error{Error: "An Internal Server Error occurred"})
+		c.JSON(http.StatusInternalServerError, models.Error{Error: "An Internal Server Error occurred"})
 		return
 	}
 

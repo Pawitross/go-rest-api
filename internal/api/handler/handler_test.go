@@ -56,6 +56,21 @@ func TestListBooksSuccess(t *testing.T) {
 	assert.NotEmpty(t, rBooks, "Book slice should not be empty")
 }
 
+func TestListBooksBadRequestUnknownParam(t *testing.T) {
+	router := SetupTestRouter(database)
+	w := httptest.NewRecorder()
+
+	req := httptest.NewRequest("GET", "/api/v1/books?foo=bar", nil)
+
+	router.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusBadRequest, w.Code)
+	var rError models.Error
+
+	err := json.NewDecoder(w.Body).Decode(&rError)
+	assert.NoError(t, err, "Error decoding response data")
+}
+
 // GET /books/id
 func TestGetBookSuccess(t *testing.T) {
 	router := SetupTestRouter(database)

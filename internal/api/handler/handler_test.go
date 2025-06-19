@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 
 	"github.com/gin-gonic/gin"
@@ -19,14 +20,23 @@ import (
 var database *db.Database
 
 func TestMain(m *testing.M) {
-	var err error
-	database, err = db.ConnectToDB()
+	code, err := runMain(m)
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	os.Exit(code)
+}
+
+func runMain(m *testing.M) (int, error) {
+	var err error
+	database, err = db.ConnectToDB()
+	if err != nil {
+		return 0, nil
+	}
 	defer database.CloseDB()
 
-	m.Run()
+	return m.Run(), nil
 }
 
 func SetupTestRouter(db *db.Database) *gin.Engine {

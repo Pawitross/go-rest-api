@@ -5,16 +5,20 @@ import (
 	filesswag "github.com/swaggo/files"
 	ginswag "github.com/swaggo/gin-swagger"
 
-	"pawrest/docs"
+	_ "pawrest/docs"
 	"pawrest/internal/api/handler"
 	"pawrest/internal/api/middleware"
 	"pawrest/internal/db"
 )
 
+// @title						Book managing API
+// @description				Documentation of a book managing REST API.
+// @BasePath					/api/v1
+// @externalDocs.description	OpenAPI Specification
+// @externalDocs.url			https://swagger.io/resources/open-api/
 func Router(router *gin.Engine, db *db.Database) {
 	h := handler.Handlers{DB: db}
 
-	docs.SwaggerInfo.BasePath = "/api/v1"
 	api := router.Group("/api")
 	{
 		v1 := api.Group("/v1")

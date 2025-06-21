@@ -1,3 +1,4 @@
+basePath: /api/v1
 definitions:
   models.Book:
     properties:
@@ -26,8 +27,13 @@ definitions:
       token:
         type: string
     type: object
+externalDocs:
+  description: OpenAPI Specification
+  url: https://swagger.io/resources/open-api/
 info:
   contact: {}
+  description: Documentation of a book managing REST API.
+  title: Book managing API
 paths:
   /books:
     get:
@@ -237,7 +243,7 @@ paths:
           $ref: '#/definitions/models.Book'
       responses:
         "204":
-          description: Updated the book
+          description: No content - Updated the book
         "400":
           description: Bad Request - Invalid input or JSON
           schema:

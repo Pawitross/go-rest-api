@@ -231,7 +231,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "204": {
-                        "description": "Updated the book"
+                        "description": "No content - Updated the book"
                     },
                     "400": {
                         "description": "Bad Request - Invalid input or JSON",
@@ -425,6 +425,10 @@ const docTemplate = `{
                 }
             }
         }
+    },
+    "externalDocs": {
+        "description": "OpenAPI Specification",
+        "url": "https://swagger.io/resources/open-api/"
     }
 }`
 
@@ -432,10 +436,10 @@ const docTemplate = `{
 var SwaggerInfo = &swag.Spec{
 	Version:          "",
 	Host:             "",
-	BasePath:         "",
+	BasePath:         "/api/v1",
 	Schemes:          []string{},
-	Title:            "",
-	Description:      "",
+	Title:            "Book managing API",
+	Description:      "Documentation of a book managing REST API.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

@@ -156,7 +156,7 @@ func (h *Handlers) PostBook(c *gin.Context) {
 // @Accept			json
 // @Param			id		path	int			true	"Existing Book id"
 // @Param			book	body	models.Book	true	"Updated Book"
-// @Success		204		"Updated the book"
+// @Success		204		"No content - Updated the book"
 // @Failure		400		{object}	models.Error	"Bad Request - Invalid input or JSON"
 // @Failure		404		{object}	models.Error	"Not Found -  No resource found"
 // @Failure		500		{object}	models.Error	"Internal Server Error"

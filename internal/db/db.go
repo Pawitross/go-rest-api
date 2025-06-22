@@ -19,6 +19,8 @@ type Database struct {
 	pool *sql.DB
 }
 
+var _ BookDatabaseInterface = (*Database)(nil)
+
 func ConnectToDB() (*Database, error) {
 	cfg := mysql.NewConfig()
 

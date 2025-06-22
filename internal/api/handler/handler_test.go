@@ -40,7 +40,7 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
-func setupTestRouter(db *db.Database) *gin.Engine {
+func setupTestRouter(db db.BookDatabaseInterface) *gin.Engine {
 	gin.SetMode(gin.TestMode)
 	router := gin.New()
 

@@ -8,6 +8,16 @@ import (
 	"pawrest/internal/models"
 )
 
+type BookDatabaseInterface interface {
+	GetBooks(params url.Values) ([]models.Book, error)
+	GetBooksExt(params url.Values) ([]models.BookExt, error)
+	GetBook(id int64) (models.Book, error)
+	InsertBook(b models.Book) (int64, error)
+	UpdateWholeBook(id int64, b models.Book) error
+	UpdateBook(id int64, b models.Book) error
+	DelBook(id int64) error
+}
+
 func (d *Database) GetBooks(params url.Values) ([]models.Book, error) {
 	query := `
 	SELECT

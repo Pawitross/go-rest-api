@@ -12,7 +12,7 @@ import (
 )
 
 type Handlers struct {
-	DB *db.Database
+	DB db.BookDatabaseInterface
 }
 
 func handleDBError(c *gin.Context, err error) {

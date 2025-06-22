@@ -223,6 +223,14 @@ func TestPutBookSuccess(t *testing.T) {
 
 	w := execRequest("PUT", "/api/v1/books/1", bytes.NewReader(jsonBook))
 	assert.Equal(t, http.StatusNoContent, w.Code)
+
+	book, _ := database.GetBook(1)
+	assert.Equal(t, testBook.Title, book.Title)
+	assert.Equal(t, testBook.Year, book.Year)
+	assert.Equal(t, testBook.Pages, book.Pages)
+	assert.Equal(t, testBook.Author, book.Author)
+	assert.Equal(t, testBook.Genre, book.Genre)
+	assert.Equal(t, testBook.Language, book.Language)
 }
 
 func TestPutBookNotFoundBigPathId(t *testing.T) {
@@ -307,6 +315,10 @@ func TestPatchBookSuccess(t *testing.T) {
 	jsonStr := []byte(`{"title":"Patch book test", "pages":999}`)
 	w := execRequest("PATCH", "/api/v1/books/1", bytes.NewReader(jsonStr))
 	assert.Equal(t, http.StatusNoContent, w.Code)
+
+	book, _ := database.GetBook(1)
+	assert.Equal(t, "Patch book test", book.Title)
+	assert.Equal(t, int64(999), book.Pages)
 }
 
 func TestPatchBookNotFoundBigPathId(t *testing.T) {

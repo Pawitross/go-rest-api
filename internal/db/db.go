@@ -49,89 +49,6 @@ func (d *Database) CloseDB() {
 	}
 }
 
-func isErrForeignKey(err error) bool {
-	var mysqlerr *mysql.MySQLError
-
-	if errors.As(err, &mysqlerr) {
-		return mysqlerr.Number == 1452
-	}
-
-	return false
-}
-
-func (d *Database) assembleFilter(params url.Values, allowedParams map[string]string) (string, []any, error) {
-	var (
-		conditions []string
-		args       []any
-	)
-
-	operators := map[string]string{
-		".eq":  "=",
-		".gt":  ">",
-		".lt":  "<",
-		".gte": ">=",
-		".lte": "<=",
-		".neq": "<>",
-	}
-
-	limit, hasLimit := params["limit"]
-	offset, hasOffset := params["offset"]
-
-	if !hasLimit && hasOffset {
-		return "", nil, fmt.Errorf("%w: a limit must be provided when using an offset", ErrParam)
-	}
-
-	for key, valSlice := range params {
-		if key == "limit" || key == "offset" || key == "extend" {
-			continue
-		}
-
-		operator := "="
-
-		for suffix, sqlOp := range operators {
-			if before, found := strings.CutSuffix(key, suffix); found {
-				key = before
-				operator = sqlOp
-				break
-			}
-		}
-
-		columnName, allowed := allowedParams[key]
-		if !allowed {
-			return "", nil, fmt.Errorf("%w: an unknown parameter was provided", ErrParam)
-		}
-
-		if len(valSlice) == 0 || valSlice[0] == "" {
-			return "", nil, fmt.Errorf("%w: provided parameter is empty", ErrParam)
-		}
-
-		if len(valSlice) > 1 {
-			return "", nil, fmt.Errorf("%w: too many parameters were provided for a single column", ErrParam)
-		}
-
-		conditions = append(conditions, columnName+" "+operator+" ?")
-		args = append(args, valSlice[0])
-	}
-
-	filter := ""
-
-	if len(conditions) > 0 {
-		filter += " WHERE " + strings.Join(conditions, " AND ")
-	}
-
-	if hasLimit {
-		filter += " LIMIT ?"
-		args = append(args, limit[0])
-	}
-
-	if hasOffset {
-		filter += " OFFSET ?"
-		args = append(args, offset[0])
-	}
-
-	return filter, args, nil
-}
-
 func queryWithParams[T any](
 	d *Database,
 	query string,
@@ -142,7 +59,7 @@ func queryWithParams[T any](
 	var args []any
 
 	if len(params) > 0 {
-		filter, argsOut, err := d.assembleFilter(params, allowPar)
+		filter, argsOut, err := AssembleFilter(params, allowPar)
 		if err != nil {
 			return nil, err
 		}
@@ -304,4 +221,87 @@ func (d *Database) deleteId(query string, id int64) error {
 	}
 
 	return nil
+}
+
+func isErrForeignKey(err error) bool {
+	var mysqlerr *mysql.MySQLError
+
+	if errors.As(err, &mysqlerr) {
+		return mysqlerr.Number == 1452
+	}
+
+	return false
+}
+
+func AssembleFilter(params url.Values, allowedParams map[string]string) (string, []any, error) {
+	var (
+		conditions []string
+		args       []any
+	)
+
+	operators := map[string]string{
+		".eq":  "=",
+		".gt":  ">",
+		".lt":  "<",
+		".gte": ">=",
+		".lte": "<=",
+		".neq": "<>",
+	}
+
+	limit, hasLimit := params["limit"]
+	offset, hasOffset := params["offset"]
+
+	if !hasLimit && hasOffset {
+		return "", nil, fmt.Errorf("%w: a limit must be provided when using an offset", ErrParam)
+	}
+
+	for key, valSlice := range params {
+		if key == "limit" || key == "offset" || key == "extend" {
+			continue
+		}
+
+		operator := "="
+
+		for suffix, sqlOp := range operators {
+			if before, found := strings.CutSuffix(key, suffix); found {
+				key = before
+				operator = sqlOp
+				break
+			}
+		}
+
+		columnName, allowed := allowedParams[key]
+		if !allowed {
+			return "", nil, fmt.Errorf("%w: an unknown parameter was provided", ErrParam)
+		}
+
+		if len(valSlice) == 0 || valSlice[0] == "" {
+			return "", nil, fmt.Errorf("%w: provided parameter is empty", ErrParam)
+		}
+
+		if len(valSlice) > 1 {
+			return "", nil, fmt.Errorf("%w: too many parameters were provided for a single column", ErrParam)
+		}
+
+		conditions = append(conditions, columnName+" "+operator+" ?")
+		args = append(args, valSlice[0])
+	}
+
+	filter := ""
+
+	if len(conditions) > 0 {
+		filter += " WHERE " + strings.Join(conditions, " AND ")
+	}
+
+	if hasLimit {
+		filter += " LIMIT ?"
+		args = append(args, limit[0])
+	}
+
+	if hasOffset {
+		filter += " OFFSET ?"
+		args = append(args, offset[0])
+	}
+
+	return filter, args, nil
 }

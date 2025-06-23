@@ -3,6 +3,7 @@ package handler_test
 import (
 	"bytes"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io"
 	"log"
@@ -15,18 +16,25 @@ import (
 	"github.com/stretchr/testify/assert"
 	"pawrest/internal/api/routes"
 	"pawrest/internal/db"
+	"pawrest/internal/db/mock"
 	"pawrest/internal/models"
 )
 
-var database *db.Database
+var database db.BookDatabaseInterface
 
 func runMain(m *testing.M) (int, error) {
-	var err error
-	database, err = db.ConnectToDB()
-	if err != nil {
-		return 0, err
+	flag.Parse()
+
+	if testing.Short() {
+		database = &mock.MockDatabase{}
+	} else {
+		var err error
+		database, err = db.ConnectToDB()
+		if err != nil {
+			return 0, err
+		}
+		defer database.(*db.Database).CloseDB()
 	}
-	defer database.CloseDB()
 
 	return m.Run(), nil
 }

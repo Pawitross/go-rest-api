@@ -20,21 +20,11 @@ func (b *Book) IsNotValid() bool {
 }
 
 type BookExt struct {
-	Id     int64  `json:"id"`
-	Title  string `json:"title"`
-	Year   int64  `json:"year"`
-	Pages  int64  `json:"pages"`
-	Author struct {
-		Id        int64  `json:"id"`
-		FirstName string `json:"first_name"`
-		LastName  string `json:"last_name"`
-	} `json:"author"`
-	Genre struct {
-		Id   int64  `json:"id"`
-		Name string `json:"name"`
-	} `json:"genre"`
-	Language struct {
-		Id   int64  `json:"id"`
-		Name string `json:"name"`
-	} `json:"language"`
+	Id       int64    `json:"id"`
+	Title    string   `json:"title"`
+	Year     int64    `json:"year"`
+	Pages    int64    `json:"pages"`
+	Author   Author   `json:"author"`
+	Genre    Genre    `json:"genre"`
+	Language Language `json:"language"`
 }

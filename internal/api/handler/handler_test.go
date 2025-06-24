@@ -180,43 +180,48 @@ func TestPostBookBadRequestMalformedJSON(t *testing.T) {
 	checkErrorBodyNotEmpty(w, t)
 }
 
-func TestPostBookBadRequestValidationErr(t *testing.T) {
-	testBook := models.Book{
-		Title:    "",
-		Year:     1996,
-		Pages:    200,
-		Author:   1,
-		Genre:    1,
-		Language: 1,
+func TestPostBookError(t *testing.T) {
+	postTests := map[string]struct {
+		testBook models.Book
+		status   int
+	}{
+		"BadRequestValidationErr": {
+			models.Book{
+				Title:    "",
+				Year:     1996,
+				Pages:    200,
+				Author:   1,
+				Genre:    1,
+				Language: 1,
+			},
+			http.StatusBadRequest,
+		},
+		"BadRequestForeignKeyErr": {
+			models.Book{
+				Title:    "Post foreign key test",
+				Year:     1996,
+				Pages:    200,
+				Author:   1,
+				Genre:    1,
+				Language: 999,
+			},
+			http.StatusBadRequest,
+		},
 	}
 
-	jsonBook := marshalCheckNoError(t, testBook)
+	for name, tt := range postTests {
+		t.Run(name, func(t *testing.T) {
+			jsonBook := marshalCheckNoError(t, tt.testBook)
 
-	w := execRequest("POST", "/api/v1/books", bytes.NewReader(jsonBook))
-	assert.Equal(t, http.StatusBadRequest, w.Code)
+			w := execRequest("POST", "/api/v1/books", bytes.NewReader(jsonBook))
+			assert.Equal(t, tt.status, w.Code)
 
-	checkErrorBodyNotEmpty(w, t)
-}
-
-func TestPostBookBadRequestForeignKeyErr(t *testing.T) {
-	testBook := models.Book{
-		Title:    "Post foreign key test",
-		Year:     1996,
-		Pages:    200,
-		Author:   1,
-		Genre:    1,
-		Language: 999,
+			checkErrorBodyNotEmpty(w, t)
+		})
 	}
-
-	jsonBook := marshalCheckNoError(t, testBook)
-
-	w := execRequest("POST", "/api/v1/books", bytes.NewReader(jsonBook))
-	assert.Equal(t, http.StatusBadRequest, w.Code)
-
-	checkErrorBodyNotEmpty(w, t)
 }
 
-// PUT /books
+// PUT /books/id
 func TestPutBookSuccess(t *testing.T) {
 	testBook := models.Book{
 		Title:    "Put book test",
@@ -241,60 +246,6 @@ func TestPutBookSuccess(t *testing.T) {
 	assert.Equal(t, testBook.Language, book.Language)
 }
 
-func TestPutBookNotFoundBigPathId(t *testing.T) {
-	testBook := models.Book{
-		Title:    "Put book test",
-		Year:     1996,
-		Pages:    593,
-		Author:   1,
-		Genre:    1,
-		Language: 1,
-	}
-
-	jsonBook := marshalCheckNoError(t, testBook)
-
-	w := execRequest("PUT", "/api/v1/books/9999", bytes.NewReader(jsonBook))
-	assert.Equal(t, http.StatusNotFound, w.Code)
-
-	checkErrorBodyNotEmpty(w, t)
-}
-
-func TestPutBookBadRequestForeignKeyErr(t *testing.T) {
-	testBook := models.Book{
-		Title:    "Put foreign key test",
-		Year:     1996,
-		Pages:    593,
-		Author:   1,
-		Genre:    1,
-		Language: 999,
-	}
-
-	jsonBook := marshalCheckNoError(t, testBook)
-
-	w := execRequest("PUT", "/api/v1/books/1", bytes.NewReader(jsonBook))
-	assert.Equal(t, http.StatusBadRequest, w.Code)
-
-	checkErrorBodyNotEmpty(w, t)
-}
-
-func TestPutBookBadRequestStringId(t *testing.T) {
-	testBook := models.Book{
-		Title:    "Put book test",
-		Year:     1996,
-		Pages:    593,
-		Author:   1,
-		Genre:    1,
-		Language: 1,
-	}
-
-	jsonBook := marshalCheckNoError(t, testBook)
-
-	w := execRequest("PUT", "/api/v1/books/string", bytes.NewReader(jsonBook))
-	assert.Equal(t, http.StatusBadRequest, w.Code)
-
-	checkErrorBodyNotEmpty(w, t)
-}
-
 func TestPutBookBadRequestMalformedJSON(t *testing.T) {
 	jsonStr := []byte(`{"title":"JSON Test","year":1996,"pages":200,"author":"Should be number","genre":1}`)
 	w := execRequest("PUT", "/api/v1/books/1", bytes.NewReader(jsonStr))
@@ -303,22 +254,74 @@ func TestPutBookBadRequestMalformedJSON(t *testing.T) {
 	checkErrorBodyNotEmpty(w, t)
 }
 
-func TestPutBookBadRequestBadJSON(t *testing.T) {
-	testBook := models.Book{
-		Title: "Put book test",
-		Year:  1996,
-		Pages: 593,
+func TestPutBookError(t *testing.T) {
+	putTests := map[string]struct {
+		testBook models.Book
+		query    string
+		status   int
+	}{
+		"NotFoundBigPathId": {
+			models.Book{
+				Title:    "Put book test",
+				Year:     1996,
+				Pages:    593,
+				Author:   1,
+				Genre:    1,
+				Language: 1,
+			},
+			"/9999",
+			http.StatusNotFound,
+		},
+		"BadRequestForeignKeyErr": {
+			models.Book{
+				Title:    "Put foreign key test",
+				Year:     1996,
+				Pages:    593,
+				Author:   1,
+				Genre:    1,
+				Language: 999,
+			},
+			"/1",
+			http.StatusBadRequest,
+		},
+		"BadRequestStringId": {
+			models.Book{
+				Title:    "Put book test",
+				Year:     1996,
+				Pages:    593,
+				Author:   1,
+				Genre:    1,
+				Language: 1,
+			},
+			"/string",
+			http.StatusBadRequest,
+		},
+		"BadRequestBadJSON": {
+			models.Book{
+				Title: "Put book test",
+				Year:  1996,
+				Pages: 593,
+			},
+			"/1",
+			http.StatusBadRequest,
+		},
 	}
 
-	jsonBook := marshalCheckNoError(t, testBook)
+	for name, tt := range putTests {
+		t.Run(name, func(t *testing.T) {
+			fullUrl := "/api/v1/books" + tt.query
 
-	w := execRequest("PUT", "/api/v1/books/1", bytes.NewReader(jsonBook))
-	assert.Equal(t, http.StatusBadRequest, w.Code)
+			jsonBook := marshalCheckNoError(t, tt.testBook)
 
-	checkErrorBodyNotEmpty(w, t)
+			w := execRequest("PUT", fullUrl, bytes.NewReader(jsonBook))
+			assert.Equal(t, tt.status, w.Code)
+
+			checkErrorBodyNotEmpty(w, t)
+		})
+	}
 }
 
-// PATCH /books
+// PATCH /books/id
 func TestPatchBookSuccess(t *testing.T) {
 	jsonStr := []byte(`{"title":"Patch book test", "pages":999}`)
 	w := execRequest("PATCH", "/api/v1/books/1", bytes.NewReader(jsonStr))
@@ -329,26 +332,37 @@ func TestPatchBookSuccess(t *testing.T) {
 	assert.Equal(t, int64(999), book.Pages)
 }
 
-func TestPatchBookNotFoundBigPathId(t *testing.T) {
-	jsonStr := []byte(`{"title":"Patch book test", "pages":999}`)
-	w := execRequest("PATCH", "/api/v1/books/9999", bytes.NewReader(jsonStr))
-	assert.Equal(t, http.StatusNotFound, w.Code)
+func TestPatchBookError(t *testing.T) {
+	patchTests := map[string]struct {
+		jsonStr string
+		query   string
+		status  int
+	}{
+		"NotFoundBigPathId": {
+			`{"title":"Patch book test", "pages":999}`,
+			"/9999",
+			http.StatusNotFound,
+		},
+		"BadRequestStringPathId": {
+			`{"title":"Patch book test", "pages":999}`,
+			"/string",
+			http.StatusBadRequest,
+		},
+		"BadRequestBadJSON": {
+			`{"title":"Patch book test", "pages":Should be number"}`,
+			"/1",
+			http.StatusBadRequest,
+		},
+	}
 
-	checkErrorBodyNotEmpty(w, t)
-}
+	for name, tt := range patchTests {
+		t.Run(name, func(t *testing.T) {
+			fullUrl := "/api/v1/books" + tt.query
 
-func TestPatchBookBadRequestStringPathId(t *testing.T) {
-	jsonStr := []byte(`{"title":"Patch book test", "pages":999}`)
-	w := execRequest("PATCH", "/api/v1/books/string", bytes.NewReader(jsonStr))
-	assert.Equal(t, http.StatusBadRequest, w.Code)
+			w := execRequest("PATCH", fullUrl, bytes.NewReader([]byte(tt.jsonStr)))
+			assert.Equal(t, tt.status, w.Code)
 
-	checkErrorBodyNotEmpty(w, t)
-}
-
-func TestPatchBookBadRequestBadJSON(t *testing.T) {
-	jsonStr := []byte(`{"title":"Patch book test", "pages":Should be number"}`)
-	w := execRequest("PATCH", "/api/v1/books/1", bytes.NewReader(jsonStr))
-	assert.Equal(t, http.StatusBadRequest, w.Code)
-
-	checkErrorBodyNotEmpty(w, t)
+			checkErrorBodyNotEmpty(w, t)
+		})
+	}
 }

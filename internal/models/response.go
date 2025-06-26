@@ -5,5 +5,6 @@ type Error struct {
 }
 
 type Token struct {
+	Admin bool   `json:"admin"`
 	Token string `json:"token"`
 }

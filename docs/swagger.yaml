@@ -1,5 +1,12 @@
 basePath: /api/v1
 definitions:
+  handler.AdminBody:
+    properties:
+      return_admin_token:
+        type: boolean
+    required:
+    - return_admin_token
+    type: object
   models.Book:
     properties:
       author:
@@ -24,6 +31,8 @@ definitions:
     type: object
   models.Token:
     properties:
+      admin:
+        type: boolean
       token:
         type: string
     type: object
@@ -260,14 +269,17 @@ paths:
       tags:
       - Books
   /login:
-    get:
-      description: Return a valid JWT token used for authentication and authorization.
-        Optional boolean admin parameter provides creation of admin access token.
+    post:
+      description: |-
+        Return a valid JWT token used for authentication and authorization.
+        Endpoint requires a JSON request body with a "return_admin_token" boolean field. Setting it to "true" returns an admin access token.
       parameters:
       - description: Return an admin token
-        in: query
+        in: body
         name: admin
-        type: boolean
+        required: true
+        schema:
+          $ref: '#/definitions/handler.AdminBody'
       responses:
         "200":
           description: OK - Response body contains JWT token

@@ -345,18 +345,21 @@ const docTemplate = `{
             }
         },
         "/login": {
-            "get": {
-                "description": "Return a valid JWT token used for authentication and authorization. Optional boolean admin parameter provides creation of admin access token.",
+            "post": {
+                "description": "Return a valid JWT token used for authentication and authorization.\nEndpoint requires a JSON request body with a \"return_admin_token\" boolean field. Setting it to \"true\" returns an admin access token.",
                 "tags": [
                     "Auth"
                 ],
                 "summary": "Get a JWT token",
                 "parameters": [
                     {
-                        "type": "boolean",
                         "description": "Return an admin token",
                         "name": "admin",
-                        "in": "query"
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handler.AdminBody"
+                        }
                     }
                 ],
                 "responses": {
@@ -383,6 +386,17 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "handler.AdminBody": {
+            "type": "object",
+            "required": [
+                "return_admin_token"
+            ],
+            "properties": {
+                "return_admin_token": {
+                    "type": "boolean"
+                }
+            }
+        },
         "models.Book": {
             "type": "object",
             "properties": {
@@ -420,6 +434,9 @@ const docTemplate = `{
         "models.Token": {
             "type": "object",
             "properties": {
+                "admin": {
+                    "type": "boolean"
+                },
                 "token": {
                     "type": "string"
                 }

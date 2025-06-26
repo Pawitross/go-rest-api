@@ -1,6 +1,7 @@
 package handler_test
 
 import (
+	"bytes"
 	"net/http"
 	"strings"
 	"testing"
@@ -17,19 +18,14 @@ func checkTokenStructure(t *testing.T, token string) {
 }
 
 func TestLoginTokenSuccess(t *testing.T) {
-	urltests := []struct {
-		query string
-	}{
-		{""},
-		{"?admin=false"},
-		{"?admin=true"},
+	loginTests := []string{
+		`{"return_admin_token":false}`,
+		`{"return_admin_token":true}`,
 	}
 
-	for _, tt := range urltests {
-		t.Run(tt.query, func(t *testing.T) {
-			fullUrl := "/api/v1/login" + tt.query
-
-			w := execRequest("GET", fullUrl, nil)
+	for _, tc := range loginTests {
+		t.Run(tc, func(t *testing.T) {
+			w := execRequest("POST", "/api/v1/login", bytes.NewReader([]byte(tc)))
 			assert.Equal(t, http.StatusOK, w.Code)
 
 			var rToken models.Token
@@ -42,8 +38,29 @@ func TestLoginTokenSuccess(t *testing.T) {
 }
 
 func TestLoginTokenBadRequest(t *testing.T) {
-	w := execRequest("GET", "/api/v1/login?admin=foo", nil)
-	assert.Equal(t, http.StatusBadRequest, w.Code)
+	errorTests := []string{
+		`{}`,
+		`{"admin":}`,
+		`{"admin":true}`,
+		`{"admin":false}`,
+		`{"return_admin_token":FALSE}`,
+		`{"return_admin_token":TRUE}`,
+		`{"return_admin_token":0}`,
+		`{"return_admin_token":1}`,
+		`{"return_admin_token":falseFoo}`,
+		`{"return_admin_token":trueFoo}`,
+		`{"return_admin_token":}`,
+		`{"return_admin_token":""}`,
+		`{"return_admin_token":"false"}`,
+		`{"return_admin_token":"true"}`,
+	}
 
-	checkErrorBodyNotEmpty(w, t)
+	for _, tc := range errorTests {
+		t.Run(tc, func(t *testing.T) {
+			w := execRequest("POST", "/api/v1/login", bytes.NewReader([]byte(tc)))
+			assert.Equal(t, http.StatusBadRequest, w.Code)
+
+			checkErrorBodyNotEmpty(w, t)
+		})
+	}
 }

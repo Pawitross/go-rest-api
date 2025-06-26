@@ -37,7 +37,7 @@ func Router(router *gin.Engine, db db.BookDatabaseInterface) {
 				books.DELETE("/:id", h.DeleteBook)
 			}
 
-			v1.GET("login", handler.ReturnToken)
+			v1.POST("login", handler.ReturnToken)
 
 			v1.GET("auth", middleware.Authenticate(), middleware.Authorize(), func(c *gin.Context) {
 				c.JSON(200, "Welcome")

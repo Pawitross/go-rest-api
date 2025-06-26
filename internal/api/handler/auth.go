@@ -9,6 +9,11 @@ import (
 	"pawrest/internal/models"
 )
 
+// https://github.com/gin-gonic/gin/issues/814
+type AdminBody struct {
+	RetAdmin *bool `json:"return_admin_token" binding:"required"`
+}
+
 func createToken(isAdmin bool) (string, error) {
 	timeNow := time.Now().Unix()
 	halfHour := int64(time.Hour/time.Second) >> 1
@@ -32,25 +37,23 @@ func createToken(isAdmin bool) (string, error) {
 }
 
 // @Summary		Get a JWT token
-// @Description	Return a valid JWT token used for authentication and authorization. Optional boolean admin parameter provides creation of admin access token.
+// @Description	Return a valid JWT token used for authentication and authorization.
+// @Description	Endpoint requires a JSON request body with a "return_admin_token" boolean field. Setting it to "true" returns an admin access token.
 // @Tags			Auth
-// @Param			admin	query		bool			false	"Return an admin token"
+// @Param			admin	body		AdminBody		true	"Return an admin token"
 // @Success		200		{object}	models.Token	"OK - Response body contains JWT token"
 // @Failure		400		{object}	models.Error	"Bad Request - Invalid parameter value"
 // @Failure		500		{object}	models.Error	"Internal Server Error - Failed to create JWT token"
-// @Router			/login [get]
+// @Router			/login [post]
 func ReturnToken(c *gin.Context) {
-	wantAdmin := c.DefaultQuery("admin", "false")
+	var body AdminBody
 
-	if wantAdmin != "false" && wantAdmin != "true" {
-		c.JSON(http.StatusBadRequest, models.Error{Error: "Invalid parameter value"})
+	if err := c.BindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, models.Error{Error: "Invalid JSON in request body"})
 		return
 	}
 
-	boolAdmin := false
-	if wantAdmin == "true" {
-		boolAdmin = true
-	}
+	boolAdmin := *body.RetAdmin
 
 	token, err := createToken(boolAdmin)
 	if err != nil {
@@ -58,5 +61,5 @@ func ReturnToken(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, models.Token{Token: token})
+	c.JSON(http.StatusOK, models.Token{Admin: boolAdmin, Token: token})
 }

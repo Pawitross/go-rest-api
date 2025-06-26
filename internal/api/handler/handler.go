@@ -29,20 +29,34 @@ func handleDBError(c *gin.Context, err error) {
 
 // @Summary		Get a list of all books
 // @Description	Responds with a list of all books as JSON. Optional filtering and pagination is available through parameters.
+// @Description	To filter extended response use filtering like this: `genre.name=Nowela`
+// @Description	To filter using comparison operators append the operator to the query parameter. Available operators:
+// @Description	- less than = `.lt`
+// @Description	- less than or equal = `.lte`
+// @Description	- greater than = `.gt`
+// @Description	- greater than or equal = `.gte`
+// @Description	- equal = `.eq`
+// @Description	- not equal = `.neq`
+// @Description
+// @Description	Examples: `pages.lt=300`, `year.gte=1980`, `language.name.neq=Polski`
 // @Tags			Books
 // @Produce		json
-// @Param			id			query		string			false	"Book id"
-// @Param			title		query		string			false	"Book title"
-// @Param			year		query		int				false	"Year of publishing of the book"
-// @Param			pages		query		int				false	"Number of pages in the book"
-// @Param			author		query		int				false	"Author id"
-// @Param			genre		query		int				false	"Genre id"
-// @Param			language	query		int				false	"Language id"
-// @Param			limit		query		int				false	"Limit returned number of resources"
-// @Param			offset		query		int				false	"Offset returned resources"
-// @Success		200			{array}		models.Book		"OK - Fetched books"
-// @Failure		400			{object}	models.Error	"Bad Request - Invalid input"
-// @Failure		500			{object}	models.Error	"Internal Server Error"
+// @Param			id					query		string			false	"Book id"
+// @Param			title				query		string			false	"Book title"
+// @Param			year				query		int				false	"Year of publishing of the book"
+// @Param			pages				query		int				false	"Number of pages in the book"
+// @Param			author				query		int				false	"Author id"
+// @Param			genre				query		int				false	"Genre id"
+// @Param			language			query		int				false	"Language id"
+// @Param			limit				query		int				false	"Limit returned number of resources"
+// @Param			offset				query		int				false	"Offset returned resources"
+// @Param			extend				query		bool			false	"Return extended book information"
+// @Param			author.id			query		int				false	"If extend=true - Author id"
+// @Param			author.first_name	query		string			false	"If extend=true - Author first name"
+// @Param			author.last_name	query		string			false	"If extend=true - Author last name"
+// @Success		200					{array}		models.Book		"OK - Fetched books"
+// @Failure		400					{object}	models.Error	"Bad Request - Invalid input"
+// @Failure		500					{object}	models.Error	"Internal Server Error"
 // @Router			/books [get]
 func (h *Handlers) GetBooks(c *gin.Context) {
 	params := c.Request.URL.Query()
@@ -107,7 +121,7 @@ func (h *Handlers) GetBook(c *gin.Context) {
 }
 
 // @Summary		Create a new book
-// @Description	Accepts a JSON body to create a new book. Responds with the created book and set Location header or an error message.
+// @Description	Accepts a JSON body to create a new book. Responds with the created book and set `Location` header or an error message.
 // @Tags			Books
 // @Accept			json
 // @Produce		json

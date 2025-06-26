@@ -46,8 +46,18 @@ info:
 paths:
   /books:
     get:
-      description: Responds with a list of all books as JSON. Optional filtering and
-        pagination is available through parameters.
+      description: |-
+        Responds with a list of all books as JSON. Optional filtering and pagination is available through parameters.
+        To filter extended response use filtering like this: `genre.name=Nowela`
+        To filter using comparison operators append the operator to the query parameter. Available operators:
+        - less than = `.lt`
+        - less than or equal = `.lte`
+        - greater than = `.gt`
+        - greater than or equal = `.gte`
+        - equal = `.eq`
+        - not equal = `.neq`
+
+        Examples: `pages.lt=300`, `year.gte=1980`, `language.name.neq=Polski`
       parameters:
       - description: Book id
         in: query
@@ -85,6 +95,22 @@ paths:
         in: query
         name: offset
         type: integer
+      - description: Return extended book information
+        in: query
+        name: extend
+        type: boolean
+      - description: If extend=true - Author id
+        in: query
+        name: author.id
+        type: integer
+      - description: If extend=true - Author first name
+        in: query
+        name: author.first_name
+        type: string
+      - description: If extend=true - Author last name
+        in: query
+        name: author.last_name
+        type: string
       produces:
       - application/json
       responses:
@@ -109,7 +135,7 @@ paths:
       consumes:
       - application/json
       description: Accepts a JSON body to create a new book. Responds with the created
-        book and set Location header or an error message.
+        book and set `Location` header or an error message.
       parameters:
       - description: New Book
         in: body
@@ -272,7 +298,7 @@ paths:
     post:
       description: |-
         Return a valid JWT token used for authentication and authorization.
-        Endpoint requires a JSON request body with a "return_admin_token" boolean field. Setting it to "true" returns an admin access token.
+        Endpoint requires a JSON request body with a `return_admin_token` boolean field. Setting it to `true` returns an admin access token.
       parameters:
       - description: Return an admin token
         in: body

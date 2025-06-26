@@ -17,7 +17,7 @@ const docTemplate = `{
     "paths": {
         "/books": {
             "get": {
-                "description": "Responds with a list of all books as JSON. Optional filtering and pagination is available through parameters.",
+                "description": "Responds with a list of all books as JSON. Optional filtering and pagination is available through parameters.\nTo filter extended response use filtering like this: ` + "`" + `genre.name=Nowela` + "`" + `\nTo filter using comparison operators append the operator to the query parameter. Available operators:\n- less than = ` + "`" + `.lt` + "`" + `\n- less than or equal = ` + "`" + `.lte` + "`" + `\n- greater than = ` + "`" + `.gt` + "`" + `\n- greater than or equal = ` + "`" + `.gte` + "`" + `\n- equal = ` + "`" + `.eq` + "`" + `\n- not equal = ` + "`" + `.neq` + "`" + `\n\nExamples: ` + "`" + `pages.lt=300` + "`" + `, ` + "`" + `year.gte=1980` + "`" + `, ` + "`" + `language.name.neq=Polski` + "`" + `",
                 "produces": [
                     "application/json"
                 ],
@@ -79,6 +79,30 @@ const docTemplate = `{
                         "description": "Offset returned resources",
                         "name": "offset",
                         "in": "query"
+                    },
+                    {
+                        "type": "boolean",
+                        "description": "Return extended book information",
+                        "name": "extend",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "If extend=true - Author id",
+                        "name": "author.id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "If extend=true - Author first name",
+                        "name": "author.first_name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "If extend=true - Author last name",
+                        "name": "author.last_name",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -106,7 +130,7 @@ const docTemplate = `{
                 }
             },
             "post": {
-                "description": "Accepts a JSON body to create a new book. Responds with the created book and set Location header or an error message.",
+                "description": "Accepts a JSON body to create a new book. Responds with the created book and set ` + "`" + `Location` + "`" + ` header or an error message.",
                 "consumes": [
                     "application/json"
                 ],
@@ -346,7 +370,7 @@ const docTemplate = `{
         },
         "/login": {
             "post": {
-                "description": "Return a valid JWT token used for authentication and authorization.\nEndpoint requires a JSON request body with a \"return_admin_token\" boolean field. Setting it to \"true\" returns an admin access token.",
+                "description": "Return a valid JWT token used for authentication and authorization.\nEndpoint requires a JSON request body with a ` + "`" + `return_admin_token` + "`" + ` boolean field. Setting it to ` + "`" + `true` + "`" + ` returns an admin access token.",
                 "tags": [
                     "Auth"
                 ],

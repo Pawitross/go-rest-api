@@ -38,7 +38,7 @@ func createToken(isAdmin bool) (string, error) {
 
 // @Summary		Get a JWT token
 // @Description	Return a valid JWT token used for authentication and authorization.
-// @Description	Endpoint requires a JSON request body with a "return_admin_token" boolean field. Setting it to "true" returns an admin access token.
+// @Description	Endpoint requires a JSON request body with a `return_admin_token` boolean field. Setting it to `true` returns an admin access token.
 // @Tags			Auth
 // @Param			admin	body		AdminBody		true	"Return an admin token"
 // @Success		200		{object}	models.Token	"OK - Response body contains JWT token"

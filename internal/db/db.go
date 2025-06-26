@@ -256,7 +256,7 @@ func AssembleFilter(params url.Values, allowedParams map[string]string) (string,
 	}
 
 	for key, valSlice := range params {
-		if key == "limit" || key == "offset" || key == "extend" {
+		if key == "limit" || key == "offset" || key == "sort_by" || key == "extend" {
 			continue
 		}
 
@@ -291,6 +291,31 @@ func AssembleFilter(params url.Values, allowedParams map[string]string) (string,
 
 	if len(conditions) > 0 {
 		filter += " WHERE " + strings.Join(conditions, " AND ")
+	}
+
+	if sort, hasSort := params["sort_by"]; hasSort {
+		if len(sort) == 0 {
+			return "", nil, fmt.Errorf("%w: provided column is empty", ErrParam)
+		}
+
+		if len(sort) > 1 {
+			return "", nil, fmt.Errorf("%w: too many columns were provided for sorting", ErrParam)
+		}
+
+		order := ""
+
+		arg := sort[0]
+		if after, found := strings.CutPrefix(arg, "-"); found {
+			order = " DESC"
+			arg = after
+		}
+
+		columnName, allowed := allowedParams[arg]
+		if !allowed {
+			return "", nil, fmt.Errorf("%w: an unknown column was provided", ErrParam)
+		}
+
+		filter = filter + " ORDER BY " + columnName + order
 	}
 
 	if hasLimit {

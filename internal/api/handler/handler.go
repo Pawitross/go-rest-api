@@ -28,7 +28,8 @@ func handleDBError(c *gin.Context, err error) {
 }
 
 // @Summary		Get a list of all books
-// @Description	Responds with a list of all books as JSON. Optional filtering and pagination is available through parameters.
+// @Description	Responds with a list of all books as JSON. Optional filtering, sorting and pagination is available through parameters.
+// @Description
 // @Description	To filter extended response use filtering like this: `genre.name=Nowela`
 // @Description	To filter using comparison operators append the operator to the query parameter. Available operators:
 // @Description	- less than = `.lt`
@@ -38,7 +39,11 @@ func handleDBError(c *gin.Context, err error) {
 // @Description	- equal = `.eq`
 // @Description	- not equal = `.neq`
 // @Description
-// @Description	Examples: `pages.lt=300`, `year.gte=1980`, `language.name.neq=Polski`
+// @Description	Examples: `pages.lt=300`, `year.gte=1980`, `language.name.neq=Polski`.
+// @Description
+// @Description	To sort, use `sort_by` query parameter followed by the column name.
+// @Description	If you want to sort in descending order, prefix the column name with a minus sign (`-`).
+// @Description	Examples: `sort_by=pages` - ascending order, `sort_by=-pages`- descending order
 // @Tags			Books
 // @Produce		json
 // @Param			id					query		string			false	"Book id"
@@ -48,6 +53,7 @@ func handleDBError(c *gin.Context, err error) {
 // @Param			author				query		int				false	"Author id"
 // @Param			genre				query		int				false	"Genre id"
 // @Param			language			query		int				false	"Language id"
+// @Param			sort_by				query		string			false	"Sorting by a column"
 // @Param			limit				query		int				false	"Limit returned number of resources"
 // @Param			offset				query		int				false	"Offset returned resources"
 // @Param			extend				query		bool			false	"Return extended book information"

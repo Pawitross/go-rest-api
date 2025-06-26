@@ -47,7 +47,8 @@ paths:
   /books:
     get:
       description: |-
-        Responds with a list of all books as JSON. Optional filtering and pagination is available through parameters.
+        Responds with a list of all books as JSON. Optional filtering, sorting and pagination is available through parameters.
+
         To filter extended response use filtering like this: `genre.name=Nowela`
         To filter using comparison operators append the operator to the query parameter. Available operators:
         - less than = `.lt`
@@ -57,7 +58,11 @@ paths:
         - equal = `.eq`
         - not equal = `.neq`
 
-        Examples: `pages.lt=300`, `year.gte=1980`, `language.name.neq=Polski`
+        Examples: `pages.lt=300`, `year.gte=1980`, `language.name.neq=Polski`.
+
+        To sort, use `sort_by` query parameter followed by the column name.
+        If you want to sort in descending order, prefix the column name with a minus sign (`-`).
+        Examples: `sort_by=pages` - ascending order, `sort_by=-pages`- descending order
       parameters:
       - description: Book id
         in: query
@@ -87,6 +92,10 @@ paths:
         in: query
         name: language
         type: integer
+      - description: Sorting by a column
+        in: query
+        name: sort_by
+        type: string
       - description: Limit returned number of resources
         in: query
         name: limit

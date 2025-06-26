@@ -366,3 +366,43 @@ func TestPatchBookError(t *testing.T) {
 		})
 	}
 }
+
+// DELETE /books/id
+func TestDeleteBookSuccess(t *testing.T) {
+	if !testing.Short() {
+		t.Skip("Skipping success deletion test on real database")
+	}
+
+	w := execRequest("DELETE", "/api/v1/books/2", nil)
+	assert.Equal(t, http.StatusNoContent, w.Code)
+
+	_, err := database.GetBook(2)
+	assert.ErrorIs(t, err, db.ErrNotFound)
+}
+
+func TestDeleteBookError(t *testing.T) {
+	deleteTests := map[string]struct {
+		query  string
+		status int
+	}{
+		"NotFoundBigPathId": {
+			"/9999",
+			http.StatusNotFound,
+		},
+		"BadRequestStringPathId": {
+			"/string",
+			http.StatusBadRequest,
+		},
+	}
+
+	for name, tt := range deleteTests {
+		t.Run(name, func(t *testing.T) {
+			fullUrl := "/api/v1/books" + tt.query
+
+			w := execRequest("DELETE", fullUrl, nil)
+			assert.Equal(t, tt.status, w.Code)
+
+			checkErrorBodyNotEmpty(w, t)
+		})
+	}
+}

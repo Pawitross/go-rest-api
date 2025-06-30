@@ -19,8 +19,10 @@ import (
 
 func runMain(m *testing.M) (int, error) {
 	defer func() {
-		if err := os.Remove("log.csv"); err != nil {
-			log.Println(err)
+		if exists, _ := fileExists("log.csv"); exists {
+			if err := os.Remove("log.csv"); err != nil {
+				log.Println(err)
+			}
 		}
 	}()
 
@@ -39,14 +41,14 @@ func TestMain(m *testing.M) {
 func fileExists(fName string) (bool, error) {
 	if _, err := os.Stat(fName); err != nil {
 		if errors.Is(err, os.ErrNotExist) {
-			return false, err
+			return false, nil
 		}
-		return true, err
+		return false, err
 	}
 	return true, nil
 }
 
-func setupTestRouter() *gin.Engine {
+func setupTestLoggingRouter() *gin.Engine {
 	gin.SetMode(gin.TestMode)
 	router := gin.New()
 
@@ -64,7 +66,12 @@ func TestLogFileCreation(t *testing.T) {
 	}
 	defer middleware.CloseLogger()
 
-	if exists, err := fileExists("log.csv"); !exists && err != nil {
+	exists, err := fileExists("log.csv")
+	if err != nil {
+		t.Errorf("Error checking file existence: %v", err)
+	}
+
+	if !exists {
 		t.Errorf("File doesn't exist")
 	}
 }
@@ -75,7 +82,7 @@ func TestLogging(t *testing.T) {
 	}
 	defer middleware.CloseLogger()
 
-	router := setupTestRouter()
+	router := setupTestLoggingRouter()
 
 	requests := []struct {
 		method   string

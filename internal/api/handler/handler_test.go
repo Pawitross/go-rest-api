@@ -14,7 +14,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
-	"pawrest/internal/api/routes"
+	"pawrest/internal/api/handler"
 	"pawrest/internal/db"
 	"pawrest/internal/db/mock"
 	"pawrest/internal/models"
@@ -52,7 +52,26 @@ func setupTestRouter(db db.BookDatabaseInterface) *gin.Engine {
 	gin.SetMode(gin.TestMode)
 	router := gin.New()
 
-	routes.Router(router, db)
+	h := handler.Handlers{DB: db}
+
+	apiv1 := router.Group("/api/v1")
+	{
+		books := apiv1.Group("/books")
+		{
+			books.GET("", h.GetBooks)
+			books.GET("/:id", h.GetBook)
+
+			books.POST("", h.PostBook)
+
+			books.PUT("/:id", h.PutBook)
+
+			books.PATCH("/:id", h.PatchBook)
+
+			books.DELETE("/:id", h.DeleteBook)
+		}
+
+		apiv1.POST("login", handler.ReturnToken)
+	}
 
 	return router
 }

@@ -62,8 +62,10 @@ func handleDBError(c *gin.Context, err error) {
 // @Param			author.last_name	query		string			false	"If extend=true - Author last name"
 // @Success		200					{array}		models.Book		"OK - Fetched books"
 // @Failure		400					{object}	models.Error	"Bad Request - Invalid input"
+// @Failure		401					{object}	models.Error	"Unauthorized - Invalid or missing token"
 // @Failure		500					{object}	models.Error	"Internal Server Error"
 // @Router			/books [get]
+// @Security		ApiKeyAuth
 func (h *Handlers) GetBooks(c *gin.Context) {
 	params := c.Request.URL.Query()
 	extend := c.DefaultQuery("extend", "false")
@@ -100,9 +102,11 @@ func (h *Handlers) GetBooks(c *gin.Context) {
 // @Param			id	path		int				true	"Book id"
 // @Success		200	{object}	models.Book		"OK - Fetched book"
 // @Failure		400	{object}	models.Error	"Bad Request - Invalid book id"
+// @Failure		401	{object}	models.Error	"Unauthorized - Invalid or missing token"
 // @Failure		404	{object}	models.Error	"Not Found - No resource found"
 // @Failure		500	{object}	models.Error	"Internal Server Error"
 // @Router			/books/{id} [get]
+// @Security		ApiKeyAuth
 func (h *Handlers) GetBook(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -134,9 +138,12 @@ func (h *Handlers) GetBook(c *gin.Context) {
 // @Param			book	body		models.Book		true	"New Book"
 // @Success		201		{object}	models.Book		"Created - Added new book"
 // @Failure		400		{object}	models.Error	"Bad Request - Invalid input or JSON"
+// @Failure		401		{object}	models.Error	"Unauthorized - Invalid or missing token"
+// @Failure		403		{object}	models.Error	"Forbidden - Insufficient permissions"
 // @Failure		500		{object}	models.Error	"Internal Server Error"
 // @Header			201		{string}	Location		"Path of the newly created book"
 // @Router			/books [post]
+// @Security		ApiKeyAuth
 func (h *Handlers) PostBook(c *gin.Context) {
 	var newBook models.Book
 
@@ -178,9 +185,12 @@ func (h *Handlers) PostBook(c *gin.Context) {
 // @Param			book	body	models.Book	true	"Updated Book"
 // @Success		204		"No content - Updated the book"
 // @Failure		400		{object}	models.Error	"Bad Request - Invalid input or JSON"
+// @Failure		401		{object}	models.Error	"Unauthorized - Invalid or missing token"
+// @Failure		403		{object}	models.Error	"Forbidden - Insufficient permissions"
 // @Failure		404		{object}	models.Error	"Not Found -  No resource found"
 // @Failure		500		{object}	models.Error	"Internal Server Error"
 // @Router			/books/{id} [put]
+// @Security		ApiKeyAuth
 func (h *Handlers) PutBook(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -217,9 +227,12 @@ func (h *Handlers) PutBook(c *gin.Context) {
 // @Param			book	body	models.Book	true	"Patches to the book"
 // @Success		204		"No Content - Successfully patched the book"
 // @Failure		400		{object}	models.Error	"Bad Request - Invalid input or JSON"
+// @Failure		401		{object}	models.Error	"Unauthorized - Invalid or missing token"
+// @Failure		403		{object}	models.Error	"Forbidden - Insufficient permissions"
 // @Failure		404		{object}	models.Error	"Not Found -  No resource found"
 // @Failure		500		{object}	models.Error	"Internal Server Error"
 // @Router			/books/{id} [patch]
+// @Security		ApiKeyAuth
 func (h *Handlers) PatchBook(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)
@@ -249,9 +262,12 @@ func (h *Handlers) PatchBook(c *gin.Context) {
 // @Param			id	path	int	true	"Book id"
 // @Success		204	"No Content - Successfully deleted the book"
 // @Failure		400	{object}	models.Error	"Bad Request - Invalid book id"
+// @Failure		401	{object}	models.Error	"Unauthorized - Invalid or missing token"
+// @Failure		403	{object}	models.Error	"Forbidden - Insufficient permissions"
 // @Failure		404	{object}	models.Error	"Not Found -  No resource found"
 // @Failure		500	{object}	models.Error	"Internal Server Error"
 // @Router			/books/{id} [delete]
+// @Security		ApiKeyAuth
 func (h *Handlers) DeleteBook(c *gin.Context) {
 	idStr := c.Param("id")
 	id, err := strconv.Atoi(idStr)

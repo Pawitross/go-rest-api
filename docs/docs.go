@@ -17,6 +17,11 @@ const docTemplate = `{
     "paths": {
         "/books": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Responds with a list of all books as JSON. Optional filtering, sorting and pagination is available through parameters.\n\nTo filter extended response use filtering like this: ` + "`" + `genre.name=Nowela` + "`" + `\nTo filter using comparison operators append the operator to the query parameter. Available operators:\n- less than = ` + "`" + `.lt` + "`" + `\n- less than or equal = ` + "`" + `.lte` + "`" + `\n- greater than = ` + "`" + `.gt` + "`" + `\n- greater than or equal = ` + "`" + `.gte` + "`" + `\n- equal = ` + "`" + `.eq` + "`" + `\n- not equal = ` + "`" + `.neq` + "`" + `\n\nExamples: ` + "`" + `pages.lt=300` + "`" + `, ` + "`" + `year.gte=1980` + "`" + `, ` + "`" + `language.name.neq=Polski` + "`" + `.\n\nTo sort, use ` + "`" + `sort_by` + "`" + ` query parameter followed by the column name.\nIf you want to sort in descending order, prefix the column name with a minus sign (` + "`" + `-` + "`" + `).\nExamples: ` + "`" + `sort_by=pages` + "`" + ` - ascending order, ` + "`" + `sort_by=-pages` + "`" + `- descending order",
                 "produces": [
                     "application/json"
@@ -127,6 +132,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/models.Error"
                         }
                     },
+                    "401": {
+                        "description": "Unauthorized - Invalid or missing token",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -136,6 +147,11 @@ const docTemplate = `{
                 }
             },
             "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Accepts a JSON body to create a new book. Responds with the created book and set ` + "`" + `Location` + "`" + ` header or an error message.",
                 "consumes": [
                     "application/json"
@@ -177,6 +193,18 @@ const docTemplate = `{
                             "$ref": "#/definitions/models.Error"
                         }
                     },
+                    "401": {
+                        "description": "Unauthorized - Invalid or missing token",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Insufficient permissions",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
@@ -188,6 +216,11 @@ const docTemplate = `{
         },
         "/books/{id}": {
             "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Responds with the queried book as JSON or an error message.",
                 "produces": [
                     "application/json"
@@ -218,6 +251,12 @@ const docTemplate = `{
                             "$ref": "#/definitions/models.Error"
                         }
                     },
+                    "401": {
+                        "description": "Unauthorized - Invalid or missing token",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
                     "404": {
                         "description": "Not Found - No resource found",
                         "schema": {
@@ -233,6 +272,11 @@ const docTemplate = `{
                 }
             },
             "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Accepts a JSON body to update a book. Responds with a status code. When an error occurs the response body contains JSON data with the message.",
                 "consumes": [
                     "application/json"
@@ -269,6 +313,18 @@ const docTemplate = `{
                             "$ref": "#/definitions/models.Error"
                         }
                     },
+                    "401": {
+                        "description": "Unauthorized - Invalid or missing token",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Insufficient permissions",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
                     "404": {
                         "description": "Not Found -  No resource found",
                         "schema": {
@@ -284,6 +340,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Responds with a status code. When an error occurs the response body contains an error message.",
                 "tags": [
                     "Books"
@@ -308,6 +369,18 @@ const docTemplate = `{
                             "$ref": "#/definitions/models.Error"
                         }
                     },
+                    "401": {
+                        "description": "Unauthorized - Invalid or missing token",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Insufficient permissions",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
                     "404": {
                         "description": "Not Found -  No resource found",
                         "schema": {
@@ -323,6 +396,11 @@ const docTemplate = `{
                 }
             },
             "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
                 "description": "Accepts a JSON body with patch data to a book. Responds with a status code. When an error occurs the response body contains JSON data with the message.",
                 "consumes": [
                     "application/json"
@@ -355,6 +433,18 @@ const docTemplate = `{
                     },
                     "400": {
                         "description": "Bad Request - Invalid input or JSON",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Invalid or missing token",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Insufficient permissions",
                         "schema": {
                             "$ref": "#/definitions/models.Error"
                         }

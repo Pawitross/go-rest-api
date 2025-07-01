@@ -133,10 +133,16 @@ paths:
           description: Bad Request - Invalid input
           schema:
             $ref: '#/definitions/models.Error'
+        "401":
+          description: Unauthorized - Invalid or missing token
+          schema:
+            $ref: '#/definitions/models.Error'
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
       summary: Get a list of all books
       tags:
       - Books
@@ -167,10 +173,20 @@ paths:
           description: Bad Request - Invalid input or JSON
           schema:
             $ref: '#/definitions/models.Error'
+        "401":
+          description: Unauthorized - Invalid or missing token
+          schema:
+            $ref: '#/definitions/models.Error'
+        "403":
+          description: Forbidden - Insufficient permissions
+          schema:
+            $ref: '#/definitions/models.Error'
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
       summary: Create a new book
       tags:
       - Books
@@ -191,6 +207,14 @@ paths:
           description: Bad Request - Invalid book id
           schema:
             $ref: '#/definitions/models.Error'
+        "401":
+          description: Unauthorized - Invalid or missing token
+          schema:
+            $ref: '#/definitions/models.Error'
+        "403":
+          description: Forbidden - Insufficient permissions
+          schema:
+            $ref: '#/definitions/models.Error'
         "404":
           description: Not Found -  No resource found
           schema:
@@ -199,6 +223,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
       summary: Delete an existing book
       tags:
       - Books
@@ -221,6 +247,10 @@ paths:
           description: Bad Request - Invalid book id
           schema:
             $ref: '#/definitions/models.Error'
+        "401":
+          description: Unauthorized - Invalid or missing token
+          schema:
+            $ref: '#/definitions/models.Error'
         "404":
           description: Not Found - No resource found
           schema:
@@ -229,6 +259,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
       summary: Get one book
       tags:
       - Books
@@ -257,6 +289,14 @@ paths:
           description: Bad Request - Invalid input or JSON
           schema:
             $ref: '#/definitions/models.Error'
+        "401":
+          description: Unauthorized - Invalid or missing token
+          schema:
+            $ref: '#/definitions/models.Error'
+        "403":
+          description: Forbidden - Insufficient permissions
+          schema:
+            $ref: '#/definitions/models.Error'
         "404":
           description: Not Found -  No resource found
           schema:
@@ -265,6 +305,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
       summary: Patch an existing book
       tags:
       - Books
@@ -292,6 +334,14 @@ paths:
           description: Bad Request - Invalid input or JSON
           schema:
             $ref: '#/definitions/models.Error'
+        "401":
+          description: Unauthorized - Invalid or missing token
+          schema:
+            $ref: '#/definitions/models.Error'
+        "403":
+          description: Forbidden - Insufficient permissions
+          schema:
+            $ref: '#/definitions/models.Error'
         "404":
           description: Not Found -  No resource found
           schema:
@@ -300,6 +350,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
       summary: Update an existing book
       tags:
       - Books

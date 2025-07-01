@@ -28,25 +28,24 @@ func Router(router *gin.Engine, db db.BookDatabaseInterface) {
 	{
 		v1 := api.Group("/v1")
 		{
-			books := v1.Group("/books")
+			books := v1.Group("/books", middleware.Authenticate())
 			{
 				books.GET("", h.GetBooks)
 				books.GET("/:id", h.GetBook)
 
-				books.POST("", h.PostBook)
+				admin := books.Group("", middleware.Authorize())
+				{
+					admin.POST("", h.PostBook)
 
-				books.PUT("/:id", h.PutBook)
+					admin.PUT("/:id", h.PutBook)
 
-				books.PATCH("/:id", h.PatchBook)
+					admin.PATCH("/:id", h.PatchBook)
 
-				books.DELETE("/:id", h.DeleteBook)
+					admin.DELETE("/:id", h.DeleteBook)
+				}
 			}
 
 			v1.POST("login", handler.ReturnToken)
-
-			v1.GET("auth", middleware.Authenticate(), middleware.Authorize(), func(c *gin.Context) {
-				c.JSON(200, "Welcome")
-			})
 		}
 	}
 

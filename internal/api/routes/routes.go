@@ -14,6 +14,11 @@ import (
 // @title						Book managing API
 // @description				Documentation of a book managing REST API.
 // @BasePath					/api/v1
+// @securityDefinitions.apikey	ApiKeyAuth
+// @in							header
+// @name						Authorization
+// @description				Type "Bearer" followed by a space and JWT token.
+
 // @externalDocs.description	OpenAPI Specification
 // @externalDocs.url			https://swagger.io/resources/open-api/
 func Router(router *gin.Engine, db db.BookDatabaseInterface) {

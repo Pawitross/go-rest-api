@@ -473,6 +473,14 @@ const docTemplate = `{
             }
         }
     },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "description": "Type \"Bearer\" followed by a space and JWT token.",
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    },
     "externalDocs": {
         "description": "OpenAPI Specification",
         "url": "https://swagger.io/resources/open-api/"

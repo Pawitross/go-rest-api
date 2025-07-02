@@ -28,6 +28,10 @@ func runMain(m *testing.M) (int, error) {
 	if testing.Short() {
 		database = &mock.MockDatabase{}
 	} else {
+		os.Setenv("DBUSER", "root")
+		os.Setenv("DBPASS", "")
+		os.Setenv("DBNAME", "paw_test")
+
 		var err error
 		database, err = db.ConnectToDB()
 		if err != nil {

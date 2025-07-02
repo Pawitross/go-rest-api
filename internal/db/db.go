@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
+	"os"
 	"reflect"
 	"strings"
 
@@ -22,13 +23,32 @@ type Database struct {
 var _ BookDatabaseInterface = (*Database)(nil)
 
 func ConnectToDB() (*Database, error) {
+	dbUser := os.Getenv("DBUSER")
+	dbPass := os.Getenv("DBPASS")
+	dbName := os.Getenv("DBNAME")
+
+	if dbUser == "" || dbName == "" {
+		return nil, fmt.Errorf("Missing required environment variables: DBUSER, DBNAME")
+	}
+
+	dbHost := os.Getenv("DBHOST")
+	dbPort := os.Getenv("DBPORT")
+
+	if dbHost == "" {
+		dbHost = "127.0.0.1"
+	}
+
+	if dbPort == "" {
+		dbPort = "3306"
+	}
+
 	cfg := mysql.NewConfig()
 
-	cfg.User = "root"
-	cfg.Passwd = ""
+	cfg.User = dbUser
+	cfg.Passwd = dbPass
 	cfg.Net = "tcp"
-	cfg.Addr = "127.0.0.1:3306"
-	cfg.DBName = "paw"
+	cfg.Addr = dbHost + ":" + dbPort
+	cfg.DBName = dbName
 	cfg.ClientFoundRows = true
 
 	db, err := sql.Open("mysql", cfg.FormatDSN())

@@ -7,10 +7,15 @@ import (
 	"github.com/gin-gonic/gin"
 	"pawrest/internal/api/middleware"
 	"pawrest/internal/api/routes"
+	"pawrest/internal/cfgyaml"
 	"pawrest/internal/db"
 )
 
 func main() {
+	if err := cfgyaml.Load("env.yaml"); err != nil {
+		log.Fatal(err)
+	}
+
 	fmt.Println("Connecting to the database...")
 	database, err := db.ConnectToDB()
 	if err != nil {

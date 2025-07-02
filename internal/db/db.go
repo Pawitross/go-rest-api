@@ -69,6 +69,10 @@ func (d *Database) CloseDB() {
 	}
 }
 
+func (d *Database) Pool() *sql.DB {
+	return d.pool
+}
+
 func queryWithParams[T any](
 	d *Database,
 	query string,

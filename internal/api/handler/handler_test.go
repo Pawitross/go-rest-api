@@ -18,6 +18,7 @@ import (
 	"pawrest/internal/db"
 	"pawrest/internal/db/mock"
 	"pawrest/internal/models"
+	"pawrest/internal/testutil"
 )
 
 var database db.BookDatabaseInterface
@@ -38,6 +39,10 @@ func runMain(m *testing.M) (int, error) {
 			return 0, err
 		}
 		defer database.(*db.Database).CloseDB()
+
+		if err := testutil.SetupDatabase(database.(*db.Database).Pool()); err != nil {
+			return 0, err
+		}
 	}
 
 	return m.Run(), nil
@@ -392,10 +397,6 @@ func TestPatchBookError(t *testing.T) {
 
 // DELETE /books/id
 func TestDeleteBookSuccess(t *testing.T) {
-	if !testing.Short() {
-		t.Skip("Skipping success deletion test on real database")
-	}
-
 	w := execRequest("DELETE", "/api/v1/books/2", nil)
 	assert.Equal(t, http.StatusNoContent, w.Code)
 

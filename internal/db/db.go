@@ -12,15 +12,21 @@ import (
 	"github.com/go-sql-driver/mysql"
 )
 
-var ErrNotFound = errors.New("No resource found")
-var ErrForeignKey = errors.New("Foreign key constraint error")
-var ErrParam = errors.New("Parameter error")
+var (
+	ErrNotFound   = errors.New("No resource found")
+	ErrForeignKey = errors.New("Foreign key constraint error")
+	ErrParam      = errors.New("Parameter error")
+)
+
+type DatabaseInterface interface {
+	BookDatabaseInterface
+}
 
 type Database struct {
 	pool *sql.DB
 }
 
-var _ BookDatabaseInterface = (*Database)(nil)
+var _ DatabaseInterface = (*Database)(nil)
 
 func ConnectToDB() (*Database, error) {
 	dbUser := os.Getenv("DBUSER")

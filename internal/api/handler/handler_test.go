@@ -21,7 +21,7 @@ import (
 	"pawrest/internal/testutil"
 )
 
-var database db.BookDatabaseInterface
+var database db.DatabaseInterface
 
 func runMain(m *testing.M) (int, error) {
 	flag.Parse()
@@ -57,7 +57,7 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
-func setupTestRouter(db db.BookDatabaseInterface) *gin.Engine {
+func setupTestRouter(db db.DatabaseInterface) *gin.Engine {
 	gin.SetMode(gin.TestMode)
 	router := gin.New()
 

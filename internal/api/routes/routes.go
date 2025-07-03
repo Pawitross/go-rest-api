@@ -21,7 +21,7 @@ import (
 
 // @externalDocs.description	OpenAPI Specification
 // @externalDocs.url			https://swagger.io/resources/open-api/
-func Router(router *gin.Engine, db db.BookDatabaseInterface) {
+func Router(router *gin.Engine, db db.DatabaseInterface) {
 	h := handler.Handlers{DB: db}
 
 	api := router.Group("/api")

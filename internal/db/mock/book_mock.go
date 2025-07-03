@@ -34,8 +34,6 @@ var booksExt = []models.BookExt{
 	},
 }
 
-type MockDatabase struct{}
-
 func (m *MockDatabase) GetBooks(params url.Values) ([]models.Book, error) {
 	allowedParams := map[string]string{
 		"id":       "id",

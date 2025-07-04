@@ -325,7 +325,7 @@ func AssembleFilter(params url.Values, allowedParams map[string]string) (string,
 	}
 
 	if sort, hasSort := params["sort_by"]; hasSort {
-		if len(sort) == 0 {
+		if len(sort) == 0 || sort[0] == "" {
 			return "", nil, fmt.Errorf("%w: provided column is empty", ErrParam)
 		}
 

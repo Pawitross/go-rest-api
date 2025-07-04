@@ -163,7 +163,7 @@ func TestQueryWithParams(t *testing.T) {
 			wantErrIs:  ErrParam,
 		},
 		"ErrorEmptySortingParam": {
-			giveParams: url.Values{"sort_by": {}},
+			giveParams: url.Values{"sort_by": {""}},
 			wantErrIs:  ErrParam,
 		},
 		"ErrorUnknownSortingParam": {

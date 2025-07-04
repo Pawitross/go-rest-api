@@ -45,6 +45,20 @@ func Router(router *gin.Engine, db db.DatabaseInterface) {
 				}
 			}
 
+			authors := v1.Group("/authors")
+			{
+				authors.GET("", h.GetAuthors)
+				authors.GET("/:id", h.GetAuthor)
+
+				authors.POST("", h.PostAuthor)
+
+				authors.PUT("/:id", h.PutAuthor)
+
+				authors.PATCH("/:id", h.PatchAuthor)
+
+				authors.DELETE("/:id", h.DeleteAuthor)
+			}
+
 			v1.POST("login", handler.ReturnToken)
 		}
 	}

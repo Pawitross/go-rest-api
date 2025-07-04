@@ -20,6 +20,7 @@ var (
 
 type DatabaseInterface interface {
 	BookDatabaseInterface
+	AuthorDatabaseInterface
 }
 
 type Database struct {

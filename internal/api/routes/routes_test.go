@@ -36,6 +36,12 @@ func TestRoutes(t *testing.T) {
 		{"PUT", "/api/v1/books/1", []byte(`{"title":"Route put test","year":2025,"pages":30,"author":1,"genre":1,"language":1}`)},
 		{"PATCH", "/api/v1/books/1", []byte(`{"title":"Route patch test"}`)},
 		{"DELETE", "/api/v1/books/2", nil},
+		{"GET", "/api/v1/authors", nil},
+		{"POST", "/api/v1/authors", []byte(`{"first_name":"Route post", "last_name":"test"}`)},
+		{"GET", "/api/v1/authors/1", nil},
+		{"PUT", "/api/v1/authors/1", []byte(`{"first_name":"Route put", "last_name":"test"}`)},
+		{"PATCH", "/api/v1/authors/1", []byte(`{"first_name":"Route patch", "last_name":"test"}`)},
+		{"DELETE", "/api/v1/authors/2", nil},
 		{"GET", "/swagger/index.html", nil},
 	}
 

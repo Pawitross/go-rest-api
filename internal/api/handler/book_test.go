@@ -12,7 +12,7 @@ import (
 )
 
 // GET /books
-func TestListBooksSuccess(t *testing.T) {
+func TestListBooks_Success(t *testing.T) {
 	w := execRequest("GET", "/api/v1/books", nil)
 	assert.Equal(t, http.StatusOK, w.Code)
 
@@ -20,7 +20,7 @@ func TestListBooksSuccess(t *testing.T) {
 	decodeBodyCheckEmpty(w, t, &rBooks)
 }
 
-func TestListBooksExtSuccess(t *testing.T) {
+func TestListBooksExt_Success(t *testing.T) {
 	w := execRequest("GET", "/api/v1/books?extend=true", nil)
 	assert.Equal(t, http.StatusOK, w.Code)
 
@@ -28,7 +28,7 @@ func TestListBooksExtSuccess(t *testing.T) {
 	decodeBodyCheckEmpty(w, t, &rBooks)
 }
 
-func TestListBooksBadRequestUnknownParam(t *testing.T) {
+func TestListBooks_BadRequest_UnknownParam(t *testing.T) {
 	w := execRequest("GET", "/api/v1/books?foo=bar", nil)
 	assert.Equal(t, http.StatusBadRequest, w.Code)
 
@@ -36,7 +36,7 @@ func TestListBooksBadRequestUnknownParam(t *testing.T) {
 }
 
 // GET /books/id
-func TestGetBookSuccess(t *testing.T) {
+func TestGetBook_Success(t *testing.T) {
 	w := execRequest("GET", "/api/v1/books/1", nil)
 	assert.Equal(t, http.StatusOK, w.Code)
 
@@ -52,22 +52,33 @@ func TestGetBookSuccess(t *testing.T) {
 	assert.NotEmpty(t, rBook.Language, "Language should not be empty")
 }
 
-func TestGetBookNotFoundBigPathId(t *testing.T) {
-	w := execRequest("GET", "/api/v1/books/9999", nil)
-	assert.Equal(t, http.StatusNotFound, w.Code)
+func TestGetBook_Error(t *testing.T) {
+	getTests := map[string]struct {
+		query  string
+		status int
+	}{
+		"NotFound_BigPathId": {
+			"/9999",
+			http.StatusNotFound,
+		},
+		"BadRequest_StringPathId": {
+			"/string",
+			http.StatusBadRequest,
+		},
+	}
 
-	checkErrorBodyNotEmpty(w, t)
-}
+	for name, tt := range getTests {
+		t.Run(name, func(t *testing.T) {
+			w := execRequest("GET", "/api/v1/books"+tt.query, nil)
+			assert.Equal(t, tt.status, w.Code)
 
-func TestGetBookBadRequestStringPathId(t *testing.T) {
-	w := execRequest("GET", "/api/v1/books/string", nil)
-	assert.Equal(t, http.StatusBadRequest, w.Code)
-
-	checkErrorBodyNotEmpty(w, t)
+			checkErrorBodyNotEmpty(w, t)
+		})
+	}
 }
 
 // POST /books
-func TestPostBookSuccess(t *testing.T) {
+func TestPostBook_Success(t *testing.T) {
 	testBook := models.Book{
 		Title:    "Post book test",
 		Year:     1996,
@@ -78,7 +89,6 @@ func TestPostBookSuccess(t *testing.T) {
 	}
 
 	jsonBook := marshalCheckNoError(t, testBook)
-
 	w := execRequest("POST", "/api/v1/books", bytes.NewReader(jsonBook))
 	assert.Equal(t, http.StatusCreated, w.Code)
 
@@ -98,20 +108,20 @@ func TestPostBookSuccess(t *testing.T) {
 	assert.Equal(t, testBook.Language, rBook.Language)
 }
 
-func TestPostBookBadRequestMalformedJSON(t *testing.T) {
-	jsonStr := []byte(`{"title":"JSON Test","year":1996,"pages":200,"author":"Should be number","genre":1}`)
-	w := execRequest("POST", "/api/v1/books", bytes.NewReader(jsonStr))
+func TestPostBook_BadRequest_MalformedJSON(t *testing.T) {
+	jsonBytes := []byte(`{"title":"JSON Test","year":1996,"pages":200,"author":"Should be number","genre":1}`)
+	w := execRequest("POST", "/api/v1/books", bytes.NewReader(jsonBytes))
 	assert.Equal(t, http.StatusBadRequest, w.Code)
 
 	checkErrorBodyNotEmpty(w, t)
 }
 
-func TestPostBookError(t *testing.T) {
+func TestPostBook_Error(t *testing.T) {
 	postTests := map[string]struct {
 		testBook models.Book
 		status   int
 	}{
-		"BadRequestValidationErr": {
+		"BadRequest_ValidationErr": {
 			models.Book{
 				Title:    "",
 				Year:     1996,
@@ -122,7 +132,7 @@ func TestPostBookError(t *testing.T) {
 			},
 			http.StatusBadRequest,
 		},
-		"BadRequestForeignKeyErr": {
+		"BadRequest_ForeignKeyErr": {
 			models.Book{
 				Title:    "Post foreign key test",
 				Year:     1996,
@@ -138,7 +148,6 @@ func TestPostBookError(t *testing.T) {
 	for name, tt := range postTests {
 		t.Run(name, func(t *testing.T) {
 			jsonBook := marshalCheckNoError(t, tt.testBook)
-
 			w := execRequest("POST", "/api/v1/books", bytes.NewReader(jsonBook))
 			assert.Equal(t, tt.status, w.Code)
 
@@ -148,7 +157,7 @@ func TestPostBookError(t *testing.T) {
 }
 
 // PUT /books/id
-func TestPutBookSuccess(t *testing.T) {
+func TestPutBook_Success(t *testing.T) {
 	testBook := models.Book{
 		Title:    "Put book test",
 		Year:     1996,
@@ -159,7 +168,6 @@ func TestPutBookSuccess(t *testing.T) {
 	}
 
 	jsonBook := marshalCheckNoError(t, testBook)
-
 	w := execRequest("PUT", "/api/v1/books/1", bytes.NewReader(jsonBook))
 	assert.Equal(t, http.StatusNoContent, w.Code)
 
@@ -172,21 +180,21 @@ func TestPutBookSuccess(t *testing.T) {
 	assert.Equal(t, testBook.Language, book.Language)
 }
 
-func TestPutBookBadRequestMalformedJSON(t *testing.T) {
-	jsonStr := []byte(`{"title":"JSON Test","year":1996,"pages":200,"author":"Should be number","genre":1}`)
-	w := execRequest("PUT", "/api/v1/books/1", bytes.NewReader(jsonStr))
+func TestPutBook_BadRequest_MalformedJSON(t *testing.T) {
+	jsonBytes := []byte(`{"title":"JSON Test","year":1996,"pages":200,"author":"Should be number","genre":1}`)
+	w := execRequest("PUT", "/api/v1/books/1", bytes.NewReader(jsonBytes))
 	assert.Equal(t, http.StatusBadRequest, w.Code)
 
 	checkErrorBodyNotEmpty(w, t)
 }
 
-func TestPutBookError(t *testing.T) {
+func TestPutBook_Error(t *testing.T) {
 	putTests := map[string]struct {
 		testBook models.Book
 		query    string
 		status   int
 	}{
-		"NotFoundBigPathId": {
+		"NotFound_BigPathId": {
 			models.Book{
 				Title:    "Put book test",
 				Year:     1996,
@@ -198,7 +206,7 @@ func TestPutBookError(t *testing.T) {
 			"/9999",
 			http.StatusNotFound,
 		},
-		"BadRequestForeignKeyErr": {
+		"BadRequest_ForeignKeyErr": {
 			models.Book{
 				Title:    "Put foreign key test",
 				Year:     1996,
@@ -210,7 +218,7 @@ func TestPutBookError(t *testing.T) {
 			"/1",
 			http.StatusBadRequest,
 		},
-		"BadRequestStringId": {
+		"BadRequest_StringId": {
 			models.Book{
 				Title:    "Put book test",
 				Year:     1996,
@@ -222,7 +230,7 @@ func TestPutBookError(t *testing.T) {
 			"/string",
 			http.StatusBadRequest,
 		},
-		"BadRequestBadJSON": {
+		"BadRequest_BadJSON": {
 			models.Book{
 				Title: "Put book test",
 				Year:  1996,
@@ -238,7 +246,6 @@ func TestPutBookError(t *testing.T) {
 			fullUrl := "/api/v1/books" + tt.query
 
 			jsonBook := marshalCheckNoError(t, tt.testBook)
-
 			w := execRequest("PUT", fullUrl, bytes.NewReader(jsonBook))
 			assert.Equal(t, tt.status, w.Code)
 
@@ -248,9 +255,9 @@ func TestPutBookError(t *testing.T) {
 }
 
 // PATCH /books/id
-func TestPatchBookSuccess(t *testing.T) {
-	jsonStr := []byte(`{"title":"Patch book test", "pages":999}`)
-	w := execRequest("PATCH", "/api/v1/books/1", bytes.NewReader(jsonStr))
+func TestPatchBook_Success(t *testing.T) {
+	jsonBytes := []byte(`{"title":"Patch book test", "pages":999}`)
+	w := execRequest("PATCH", "/api/v1/books/1", bytes.NewReader(jsonBytes))
 	assert.Equal(t, http.StatusNoContent, w.Code)
 
 	book, _ := database.GetBook(1)
@@ -258,23 +265,23 @@ func TestPatchBookSuccess(t *testing.T) {
 	assert.Equal(t, int64(999), book.Pages)
 }
 
-func TestPatchBookError(t *testing.T) {
+func TestPatchBook_Error(t *testing.T) {
 	patchTests := map[string]struct {
 		jsonStr string
 		query   string
 		status  int
 	}{
-		"NotFoundBigPathId": {
+		"NotFound_BigPathId": {
 			`{"title":"Patch book test", "pages":999}`,
 			"/9999",
 			http.StatusNotFound,
 		},
-		"BadRequestStringPathId": {
+		"BadRequest_StringPathId": {
 			`{"title":"Patch book test", "pages":999}`,
 			"/string",
 			http.StatusBadRequest,
 		},
-		"BadRequestBadJSON": {
+		"BadRequest_BadJSON": {
 			`{"title":"Patch book test", "pages":Should be number"}`,
 			"/1",
 			http.StatusBadRequest,
@@ -294,7 +301,7 @@ func TestPatchBookError(t *testing.T) {
 }
 
 // DELETE /books/id
-func TestDeleteBookSuccess(t *testing.T) {
+func TestDeleteBook_Success(t *testing.T) {
 	w := execRequest("DELETE", "/api/v1/books/2", nil)
 	assert.Equal(t, http.StatusNoContent, w.Code)
 
@@ -302,16 +309,16 @@ func TestDeleteBookSuccess(t *testing.T) {
 	assert.ErrorIs(t, err, db.ErrNotFound)
 }
 
-func TestDeleteBookError(t *testing.T) {
+func TestDeleteBook_Error(t *testing.T) {
 	deleteTests := map[string]struct {
 		query  string
 		status int
 	}{
-		"NotFoundBigPathId": {
+		"NotFound_BigPathId": {
 			"/9999",
 			http.StatusNotFound,
 		},
-		"BadRequestStringPathId": {
+		"BadRequest_StringPathId": {
 			"/string",
 			http.StatusBadRequest,
 		},

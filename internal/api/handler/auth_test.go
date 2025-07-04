@@ -17,7 +17,7 @@ func checkTokenStructure(t *testing.T, token string) {
 	assert.Equal(t, 2, strings.Count(token, "."))
 }
 
-func TestLoginTokenSuccess(t *testing.T) {
+func TestLoginToken_Success(t *testing.T) {
 	loginTests := []string{
 		`{"return_admin_token":false}`,
 		`{"return_admin_token":true}`,
@@ -37,7 +37,7 @@ func TestLoginTokenSuccess(t *testing.T) {
 	}
 }
 
-func TestLoginTokenBadRequest(t *testing.T) {
+func TestLoginToken_BadRequest(t *testing.T) {
 	errorTests := []string{
 		`{}`,
 		`{"admin":}`,

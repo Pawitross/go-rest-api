@@ -11,13 +11,42 @@ import (
 	"pawrest/internal/db"
 )
 
-// @title						Book managing API
-// @description				Documentation of a book managing REST API.
+// @title		Book managing API
+// @description	Documentation of a book managing REST API.
+// @description
+// @description	**How to use filtering:**
+// @description	To use simple filtering put name of the column in the query parameter followed by the value.
+// @description	Examples: `last_name=Orwell`, `title=Dziady`
+// @description	To filter extended response use filtering like this: `genre.name=Nowela`
+// @description
+// @description	To filter using comparison operators append the operator to the query parameter. Available operators:
+// @description	- less than = `.lt`
+// @description	- less than or equal = `.lte`
+// @description	- greater than = `.gt`
+// @description	- greater than or equal = `.gte`
+// @description	- equal = `.eq`
+// @description	- not equal = `.neq`
+// @description
+// @description	Examples: `pages.lt=300`, `year.gte=1980`, `language.name.neq=Polski`.
+// @description
+// @description	**How to use sorting:**
+// @description	To sort, use `sort_by` query parameter followed by the column name.
+// @description	If you want to sort in descending order, prefix the column name with a minus sign (`-`).
+// @description	Examples: `sort_by=pages` - ascending order, `sort_by=-pages` - descending order
+// @description
+// @description	**How to use limit and offset:**
+// @description	To use a limit, use the `limit` query parameter, like this: `limit=10`
+// @description	To use offset, you also need to provide a limit as well.
+// @description	The order of the limit and offset doesn't matter.
+// @description	Examples: `offset=10&limit=50`, `limit=50&offset=10`
+
 // @BasePath					/api/v1
+
 // @securityDefinitions.apikey	ApiKeyAuth
 // @in							header
 // @name						Authorization
-// @description				Type "Bearer" followed by a space and JWT token.
+// @description					Provide the JWT token as a Bearer token in the format "Bearer <your_token_here>".
+// @description					To get the token use the /login endpoint with necessary body.
 
 // @externalDocs.description	OpenAPI Specification
 // @externalDocs.url			https://swagger.io/resources/open-api/

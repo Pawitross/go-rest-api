@@ -41,28 +41,40 @@ externalDocs:
   url: https://swagger.io/resources/open-api/
 info:
   contact: {}
-  description: Documentation of a book managing REST API.
+  description: |-
+    Documentation of a book managing REST API.
+
+    **How to use filtering:**
+    To use simple filtering put name of the column in the query parameter followed by the value.
+    Examples: `last_name=Orwell`, `title=Dziady`
+    To filter extended response use filtering like this: `genre.name=Nowela`
+
+    To filter using comparison operators append the operator to the query parameter. Available operators:
+    - less than = `.lt`
+    - less than or equal = `.lte`
+    - greater than = `.gt`
+    - greater than or equal = `.gte`
+    - equal = `.eq`
+    - not equal = `.neq`
+
+    Examples: `pages.lt=300`, `year.gte=1980`, `language.name.neq=Polski`.
+
+    **How to use sorting:**
+    To sort, use `sort_by` query parameter followed by the column name.
+    If you want to sort in descending order, prefix the column name with a minus sign (`-`).
+    Examples: `sort_by=pages` - ascending order, `sort_by=-pages` - descending order
+
+    **How to use limit and offset:**
+    To use a limit, use the `limit` query parameter, like this: `limit=10`
+    To use offset, you also need to provide a limit as well.
+    The order of the limit and offset doesn't matter.
+    Examples: `offset=10&limit=50`, `limit=50&offset=10`
   title: Book managing API
 paths:
   /books:
     get:
-      description: |-
-        Responds with a list of all books as JSON. Optional filtering, sorting and pagination is available through parameters.
-
-        To filter extended response use filtering like this: `genre.name=Nowela`
-        To filter using comparison operators append the operator to the query parameter. Available operators:
-        - less than = `.lt`
-        - less than or equal = `.lte`
-        - greater than = `.gt`
-        - greater than or equal = `.gte`
-        - equal = `.eq`
-        - not equal = `.neq`
-
-        Examples: `pages.lt=300`, `year.gte=1980`, `language.name.neq=Polski`.
-
-        To sort, use `sort_by` query parameter followed by the column name.
-        If you want to sort in descending order, prefix the column name with a minus sign (`-`).
-        Examples: `sort_by=pages` - ascending order, `sort_by=-pages`- descending order
+      description: Responds with a list of all books as JSON. Optional filtering,
+        sorting and pagination is available through parameters.
       parameters:
       - description: Book id
         in: query
@@ -385,7 +397,9 @@ paths:
       - Auth
 securityDefinitions:
   ApiKeyAuth:
-    description: Type "Bearer" followed by a space and JWT token.
+    description: |-
+      Provide the JWT token as a Bearer token in the format "Bearer <your_token_here>".
+      To get the token use the /login endpoint with necessary body.
     in: header
     name: Authorization
     type: apiKey

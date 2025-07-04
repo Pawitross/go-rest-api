@@ -22,7 +22,7 @@ const docTemplate = `{
                         "ApiKeyAuth": []
                     }
                 ],
-                "description": "Responds with a list of all books as JSON. Optional filtering, sorting and pagination is available through parameters.\n\nTo filter extended response use filtering like this: ` + "`" + `genre.name=Nowela` + "`" + `\nTo filter using comparison operators append the operator to the query parameter. Available operators:\n- less than = ` + "`" + `.lt` + "`" + `\n- less than or equal = ` + "`" + `.lte` + "`" + `\n- greater than = ` + "`" + `.gt` + "`" + `\n- greater than or equal = ` + "`" + `.gte` + "`" + `\n- equal = ` + "`" + `.eq` + "`" + `\n- not equal = ` + "`" + `.neq` + "`" + `\n\nExamples: ` + "`" + `pages.lt=300` + "`" + `, ` + "`" + `year.gte=1980` + "`" + `, ` + "`" + `language.name.neq=Polski` + "`" + `.\n\nTo sort, use ` + "`" + `sort_by` + "`" + ` query parameter followed by the column name.\nIf you want to sort in descending order, prefix the column name with a minus sign (` + "`" + `-` + "`" + `).\nExamples: ` + "`" + `sort_by=pages` + "`" + ` - ascending order, ` + "`" + `sort_by=-pages` + "`" + `- descending order",
+                "description": "Responds with a list of all books as JSON. Optional filtering, sorting and pagination is available through parameters.",
                 "produces": [
                     "application/json"
                 ],
@@ -565,7 +565,7 @@ const docTemplate = `{
     },
     "securityDefinitions": {
         "ApiKeyAuth": {
-            "description": "Type \"Bearer\" followed by a space and JWT token.",
+            "description": "Provide the JWT token as a Bearer token in the format \"Bearer \u003cyour_token_here\u003e\".\nTo get the token use the /login endpoint with necessary body.",
             "type": "apiKey",
             "name": "Authorization",
             "in": "header"
@@ -584,7 +584,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "/api/v1",
 	Schemes:          []string{},
 	Title:            "Book managing API",
-	Description:      "Documentation of a book managing REST API.",
+	Description:      "Documentation of a book managing REST API.\n\n**How to use filtering:**\nTo use simple filtering put name of the column in the query parameter followed by the value.\nExamples: `last_name=Orwell`, `title=Dziady`\nTo filter extended response use filtering like this: `genre.name=Nowela`\n\nTo filter using comparison operators append the operator to the query parameter. Available operators:\n- less than = `.lt`\n- less than or equal = `.lte`\n- greater than = `.gt`\n- greater than or equal = `.gte`\n- equal = `.eq`\n- not equal = `.neq`\n\nExamples: `pages.lt=300`, `year.gte=1980`, `language.name.neq=Polski`.\n\n**How to use sorting:**\nTo sort, use `sort_by` query parameter followed by the column name.\nIf you want to sort in descending order, prefix the column name with a minus sign (`-`).\nExamples: `sort_by=pages` - ascending order, `sort_by=-pages` - descending order\n\n**How to use limit and offset:**\nTo use a limit, use the `limit` query parameter, like this: `limit=10`\nTo use offset, you also need to provide a limit as well.\nThe order of the limit and offset doesn't matter.\nExamples: `offset=10&limit=50`, `limit=50&offset=10`",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

@@ -13,21 +13,6 @@ import (
 
 // @Summary		Get a list of all books
 // @Description	Responds with a list of all books as JSON. Optional filtering, sorting and pagination is available through parameters.
-// @Description
-// @Description	To filter extended response use filtering like this: `genre.name=Nowela`
-// @Description	To filter using comparison operators append the operator to the query parameter. Available operators:
-// @Description	- less than = `.lt`
-// @Description	- less than or equal = `.lte`
-// @Description	- greater than = `.gt`
-// @Description	- greater than or equal = `.gte`
-// @Description	- equal = `.eq`
-// @Description	- not equal = `.neq`
-// @Description
-// @Description	Examples: `pages.lt=300`, `year.gte=1980`, `language.name.neq=Polski`.
-// @Description
-// @Description	To sort, use `sort_by` query parameter followed by the column name.
-// @Description	If you want to sort in descending order, prefix the column name with a minus sign (`-`).
-// @Description	Examples: `sort_by=pages` - ascending order, `sort_by=-pages`- descending order
 // @Tags			Books
 // @Produce		json
 // @Param			id					query		string			false	"Book id"

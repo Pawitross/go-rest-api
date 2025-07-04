@@ -1,6 +1,7 @@
 package handler_test
 
 import (
+	"bytes"
 	"encoding/json"
 	"flag"
 	"io"
@@ -52,6 +53,22 @@ func TestMain(m *testing.M) {
 	}
 
 	os.Exit(code)
+}
+
+func execAndCheck(t *testing.T, method, url string, body []byte, status int, o any) {
+	w := execRequest(method, url, bytes.NewReader(body))
+	assert.Equal(t, status, w.Code)
+
+	if o != nil {
+		decodeJSONBodyCheckEmpty(w, t, o)
+	}
+}
+
+func execAndCheckError(t *testing.T, method, url string, body []byte, status int) {
+	w := execRequest(method, url, bytes.NewReader(body))
+	assert.Equal(t, status, w.Code)
+
+	checkErrorBodyNotEmpty(w, t)
 }
 
 func setupTestRouter(db db.DatabaseInterface) *gin.Engine {

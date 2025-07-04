@@ -13,35 +13,23 @@ import (
 
 // GET /books
 func TestListBooks_Success(t *testing.T) {
-	w := execRequest("GET", "/api/v1/books", nil)
-	assert.Equal(t, http.StatusOK, w.Code)
-
 	var rBooks []models.Book
-	decodeJSONBodyCheckEmpty(w, t, &rBooks)
+	execAndCheck(t, "GET", "/api/v1/books", nil, http.StatusOK, &rBooks)
 }
 
 func TestListBooksExt_Success(t *testing.T) {
-	w := execRequest("GET", "/api/v1/books?extend=true", nil)
-	assert.Equal(t, http.StatusOK, w.Code)
-
 	var rBooks []models.BookExt
-	decodeJSONBodyCheckEmpty(w, t, &rBooks)
+	execAndCheck(t, "GET", "/api/v1/books?extend=true", nil, http.StatusOK, &rBooks)
 }
 
 func TestListBooks_BadRequest_UnknownParam(t *testing.T) {
-	w := execRequest("GET", "/api/v1/books?foo=bar", nil)
-	assert.Equal(t, http.StatusBadRequest, w.Code)
-
-	checkErrorBodyNotEmpty(w, t)
+	execAndCheckError(t, "GET", "/api/v1/books?foo=bar", nil, http.StatusBadRequest)
 }
 
 // GET /books/id
 func TestGetBook_Success(t *testing.T) {
-	w := execRequest("GET", "/api/v1/books/1", nil)
-	assert.Equal(t, http.StatusOK, w.Code)
-
 	var rBook models.Book
-	decodeJSONBodyCheckEmpty(w, t, &rBook)
+	execAndCheck(t, "GET", "/api/v1/books/1", nil, http.StatusOK, &rBook)
 
 	assert.NotEmpty(t, rBook, "Book in the response body should not be empty")
 	assert.NotEmpty(t, rBook.Title, "Title should not be empty")
@@ -69,10 +57,8 @@ func TestGetBook_Error(t *testing.T) {
 
 	for name, tt := range getTests {
 		t.Run(name, func(t *testing.T) {
-			w := execRequest("GET", "/api/v1/books"+tt.query, nil)
-			assert.Equal(t, tt.status, w.Code)
-
-			checkErrorBodyNotEmpty(w, t)
+			fullUrl := "/api/v1/books" + tt.query
+			execAndCheckError(t, "GET", fullUrl, nil, tt.status)
 		})
 	}
 }
@@ -110,10 +96,7 @@ func TestPostBook_Success(t *testing.T) {
 
 func TestPostBook_BadRequest_MalformedJSON(t *testing.T) {
 	jsonBytes := []byte(`{"title":"JSON Test","year":1996,"pages":200,"author":"Should be number","genre":1}`)
-	w := execRequest("POST", "/api/v1/books", bytes.NewReader(jsonBytes))
-	assert.Equal(t, http.StatusBadRequest, w.Code)
-
-	checkErrorBodyNotEmpty(w, t)
+	execAndCheckError(t, "POST", "/api/v1/books", jsonBytes, http.StatusBadRequest)
 }
 
 func TestPostBook_Error(t *testing.T) {
@@ -148,10 +131,7 @@ func TestPostBook_Error(t *testing.T) {
 	for name, tt := range postTests {
 		t.Run(name, func(t *testing.T) {
 			jsonBook := marshalCheckNoError(t, tt.testBook)
-			w := execRequest("POST", "/api/v1/books", bytes.NewReader(jsonBook))
-			assert.Equal(t, tt.status, w.Code)
-
-			checkErrorBodyNotEmpty(w, t)
+			execAndCheckError(t, "POST", "/api/v1/books", jsonBook, tt.status)
 		})
 	}
 }
@@ -168,8 +148,7 @@ func TestPutBook_Success(t *testing.T) {
 	}
 
 	jsonBook := marshalCheckNoError(t, testBook)
-	w := execRequest("PUT", "/api/v1/books/1", bytes.NewReader(jsonBook))
-	assert.Equal(t, http.StatusNoContent, w.Code)
+	execAndCheck(t, "PUT", "/api/v1/books/1", jsonBook, http.StatusNoContent, nil)
 
 	book, _ := database.GetBook(1)
 	assert.Equal(t, testBook.Title, book.Title)
@@ -182,10 +161,7 @@ func TestPutBook_Success(t *testing.T) {
 
 func TestPutBook_BadRequest_MalformedJSON(t *testing.T) {
 	jsonBytes := []byte(`{"title":"JSON Test","year":1996,"pages":200,"author":"Should be number","genre":1}`)
-	w := execRequest("PUT", "/api/v1/books/1", bytes.NewReader(jsonBytes))
-	assert.Equal(t, http.StatusBadRequest, w.Code)
-
-	checkErrorBodyNotEmpty(w, t)
+	execAndCheckError(t, "PUT", "/api/v1/books/1", jsonBytes, http.StatusBadRequest)
 }
 
 func TestPutBook_Error(t *testing.T) {
@@ -244,12 +220,8 @@ func TestPutBook_Error(t *testing.T) {
 	for name, tt := range putTests {
 		t.Run(name, func(t *testing.T) {
 			fullUrl := "/api/v1/books" + tt.query
-
 			jsonBook := marshalCheckNoError(t, tt.testBook)
-			w := execRequest("PUT", fullUrl, bytes.NewReader(jsonBook))
-			assert.Equal(t, tt.status, w.Code)
-
-			checkErrorBodyNotEmpty(w, t)
+			execAndCheckError(t, "PUT", fullUrl, jsonBook, tt.status)
 		})
 	}
 }
@@ -257,8 +229,7 @@ func TestPutBook_Error(t *testing.T) {
 // PATCH /books/id
 func TestPatchBook_Success(t *testing.T) {
 	jsonBytes := []byte(`{"title":"Patch book test", "pages":999}`)
-	w := execRequest("PATCH", "/api/v1/books/1", bytes.NewReader(jsonBytes))
-	assert.Equal(t, http.StatusNoContent, w.Code)
+	execAndCheck(t, "PATCH", "/api/v1/books/1", jsonBytes, http.StatusNoContent, nil)
 
 	book, _ := database.GetBook(1)
 	assert.Equal(t, "Patch book test", book.Title)
@@ -291,19 +262,14 @@ func TestPatchBook_Error(t *testing.T) {
 	for name, tt := range patchTests {
 		t.Run(name, func(t *testing.T) {
 			fullUrl := "/api/v1/books" + tt.query
-
-			w := execRequest("PATCH", fullUrl, bytes.NewReader([]byte(tt.jsonStr)))
-			assert.Equal(t, tt.status, w.Code)
-
-			checkErrorBodyNotEmpty(w, t)
+			execAndCheckError(t, "PATCH", fullUrl, []byte(tt.jsonStr), tt.status)
 		})
 	}
 }
 
 // DELETE /books/id
 func TestDeleteBook_Success(t *testing.T) {
-	w := execRequest("DELETE", "/api/v1/books/2", nil)
-	assert.Equal(t, http.StatusNoContent, w.Code)
+	execAndCheck(t, "DELETE", "/api/v1/books/2", nil, http.StatusNoContent, nil)
 
 	_, err := database.GetBook(2)
 	assert.ErrorIs(t, err, db.ErrNotFound)
@@ -327,11 +293,7 @@ func TestDeleteBook_Error(t *testing.T) {
 	for name, tt := range deleteTests {
 		t.Run(name, func(t *testing.T) {
 			fullUrl := "/api/v1/books" + tt.query
-
-			w := execRequest("DELETE", fullUrl, nil)
-			assert.Equal(t, tt.status, w.Code)
-
-			checkErrorBodyNotEmpty(w, t)
+			execAndCheckError(t, "DELETE", fullUrl, nil, tt.status)
 		})
 	}
 }

@@ -13,27 +13,18 @@ import (
 
 // GET /authors
 func TestListAuthors_Success(t *testing.T) {
-	w := execRequest("GET", "/api/v1/authors", nil)
-	assert.Equal(t, http.StatusOK, w.Code)
-
 	var rAuthors []models.Author
-	decodeJSONBodyCheckEmpty(w, t, &rAuthors)
+	execAndCheck(t, "GET", "/api/v1/authors", nil, http.StatusOK, &rAuthors)
 }
 
 func TestListAuthors_BadRequest_UnknownParam(t *testing.T) {
-	w := execRequest("GET", "/api/v1/authors?foo=bar", nil)
-	assert.Equal(t, http.StatusBadRequest, w.Code)
-
-	checkErrorBodyNotEmpty(w, t)
+	execAndCheckError(t, "GET", "/api/v1/authors?foo=bar", nil, http.StatusBadRequest)
 }
 
 // GET /authors/id
 func TestGetAuthor_Success(t *testing.T) {
-	w := execRequest("GET", "/api/v1/authors/1", nil)
-	assert.Equal(t, http.StatusOK, w.Code)
-
 	var rAuthor models.Author
-	decodeJSONBodyCheckEmpty(w, t, &rAuthor)
+	execAndCheck(t, "GET", "/api/v1/authors/1", nil, http.StatusOK, &rAuthor)
 
 	assert.NotEmpty(t, rAuthor, "Author in the response body should not be empty")
 	assert.NotEmpty(t, rAuthor.FirstName, "FirstName should not be empty")
@@ -57,10 +48,8 @@ func TestGetAuthor_Error(t *testing.T) {
 
 	for name, tt := range getTests {
 		t.Run(name, func(t *testing.T) {
-			w := execRequest("GET", "/api/v1/authors"+tt.query, nil)
-			assert.Equal(t, tt.status, w.Code)
-
-			checkErrorBodyNotEmpty(w, t)
+			fullUrl := "/api/v1/authors" + tt.query
+			execAndCheckError(t, "GET", fullUrl, nil, tt.status)
 		})
 	}
 }
@@ -90,10 +79,7 @@ func TestPostAuthor_Success(t *testing.T) {
 
 func TestPostAuthor_BadRequest_MalformedJSON(t *testing.T) {
 	jsonBytes := []byte(`{"first_name":999,"last_name":"test"}`)
-	w := execRequest("POST", "/api/v1/authors", bytes.NewReader(jsonBytes))
-	assert.Equal(t, http.StatusBadRequest, w.Code)
-
-	checkErrorBodyNotEmpty(w, t)
+	execAndCheckError(t, "POST", "/api/v1/authors", jsonBytes, http.StatusBadRequest)
 }
 
 func TestPostAuthor_Error(t *testing.T) {
@@ -113,10 +99,7 @@ func TestPostAuthor_Error(t *testing.T) {
 	for name, tt := range postTests {
 		t.Run(name, func(t *testing.T) {
 			jsonAuthor := marshalCheckNoError(t, tt.testAuthor)
-			w := execRequest("POST", "/api/v1/authors", bytes.NewReader(jsonAuthor))
-			assert.Equal(t, tt.status, w.Code)
-
-			checkErrorBodyNotEmpty(w, t)
+			execAndCheckError(t, "POST", "/api/v1/authors", jsonAuthor, tt.status)
 		})
 	}
 }
@@ -129,8 +112,7 @@ func TestPutAuthor_Success(t *testing.T) {
 	}
 
 	jsonAuthor := marshalCheckNoError(t, testAuthor)
-	w := execRequest("PUT", "/api/v1/authors/1", bytes.NewReader(jsonAuthor))
-	assert.Equal(t, http.StatusNoContent, w.Code)
+	execAndCheck(t, "PUT", "/api/v1/authors/1", jsonAuthor, http.StatusNoContent, nil)
 
 	author, _ := database.GetAuthor(1)
 	assert.Equal(t, testAuthor.FirstName, author.FirstName)
@@ -139,10 +121,7 @@ func TestPutAuthor_Success(t *testing.T) {
 
 func TestPutAuthor_BadRequest_MalformedJSON(t *testing.T) {
 	jsonBytes := []byte(`{"first_name":999,"last_name":"test"}`)
-	w := execRequest("PUT", "/api/v1/authors/1", bytes.NewReader(jsonBytes))
-	assert.Equal(t, http.StatusBadRequest, w.Code)
-
-	checkErrorBodyNotEmpty(w, t)
+	execAndCheckError(t, "PUT", "/api/v1/authors/1", jsonBytes, http.StatusBadRequest)
 }
 
 func TestPutAuthor_Error(t *testing.T) {
@@ -179,12 +158,8 @@ func TestPutAuthor_Error(t *testing.T) {
 	for name, tt := range putTests {
 		t.Run(name, func(t *testing.T) {
 			fullUrl := "/api/v1/authors" + tt.query
-
 			jsonAuthor := marshalCheckNoError(t, tt.testAuthor)
-			w := execRequest("PUT", fullUrl, bytes.NewReader(jsonAuthor))
-			assert.Equal(t, tt.status, w.Code)
-
-			checkErrorBodyNotEmpty(w, t)
+			execAndCheckError(t, "PUT", fullUrl, jsonAuthor, tt.status)
 		})
 	}
 }
@@ -192,8 +167,7 @@ func TestPutAuthor_Error(t *testing.T) {
 // PATCH /authors/id
 func TestPatchAuthor_Success(t *testing.T) {
 	jsonBytes := []byte(`{"first_name":"Patch test"}`)
-	w := execRequest("PATCH", "/api/v1/authors/1", bytes.NewReader(jsonBytes))
-	assert.Equal(t, http.StatusNoContent, w.Code)
+	execAndCheck(t, "PATCH", "/api/v1/authors/1", jsonBytes, http.StatusNoContent, nil)
 
 	author, _ := database.GetAuthor(1)
 	assert.Equal(t, "Patch test", author.FirstName)
@@ -225,11 +199,7 @@ func TestPatchAuthor_Error(t *testing.T) {
 	for name, tt := range patchTests {
 		t.Run(name, func(t *testing.T) {
 			fullUrl := "/api/v1/authors" + tt.query
-
-			w := execRequest("PATCH", fullUrl, bytes.NewReader([]byte(tt.jsonStr)))
-			assert.Equal(t, tt.status, w.Code)
-
-			checkErrorBodyNotEmpty(w, t)
+			execAndCheckError(t, "PATCH", fullUrl, []byte(tt.jsonStr), tt.status)
 		})
 	}
 }
@@ -240,9 +210,7 @@ func TestDeleteAuthor_Success(t *testing.T) {
 	assert.NoError(t, err)
 
 	newAuthorLoc := fmt.Sprintf("/api/v1/authors/%v", newId)
-
-	w := execRequest("DELETE", newAuthorLoc, nil)
-	assert.Equal(t, http.StatusNoContent, w.Code)
+	execAndCheck(t, "DELETE", newAuthorLoc, nil, http.StatusNoContent, nil)
 
 	_, err = database.GetAuthor(newId)
 	assert.ErrorIs(t, err, db.ErrNotFound)
@@ -266,11 +234,7 @@ func TestDeleteAuthor_Error(t *testing.T) {
 	for name, tt := range deleteTests {
 		t.Run(name, func(t *testing.T) {
 			fullUrl := "/api/v1/authors" + tt.query
-
-			w := execRequest("DELETE", fullUrl, nil)
-			assert.Equal(t, tt.status, w.Code)
-
-			checkErrorBodyNotEmpty(w, t)
+			execAndCheckError(t, "DELETE", fullUrl, nil, tt.status)
 		})
 	}
 }

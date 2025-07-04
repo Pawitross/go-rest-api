@@ -17,7 +17,7 @@ func TestListAuthors_Success(t *testing.T) {
 	assert.Equal(t, http.StatusOK, w.Code)
 
 	var rAuthors []models.Author
-	decodeBodyCheckEmpty(w, t, &rAuthors)
+	decodeJSONBodyCheckEmpty(w, t, &rAuthors)
 }
 
 func TestListAuthors_BadRequest_UnknownParam(t *testing.T) {
@@ -33,7 +33,7 @@ func TestGetAuthor_Success(t *testing.T) {
 	assert.Equal(t, http.StatusOK, w.Code)
 
 	var rAuthor models.Author
-	decodeBodyCheckEmpty(w, t, &rAuthor)
+	decodeJSONBodyCheckEmpty(w, t, &rAuthor)
 
 	assert.NotEmpty(t, rAuthor, "Author in the response body should not be empty")
 	assert.NotEmpty(t, rAuthor.FirstName, "FirstName should not be empty")
@@ -77,7 +77,7 @@ func TestPostAuthor_Success(t *testing.T) {
 	assert.Equal(t, http.StatusCreated, w.Code)
 
 	var rAuthor models.Author
-	decodeBodyCheckEmpty(w, t, &rAuthor)
+	decodeJSONBodyCheckEmpty(w, t, &rAuthor)
 	defer database.DelAuthor(rAuthor.Id)
 
 	expLoc := fmt.Sprintf("/api/v1/authors/%v", rAuthor.Id)

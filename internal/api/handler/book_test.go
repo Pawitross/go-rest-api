@@ -17,7 +17,7 @@ func TestListBooks_Success(t *testing.T) {
 	assert.Equal(t, http.StatusOK, w.Code)
 
 	var rBooks []models.Book
-	decodeBodyCheckEmpty(w, t, &rBooks)
+	decodeJSONBodyCheckEmpty(w, t, &rBooks)
 }
 
 func TestListBooksExt_Success(t *testing.T) {
@@ -25,7 +25,7 @@ func TestListBooksExt_Success(t *testing.T) {
 	assert.Equal(t, http.StatusOK, w.Code)
 
 	var rBooks []models.BookExt
-	decodeBodyCheckEmpty(w, t, &rBooks)
+	decodeJSONBodyCheckEmpty(w, t, &rBooks)
 }
 
 func TestListBooks_BadRequest_UnknownParam(t *testing.T) {
@@ -41,7 +41,7 @@ func TestGetBook_Success(t *testing.T) {
 	assert.Equal(t, http.StatusOK, w.Code)
 
 	var rBook models.Book
-	decodeBodyCheckEmpty(w, t, &rBook)
+	decodeJSONBodyCheckEmpty(w, t, &rBook)
 
 	assert.NotEmpty(t, rBook, "Book in the response body should not be empty")
 	assert.NotEmpty(t, rBook.Title, "Title should not be empty")
@@ -93,7 +93,7 @@ func TestPostBook_Success(t *testing.T) {
 	assert.Equal(t, http.StatusCreated, w.Code)
 
 	var rBook models.Book
-	decodeBodyCheckEmpty(w, t, &rBook)
+	decodeJSONBodyCheckEmpty(w, t, &rBook)
 	defer database.DelBook(rBook.Id)
 
 	expLoc := fmt.Sprintf("/api/v1/books/%v", rBook.Id)

@@ -29,7 +29,7 @@ func TestLoginToken_Success(t *testing.T) {
 			assert.Equal(t, http.StatusOK, w.Code)
 
 			var rToken models.Token
-			decodeBodyCheckEmpty(w, t, &rToken)
+			decodeJSONBodyCheckEmpty(w, t, &rToken)
 
 			token := rToken.Token
 			checkTokenStructure(t, token)

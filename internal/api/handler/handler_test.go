@@ -113,7 +113,7 @@ func marshalCheckNoError(t *testing.T, obj any) []byte {
 	return j
 }
 
-func decodeBodyCheckEmpty(w *httptest.ResponseRecorder, t *testing.T, obj any) {
+func decodeJSONBodyCheckEmpty(w *httptest.ResponseRecorder, t *testing.T, obj any) {
 	err := json.NewDecoder(w.Body).Decode(obj)
 	assert.NoError(t, err, "Error decoding response data:", err)
 	assert.NotEmpty(t, obj, "Obj should not be empty")
@@ -121,5 +121,5 @@ func decodeBodyCheckEmpty(w *httptest.ResponseRecorder, t *testing.T, obj any) {
 
 func checkErrorBodyNotEmpty(w *httptest.ResponseRecorder, t *testing.T) {
 	var rError models.Error
-	decodeBodyCheckEmpty(w, t, &rError)
+	decodeJSONBodyCheckEmpty(w, t, &rError)
 }

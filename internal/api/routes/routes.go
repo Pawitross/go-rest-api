@@ -35,12 +35,12 @@ import (
 // @description	Examples: `sort_by=pages` - ascending order, `sort_by=-pages` - descending order
 // @description
 // @description	**How to use limit and offset:**
-// @description	To use a limit, use the `limit` query parameter, like this: `limit=10`
-// @description	To use offset, you also need to provide a limit as well.
-// @description	The order of the limit and offset doesn't matter.
+// @description	To use limit, use the `limit` query parameter, like this: `limit=10`
+// @description	To use offset, you also need to provide a limit.
+// @description	The order of the limit and offset parameters doesn't matter.
 // @description	Examples: `offset=10&limit=50`, `limit=50&offset=10`
 
-// @BasePath					/api/v1
+// @BasePath	/api/v1
 
 // @securityDefinitions.apikey	ApiKeyAuth
 // @in							header
@@ -65,27 +65,24 @@ func Router(router *gin.Engine, db db.DatabaseInterface) {
 				admin := books.Group("", middleware.Authorize())
 				{
 					admin.POST("", h.PostBook)
-
 					admin.PUT("/:id", h.PutBook)
-
 					admin.PATCH("/:id", h.PatchBook)
-
 					admin.DELETE("/:id", h.DeleteBook)
 				}
 			}
 
-			authors := v1.Group("/authors")
+			authors := v1.Group("/authors", middleware.Authenticate())
 			{
 				authors.GET("", h.GetAuthors)
 				authors.GET("/:id", h.GetAuthor)
 
-				authors.POST("", h.PostAuthor)
-
-				authors.PUT("/:id", h.PutAuthor)
-
-				authors.PATCH("/:id", h.PatchAuthor)
-
-				authors.DELETE("/:id", h.DeleteAuthor)
+				admin := authors.Group("", middleware.Authorize())
+				{
+					admin.POST("", h.PostAuthor)
+					admin.PUT("/:id", h.PutAuthor)
+					admin.PATCH("/:id", h.PatchAuthor)
+					admin.DELETE("/:id", h.DeleteAuthor)
+				}
 			}
 
 			v1.POST("login", handler.ReturnToken)

@@ -1,12 +1,413 @@
 {
     "swagger": "2.0",
     "info": {
-        "description": "Documentation of a book managing REST API.\n\n**How to use filtering:**\nTo use simple filtering put name of the column in the query parameter followed by the value.\nExamples: `last_name=Orwell`, `title=Dziady`\nTo filter extended response use filtering like this: `genre.name=Nowela`\n\nTo filter using comparison operators append the operator to the query parameter. Available operators:\n- less than = `.lt`\n- less than or equal = `.lte`\n- greater than = `.gt`\n- greater than or equal = `.gte`\n- equal = `.eq`\n- not equal = `.neq`\n\nExamples: `pages.lt=300`, `year.gte=1980`, `language.name.neq=Polski`.\n\n**How to use sorting:**\nTo sort, use `sort_by` query parameter followed by the column name.\nIf you want to sort in descending order, prefix the column name with a minus sign (`-`).\nExamples: `sort_by=pages` - ascending order, `sort_by=-pages` - descending order\n\n**How to use limit and offset:**\nTo use a limit, use the `limit` query parameter, like this: `limit=10`\nTo use offset, you also need to provide a limit as well.\nThe order of the limit and offset doesn't matter.\nExamples: `offset=10\u0026limit=50`, `limit=50\u0026offset=10`",
+        "description": "Documentation of a book managing REST API.\n\n**How to use filtering:**\nTo use simple filtering put name of the column in the query parameter followed by the value.\nExamples: `last_name=Orwell`, `title=Dziady`\nTo filter extended response use filtering like this: `genre.name=Nowela`\n\nTo filter using comparison operators append the operator to the query parameter. Available operators:\n- less than = `.lt`\n- less than or equal = `.lte`\n- greater than = `.gt`\n- greater than or equal = `.gte`\n- equal = `.eq`\n- not equal = `.neq`\n\nExamples: `pages.lt=300`, `year.gte=1980`, `language.name.neq=Polski`.\n\n**How to use sorting:**\nTo sort, use `sort_by` query parameter followed by the column name.\nIf you want to sort in descending order, prefix the column name with a minus sign (`-`).\nExamples: `sort_by=pages` - ascending order, `sort_by=-pages` - descending order\n\n**How to use limit and offset:**\nTo use limit, use the `limit` query parameter, like this: `limit=10`\nTo use offset, you also need to provide a limit.\nThe order of the limit and offset parameters doesn't matter.\nExamples: `offset=10\u0026limit=50`, `limit=50\u0026offset=10`",
         "title": "Book managing API",
         "contact": {}
     },
     "basePath": "/api/v1",
     "paths": {
+        "/authors": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Responds with a list of all authors as JSON. Optional filtering, sorting and pagination is available through parameters.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authors"
+                ],
+                "summary": "Get a list of all authors",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Author id",
+                        "name": "id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Author's first name",
+                        "name": "first_name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Author's last name",
+                        "name": "last_name",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sorting by a column",
+                        "name": "sort_by",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Limit returned number of resources",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Offset returned resources",
+                        "name": "offset",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK - Fetched authors",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Author"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request - Invalid input",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Invalid or missing token",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Accepts a JSON body to create a new author. Responds with the created author and set `Location` header or an error message.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authors"
+                ],
+                "summary": "Create a new author",
+                "parameters": [
+                    {
+                        "description": "New Author",
+                        "name": "author",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Author"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created - Added new author",
+                        "schema": {
+                            "$ref": "#/definitions/models.Author"
+                        },
+                        "headers": {
+                            "Location": {
+                                "type": "string",
+                                "description": "Path of the newly created author"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request - Invalid input or JSON",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Invalid or missing token",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Insufficient permissions",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/authors/{id}": {
+            "get": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Responds with the queried author as JSON or an error message.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authors"
+                ],
+                "summary": "Get one author",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Author id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK - Fetched author",
+                        "schema": {
+                            "$ref": "#/definitions/models.Author"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request - Invalid author id",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Invalid or missing token",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found - No resource found",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Accepts a JSON body to update a author. Responds with a status code. When an error occurs the response body contains JSON data with the message.",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authors"
+                ],
+                "summary": "Update an existing author",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Existing Author id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Updated Author",
+                        "name": "author",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Author"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No content - Updated the author"
+                    },
+                    "400": {
+                        "description": "Bad Request - Invalid input or JSON",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Invalid or missing token",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Insufficient permissions",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found -  No resource found",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Responds with a status code. When an error occurs the response body contains an error message.",
+                "tags": [
+                    "Authors"
+                ],
+                "summary": "Delete an existing author",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Author id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content - Successfully deleted the author"
+                    },
+                    "400": {
+                        "description": "Bad Request - Invalid author id",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Invalid or missing token",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Insufficient permissions",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found -  No resource found",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Accepts a JSON body with patch data to a author. Responds with a status code. When an error occurs the response body contains JSON data with the message.",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Authors"
+                ],
+                "summary": "Patch an existing author",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Existing Author id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Patches to the author",
+                        "name": "author",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Author"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content - Successfully patched the author"
+                    },
+                    "400": {
+                        "description": "Bad Request - Invalid input or JSON",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Invalid or missing token",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Insufficient permissions",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found -  No resource found",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            }
+        },
         "/books": {
             "get": {
                 "security": [
@@ -506,6 +907,20 @@
             "properties": {
                 "return_admin_token": {
                     "type": "boolean"
+                }
+            }
+        },
+        "models.Author": {
+            "type": "object",
+            "properties": {
+                "first_name": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "last_name": {
+                    "type": "string"
                 }
             }
         },

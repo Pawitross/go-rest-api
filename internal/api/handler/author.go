@@ -18,6 +18,8 @@ import (
 // @Param			id			query		string			false	"Author id"
 // @Param			first_name	query		string			false	"Author's first name"
 // @Param			last_name	query		string			false	"Author's last name"
+// @Param			birth_year	query		int				false	"Author's birth year"
+// @Param			death_year	query		int				false	"Author's death year"
 // @Param			sort_by		query		string			false	"Sorting by a column"
 // @Param			limit		query		int				false	"Limit returned number of resources"
 // @Param			offset		query		int				false	"Offset returned resources"

@@ -11,11 +11,23 @@ func TestAuthorValidation(t *testing.T) {
 		author    models.Author
 		isInvalid bool
 	}{
-		"Valid": {
+		"ValidFull": {
 			author: models.Author{
 				Id:        1,
 				FirstName: "Jane",
 				LastName:  "Doe",
+				BirthYear: 1970,
+				DeathYear: models.I64Ptr(2043),
+			},
+			isInvalid: false,
+		},
+		"ValidNilDeathYear": {
+			author: models.Author{
+				Id:        1,
+				FirstName: "Jane",
+				LastName:  "Doe",
+				BirthYear: 1970,
+				DeathYear: nil,
 			},
 			isInvalid: false,
 		},
@@ -24,6 +36,8 @@ func TestAuthorValidation(t *testing.T) {
 				Id:        1,
 				FirstName: "",
 				LastName:  "Doe",
+				BirthYear: 1970,
+				DeathYear: models.I64Ptr(2043),
 			},
 			isInvalid: true,
 		},
@@ -32,6 +46,18 @@ func TestAuthorValidation(t *testing.T) {
 				Id:        1,
 				FirstName: "Jane",
 				LastName:  "",
+				BirthYear: 1970,
+				DeathYear: models.I64Ptr(2043),
+			},
+			isInvalid: true,
+		},
+		"BirthYearGreaterThanDeathYear": {
+			author: models.Author{
+				Id:        1,
+				FirstName: "Jane",
+				LastName:  "Doe",
+				BirthYear: 2000,
+				DeathYear: models.I64Ptr(1900),
 			},
 			isInvalid: true,
 		},

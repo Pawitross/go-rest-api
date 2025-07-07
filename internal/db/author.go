@@ -18,17 +18,19 @@ type AuthorDatabaseInterface interface {
 
 func (d *Database) GetAuthors(params url.Values) ([]models.Author, error) {
 	query := `
-	SELECT id, imie, nazwisko
+	SELECT id, imie, nazwisko, rok_urodzenia, rok_smierci
 	FROM autor`
 
 	allowedParams := map[string]string{
 		"id":         "id",
 		"first_name": "imie",
 		"last_name":  "nazwisko",
+		"birth_year": "rok_urodzenia",
+		"death_year": "rok_smierci",
 	}
 
 	authorFunc := func(a *models.Author, rows *sql.Rows) error {
-		return rows.Scan(&a.Id, &a.FirstName, &a.LastName)
+		return rows.Scan(&a.Id, &a.FirstName, &a.LastName, &a.BirthYear, &a.DeathYear)
 	}
 
 	return queryWithParams[models.Author](
@@ -42,12 +44,12 @@ func (d *Database) GetAuthors(params url.Values) ([]models.Author, error) {
 
 func (d *Database) GetAuthor(id int64) (models.Author, error) {
 	query := `
-	SELECT id, imie, nazwisko
+	SELECT id, imie, nazwisko, rok_urodzenia, rok_smierci
 	FROM autor
 	WHERE id = ?`
 
 	authorFunc := func(a *models.Author, row *sql.Row) error {
-		return row.Scan(&a.Id, &a.FirstName, &a.LastName)
+		return row.Scan(&a.Id, &a.FirstName, &a.LastName, &a.BirthYear, &a.DeathYear)
 	}
 
 	return queryId[models.Author](d, query, id, authorFunc)
@@ -55,10 +57,10 @@ func (d *Database) GetAuthor(id int64) (models.Author, error) {
 
 func (d *Database) InsertAuthor(a models.Author) (int64, error) {
 	query := `
-	INSERT INTO autor (imie, nazwisko)
-	VALUES (?, ?)`
+	INSERT INTO autor (imie, nazwisko, rok_urodzenia, rok_smierci)
+	VALUES (?, ?, ?, ?)`
 
-	return d.insert(query, a.FirstName, a.LastName)
+	return d.insert(query, a.FirstName, a.LastName, a.BirthYear, a.DeathYear)
 }
 
 func (d *Database) UpdateWholeAuthor(id int64, a models.Author) error {
@@ -66,16 +68,20 @@ func (d *Database) UpdateWholeAuthor(id int64, a models.Author) error {
 	UPDATE autor
 	SET
 		imie = ?,
-		nazwisko = ?
+		nazwisko = ?,
+		rok_urodzenia = ?,
+		rok_smierci = ?
 	WHERE id = ?`
 
-	return d.updateWholeId(query, a.FirstName, a.LastName, id)
+	return d.updateWholeId(query, a.FirstName, a.LastName, a.BirthYear, a.DeathYear, id)
 }
 
 func (d *Database) UpdateAuthor(id int64, a models.Author) error {
 	fieldToDb := map[string]string{
 		"FirstName": "imie",
 		"LastName":  "nazwisko",
+		"BirthYear": "rok_urodzenia",
+		"DeathYear": "rok_smierci",
 	}
 
 	return d.updatePartId(a, "autor", id, fieldToDb)

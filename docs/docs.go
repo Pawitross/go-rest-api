@@ -50,6 +50,18 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
+                        "type": "integer",
+                        "description": "Author's birth year",
+                        "name": "birth_year",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Author's death year",
+                        "name": "death_year",
+                        "in": "query"
+                    },
+                    {
                         "type": "string",
                         "description": "Sorting by a column",
                         "name": "sort_by",
@@ -921,6 +933,12 @@ const docTemplate = `{
         "models.Author": {
             "type": "object",
             "properties": {
+                "birth_year": {
+                    "type": "integer"
+                },
+                "death_year": {
+                    "type": "integer"
+                },
                 "first_name": {
                     "type": "string"
                 },

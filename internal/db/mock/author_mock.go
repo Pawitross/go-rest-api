@@ -8,9 +8,9 @@ import (
 )
 
 var authors = []models.Author{
-	{Id: 1, FirstName: "John", LastName: "Doe"},
-	{Id: 2, FirstName: "Alice", LastName: "Smith"},
-	{Id: 3, FirstName: "Richard", LastName: "Roe"},
+	{Id: 1, FirstName: "John", LastName: "Doe", BirthYear: 1949, DeathYear: models.I64Ptr(2023)},
+	{Id: 2, FirstName: "Alice", LastName: "Smith", BirthYear: 1988, DeathYear: nil},
+	{Id: 3, FirstName: "Richard", LastName: "Roe", BirthYear: 1921, DeathYear: models.I64Ptr(2009)},
 }
 
 func (m *MockDatabase) GetAuthors(params url.Values) ([]models.Author, error) {
@@ -65,6 +65,12 @@ func (m *MockDatabase) UpdateAuthor(id int64, a models.Author) error {
 			}
 			if a.LastName != "" {
 				authors[i].LastName = a.LastName
+			}
+			if a.BirthYear != 0 {
+				authors[i].BirthYear = a.BirthYear
+			}
+			if a.DeathYear != nil {
+				authors[i].DeathYear = a.DeathYear
 			}
 
 			return nil

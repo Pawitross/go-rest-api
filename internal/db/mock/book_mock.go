@@ -64,6 +64,8 @@ func (m *MockDatabase) GetBooksExt(params url.Values) ([]models.BookExt, error) 
 		"author.id":         "id_autora",
 		"author.first_name": "a.imie",
 		"author.last_name":  "a.nazwisko",
+		"author.birth_year": "a.rok_urodzenia",
+		"author.death_year": "a.rok_smierci",
 		"genre.id":          "id_gatunku",
 		"genre.name":        "g.nazwa",
 		"language.id":       "id_jezyka",

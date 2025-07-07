@@ -59,6 +59,8 @@ func TestPostAuthor_Success(t *testing.T) {
 	testAuthor := models.Author{
 		FirstName: "Post",
 		LastName:  "test",
+		BirthYear: 1970,
+		DeathYear: models.I64Ptr(2043),
 	}
 
 	jsonAuthor := marshalCheckNoError(t, testAuthor)
@@ -75,6 +77,8 @@ func TestPostAuthor_Success(t *testing.T) {
 	assert.NotZero(t, rAuthor.Id, "Auto generatated, non zero ID")
 	assert.Equal(t, testAuthor.FirstName, rAuthor.FirstName)
 	assert.Equal(t, testAuthor.LastName, rAuthor.LastName)
+	assert.Equal(t, testAuthor.BirthYear, rAuthor.BirthYear)
+	assert.Equal(t, testAuthor.DeathYear, rAuthor.DeathYear)
 }
 
 func TestPostAuthor_BadRequest_MalformedJSON(t *testing.T) {
@@ -87,10 +91,21 @@ func TestPostAuthor_Error(t *testing.T) {
 		testAuthor models.Author
 		status     int
 	}{
-		"BadRequest_ValidationErr": {
+		"BadRequest_ValidationErr_EmptyName": {
 			models.Author{
 				FirstName: "",
 				LastName:  "test",
+				BirthYear: 1970,
+				DeathYear: models.I64Ptr(2043),
+			},
+			http.StatusBadRequest,
+		},
+		"BadRequest_ValidationErr_BirthGreaterThanDeath": {
+			models.Author{
+				FirstName: "",
+				LastName:  "test",
+				BirthYear: 2000,
+				DeathYear: models.I64Ptr(1900),
 			},
 			http.StatusBadRequest,
 		},
@@ -109,6 +124,8 @@ func TestPutAuthor_Success(t *testing.T) {
 	testAuthor := models.Author{
 		FirstName: "Put",
 		LastName:  "test",
+		BirthYear: 2000,
+		DeathYear: nil,
 	}
 
 	jsonAuthor := marshalCheckNoError(t, testAuthor)
@@ -117,6 +134,8 @@ func TestPutAuthor_Success(t *testing.T) {
 	author, _ := database.GetAuthor(1)
 	assert.Equal(t, testAuthor.FirstName, author.FirstName)
 	assert.Equal(t, testAuthor.LastName, author.LastName)
+	assert.Equal(t, testAuthor.BirthYear, author.BirthYear)
+	assert.Equal(t, testAuthor.DeathYear, author.DeathYear)
 }
 
 func TestPutAuthor_BadRequest_MalformedJSON(t *testing.T) {
@@ -134,6 +153,8 @@ func TestPutAuthor_Error(t *testing.T) {
 			models.Author{
 				FirstName: "Put",
 				LastName:  "test",
+				BirthYear: 1970,
+				DeathYear: models.I64Ptr(2043),
 			},
 			"/9999",
 			http.StatusNotFound,
@@ -142,6 +163,8 @@ func TestPutAuthor_Error(t *testing.T) {
 			models.Author{
 				FirstName: "Put",
 				LastName:  "test",
+				BirthYear: 1970,
+				DeathYear: models.I64Ptr(2043),
 			},
 			"/string",
 			http.StatusBadRequest,
@@ -166,11 +189,14 @@ func TestPutAuthor_Error(t *testing.T) {
 
 // PATCH /authors/id
 func TestPatchAuthor_Success(t *testing.T) {
-	jsonBytes := []byte(`{"first_name":"Patch test"}`)
+	jsonBytes := []byte(`{"first_name":"Patch test", "death_year": 2025}`)
 	execAndCheck(t, "PATCH", "/api/v1/authors/1", jsonBytes, http.StatusNoContent, nil)
 
 	author, _ := database.GetAuthor(1)
 	assert.Equal(t, "Patch test", author.FirstName)
+	assert.NotEmpty(t, author.LastName)
+	assert.NotEmpty(t, author.BirthYear)
+	assert.Equal(t, int64(2025), *author.DeathYear)
 }
 
 func TestPatchAuthor_Error(t *testing.T) {
@@ -206,7 +232,12 @@ func TestPatchAuthor_Error(t *testing.T) {
 
 // DELETE /authors/id
 func TestDeleteAuthor_Success(t *testing.T) {
-	newId, err := database.InsertAuthor(models.Author{FirstName: "Delete", LastName: "tester"})
+	newId, err := database.InsertAuthor(models.Author{
+		FirstName: "Delete",
+		LastName:  "tester",
+		BirthYear: 1900,
+		DeathYear: nil,
+	})
 	assert.NoError(t, err)
 
 	newAuthorLoc := fmt.Sprintf("/api/v1/authors/%v", newId)

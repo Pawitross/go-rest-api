@@ -60,9 +60,11 @@ func SetupDatabase(db *sql.DB) error {
 		    PRIMARY KEY (id)
 		);`,
 		`CREATE TABLE autor (
-		    id          INT AUTO_INCREMENT,
-		    imie        VARCHAR(128) NOT NULL,
-		    nazwisko    VARCHAR(128) NOT NULL,
+		    id              INT AUTO_INCREMENT,
+		    imie            VARCHAR(128) NOT NULL,
+		    nazwisko        VARCHAR(128) NOT NULL,
+		    rok_urodzenia   DECIMAL(5) NOT NULL,
+		    rok_smierci     DECIMAL(5),
 		    PRIMARY KEY (id)
 		);`,
 		`CREATE TABLE ksiazka (
@@ -90,7 +92,13 @@ func SetupDatabase(db *sql.DB) error {
 		    ("Polski"),
 		    ("Angielski"),
 		    ("Niemiecki"),
-		    ("Rosyjski");`,
+		    ("Rosyjski"),
+		    ("Francuski"),
+		    ("Włoski"),
+		    ("Hiszpański"),
+		    ("Arabski"),
+		    ("Chiński"),
+		    ("Japoński");`,
 		`INSERT INTO gatunek (nazwa) VALUES
 		    ("Nowela"),
 		    ("Epopeja"),
@@ -101,16 +109,16 @@ func SetupDatabase(db *sql.DB) error {
 		    ("Opowieść"),
 		    ("Zbiór poezji"),
 		    ("Dystopia");`,
-		`INSERT INTO autor (imie, nazwisko) VALUES
-		    ("Adam", "Mickiewicz"),
-		    ("Witold", "Gombrowicz"),
-		    ("Bolesław", "Prus"),
-		    ("Fiodor", "Dostojewski"),
-		    ("Stanisław", "Lem"),
-		    ("Jan", "Brzechwa"),
-		    ("Ernest", "Hemingway"),
-		    ("Henryk", "Sienkiewicz"),
-		    ("George", "Orwell");`,
+		`INSERT INTO autor (imie, nazwisko, rok_urodzenia, rok_smierci) VALUES
+		    ("Adam", "Mickiewicz", 1798, 1855),
+		    ("Witold", "Gombrowicz", 1904, 1969),
+		    ("Bolesław", "Prus", 1847, 1912),
+		    ("Fiodor", "Dostojewski", 1821, 1881),
+		    ("Stanisław", "Lem", 1921, 2006),
+		    ("Jan", "Brzechwa", 1898, 1966),
+		    ("Ernest", "Hemingway", 1899, 1961),
+		    ("Henryk", "Sienkiewicz", 1846, 1916),
+		    ("George", "Orwell", 1903, 1950);`,
 		`INSERT INTO ksiazka (
 		    tytul, rok_wydania, liczba_stron, id_autora, id_gatunku, id_jezyka
 		) VALUES

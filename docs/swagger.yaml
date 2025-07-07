@@ -9,6 +9,10 @@ definitions:
     type: object
   models.Author:
     properties:
+      birth_year:
+        type: integer
+      death_year:
+        type: integer
       first_name:
         type: string
       id:
@@ -97,6 +101,14 @@ paths:
         in: query
         name: last_name
         type: string
+      - description: Author's birth year
+        in: query
+        name: birth_year
+        type: integer
+      - description: Author's death year
+        in: query
+        name: death_year
+        type: integer
       - description: Sorting by a column
         in: query
         name: sort_by

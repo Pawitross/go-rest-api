@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 
@@ -12,6 +13,12 @@ import (
 )
 
 func main() {
+	httpsFlag := flag.Bool("https", false, "Start the server with HTTPS")
+	portFlag := flag.String("port", "", "Server port")
+	certFlag := flag.String("cert", "keys/server.pem", "TLS certificate file location")
+	keyFlag := flag.String("key", "keys/server.key", "TLS private key file location")
+	flag.Parse()
+
 	if err := cfgyaml.Load("env.yaml"); err != nil {
 		log.Fatal(err)
 	}
@@ -35,7 +42,24 @@ func main() {
 	router.Use(middleware.FileLogger())
 	routes.Router(router, database)
 
-	if err := router.Run(":8080"); err != nil {
-		log.Fatal(err)
+	useHTTPS := *httpsFlag
+	port := *portFlag
+
+	if port == "" {
+		if useHTTPS {
+			port = "8443"
+		} else {
+			port = "8080"
+		}
+	}
+
+	if useHTTPS {
+		if err := router.RunTLS(":"+port, *certFlag, *keyFlag); err != nil {
+			log.Fatal(err)
+		}
+	} else {
+		if err := router.Run(":" + port); err != nil {
+			log.Fatal(err)
+		}
 	}
 }

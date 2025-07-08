@@ -15,7 +15,11 @@ var authors = []models.Author{
 
 func (m *MockDatabase) GetAuthors(params url.Values) ([]models.Author, error) {
 	allowedParams := map[string]string{
-		"id": "id",
+		"id":         "id",
+		"first_name": "imie",
+		"last_name":  "nazwisko",
+		"birth_year": "rok_urodzenia",
+		"death_year": "rok_smierci",
 	}
 
 	if len(params) > 0 {

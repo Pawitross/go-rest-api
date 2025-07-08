@@ -108,7 +108,7 @@ paths:
       - description: Author's death year
         in: query
         name: death_year
-        type: integer
+        type: string
       - description: Sorting by a column
         in: query
         name: sort_by

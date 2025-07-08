@@ -56,7 +56,7 @@ const docTemplate = `{
                         "in": "query"
                     },
                     {
-                        "type": "integer",
+                        "type": "string",
                         "description": "Author's death year",
                         "name": "death_year",
                         "in": "query"

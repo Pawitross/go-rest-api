@@ -43,6 +43,9 @@ func runMain(m *testing.M) (int, error) {
 		return 0, err
 	}
 
+	defer database.Pool().Exec("DROP TABLE IF EXISTS test_fk")
+	defer database.Pool().Exec("DROP TABLE IF EXISTS test_table")
+
 	return m.Run(), nil
 }
 
@@ -144,6 +147,9 @@ func TestQueryWithParams(t *testing.T) {
 		"SuccessIdParamLte": {
 			giveParams: url.Values{"id.lte": {"3"}},
 		},
+		"SuccessRankingParamNeqNull": {
+			giveParams: url.Values{"ranking.neq": {"null"}},
+		},
 		"SuccessLimit": {
 			giveParams: url.Values{"limit": {"10"}},
 		},
@@ -160,6 +166,10 @@ func TestQueryWithParams(t *testing.T) {
 		},
 		"ErrorMultipleSameParam": {
 			giveParams: url.Values{"id": {"1", "2"}},
+			wantErrIs:  ErrParam,
+		},
+		"ErrorGtOnNull": {
+			giveParams: url.Values{"ranking.gt": {"null"}},
 			wantErrIs:  ErrParam,
 		},
 		"ErrorEmptySortingParam": {

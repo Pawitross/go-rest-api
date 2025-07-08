@@ -314,8 +314,22 @@ func AssembleFilter(params url.Values, allowedParams map[string]string) (string,
 			return "", nil, fmt.Errorf("%w: too many parameters were provided for a single column", ErrParam)
 		}
 
-		conditions = append(conditions, columnName+" "+operator+" ?")
-		args = append(args, valSlice[0])
+		if strings.ToLower(valSlice[0]) != "null" {
+			conditions = append(conditions, columnName+" "+operator+" ?")
+			args = append(args, valSlice[0])
+		} else {
+			if operator != "=" && operator != "<>" {
+				return "", nil, fmt.Errorf("%w: cannot use other operations than equal or not equal on null", ErrParam)
+			}
+
+			if operator == "=" {
+				operator = "IS"
+			} else {
+				operator = "IS NOT"
+			}
+
+			conditions = append(conditions, columnName+" "+operator+" NULL")
+		}
 	}
 
 	filter := ""

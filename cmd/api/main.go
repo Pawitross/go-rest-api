@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"pawrest/internal/api/middleware"
@@ -11,6 +12,29 @@ import (
 	"pawrest/internal/cfgyaml"
 	"pawrest/internal/db"
 )
+
+func isFlagPassed(flagName string) bool {
+	found := false
+	flag.Visit(func(f *flag.Flag) {
+		if f.Name == flagName {
+			found = true
+		}
+	})
+
+	return found
+}
+
+func resolveStrFlag(flagPtr *string, flagName, envVar string) string {
+	if isFlagPassed(flagName) {
+		return *flagPtr
+	}
+
+	if val := os.Getenv(envVar); val != "" {
+		return val
+	}
+
+	return *flagPtr
+}
 
 func main() {
 	httpsFlag := flag.Bool("https", false, "Start the server with HTTPS")
@@ -42,8 +66,10 @@ func main() {
 	router.Use(middleware.FileLogger())
 	routes.Router(router, database)
 
-	useHTTPS := *httpsFlag
-	port := *portFlag
+	useHTTPS := *httpsFlag || os.Getenv("HTTPS") == "true"
+	port := resolveStrFlag(portFlag, "port", "PORT")
+	cert := resolveStrFlag(certFlag, "cert", "TLS_CERT")
+	key := resolveStrFlag(keyFlag, "key", "TLS_KEY")
 
 	if port == "" {
 		if useHTTPS {
@@ -54,7 +80,7 @@ func main() {
 	}
 
 	if useHTTPS {
-		if err := router.RunTLS(":"+port, *certFlag, *keyFlag); err != nil {
+		if err := router.RunTLS(":"+port, cert, key); err != nil {
 			log.Fatal(err)
 		}
 	} else {

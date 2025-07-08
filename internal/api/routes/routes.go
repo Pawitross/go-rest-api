@@ -85,6 +85,15 @@ func Router(router *gin.Engine, db db.DatabaseInterface) {
 				}
 			}
 
+			genres := v1.Group("/genres")
+			{
+				genres.GET("", h.GetGenres)
+				genres.GET("/:id", h.GetGenre)
+				genres.POST("", h.PostGenre)
+				genres.PUT("/:id", h.PutGenre)
+				genres.DELETE("/:id", h.DeleteGenre)
+			}
+
 			v1.POST("login", handler.ReturnToken)
 		}
 	}

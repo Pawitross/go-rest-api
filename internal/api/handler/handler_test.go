@@ -107,6 +107,18 @@ func setupTestRouter(db db.DatabaseInterface) *gin.Engine {
 			authors.DELETE("/:id", h.DeleteAuthor)
 		}
 
+		genres := apiv1.Group("/genres")
+		{
+			genres.GET("", h.GetGenres)
+			genres.GET("/:id", h.GetGenre)
+
+			genres.POST("", h.PostGenre)
+
+			genres.PUT("/:id", h.PutGenre)
+
+			genres.DELETE("/:id", h.DeleteGenre)
+		}
+
 		apiv1.POST("login", handler.ReturnToken)
 	}
 

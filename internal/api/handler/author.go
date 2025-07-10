@@ -241,3 +241,32 @@ func (h *Handlers) DeleteAuthor(c *gin.Context) {
 
 	c.Status(http.StatusNoContent)
 }
+
+// @Summary		Return allowed operations for authors
+// @Description	Responds with an empty response body.
+// @Tags			Authors
+// @Success		204	"No Content - Successfully responded with available options"
+// @Failure		401	{object}	models.Error	"Unauthorized - Invalid or missing token"
+// @Failure		403	{object}	models.Error	"Forbidden - Insufficient permissions"
+// @Header			204	{string}	Allow			"Allowed operations for the resource"
+// @Router			/authors [options]
+// @Security		ApiKeyAuth
+func (h *Handlers) OptionsAuthors(c *gin.Context) {
+	c.Header("Allow", "GET, POST, OPTIONS")
+	c.Status(http.StatusNoContent)
+}
+
+// @Summary		Return allowed operations for author
+// @Description	Responds with an empty response body.
+// @Tags			Authors
+// @Param			id	path	string	true	"Author id"
+// @Success		204	"No Content - Successfully responded with available options"
+// @Failure		401	{object}	models.Error	"Unauthorized - Invalid or missing token"
+// @Failure		403	{object}	models.Error	"Forbidden - Insufficient permissions"
+// @Header			204	{string}	Allow			"Allowed operations for the resource"
+// @Router			/authors/{id} [options]
+// @Security		ApiKeyAuth
+func (h *Handlers) OptionsAuthor(c *gin.Context) {
+	c.Header("Allow", "GET, POST, PUT, PATCH, DELETE, OPTIONS")
+	c.Status(http.StatusNoContent)
+}

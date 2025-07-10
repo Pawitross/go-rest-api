@@ -32,6 +32,8 @@ var authRouteTests = []struct {
 	{"PUT", "/api/v1/authors/1", []byte(`{"first_name":"Route put", "last_name":"test"}`)},
 	{"PATCH", "/api/v1/authors/1", []byte(`{"first_name":"Route patch", "last_name":"test"}`)},
 	{"DELETE", "/api/v1/authors/2", nil},
+	{"OPTIONS", "/api/v1/authors", nil},
+	{"OPTIONS", "/api/v1/authors/1", nil},
 
 	{"GET", "/api/v1/genres", nil},
 	{"GET", "/api/v1/genres/1", nil},
@@ -126,6 +128,8 @@ func TestRoutes_NonAdminToken(t *testing.T) {
 			switch tt.method {
 			case "GET":
 				assert.Equal(t, http.StatusOK, w.Code)
+			case "OPTIONS":
+				assert.Equal(t, http.StatusNoContent, w.Code)
 			default:
 				assert.Equal(t, http.StatusForbidden, w.Code)
 			}
@@ -149,11 +153,7 @@ func TestRoutes_AdminToken(t *testing.T) {
 				assert.Equal(t, http.StatusOK, w.Code)
 			case "POST":
 				assert.Equal(t, http.StatusCreated, w.Code)
-			case "PUT":
-				assert.Equal(t, http.StatusNoContent, w.Code)
-			case "PATCH":
-				assert.Equal(t, http.StatusNoContent, w.Code)
-			case "DELETE":
+			case "PUT", "PATCH", "DELETE", "OPTIONS":
 				assert.Equal(t, http.StatusNoContent, w.Code)
 			}
 		})

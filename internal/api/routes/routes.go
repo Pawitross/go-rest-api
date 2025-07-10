@@ -75,6 +75,8 @@ func Router(router *gin.Engine, db db.DatabaseInterface) {
 			{
 				authors.GET("", h.GetAuthors)
 				authors.GET("/:id", h.GetAuthor)
+				authors.OPTIONS("", h.OptionsAuthors)
+				authors.OPTIONS("/:id", h.OptionsAuthor)
 
 				admin := authors.Group("", middleware.Authorize())
 				{

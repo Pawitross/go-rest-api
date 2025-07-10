@@ -176,6 +176,41 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "options": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Responds with an empty response body.",
+                "tags": [
+                    "Authors"
+                ],
+                "summary": "Return allowed operations for authors",
+                "responses": {
+                    "204": {
+                        "description": "No Content - Successfully responded with available options",
+                        "headers": {
+                            "Allow": {
+                                "type": "string",
+                                "description": "Allowed operations for the resource"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Invalid or missing token",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Insufficient permissions",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
             }
         },
         "/authors/{id}": {
@@ -353,6 +388,50 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            },
+            "options": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Responds with an empty response body.",
+                "tags": [
+                    "Authors"
+                ],
+                "summary": "Return allowed operations for author",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Author id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content - Successfully responded with available options",
+                        "headers": {
+                            "Allow": {
+                                "type": "string",
+                                "description": "Allowed operations for the resource"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Invalid or missing token",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Insufficient permissions",
                         "schema": {
                             "$ref": "#/definitions/models.Error"
                         }

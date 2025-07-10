@@ -97,6 +97,8 @@ func setupTestRouter(db db.DatabaseInterface) *gin.Engine {
 		{
 			authors.GET("", h.GetAuthors)
 			authors.GET("/:id", h.GetAuthor)
+			authors.OPTIONS("", h.OptionsAuthors)
+			authors.OPTIONS("/:id", h.OptionsAuthor)
 
 			authors.POST("", h.PostAuthor)
 

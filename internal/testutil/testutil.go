@@ -2,7 +2,42 @@ package testutil
 
 import (
 	"database/sql"
+	"log"
+	"os"
+	"strings"
 )
+
+func SetupDatabase(db *sql.DB) error {
+	if err := setupFromScript(db); err != nil {
+		log.Println("Error when setting up the database from the script:", err)
+
+		log.Println("Setting up the database from hardcoded statements.")
+		return setupHardcoded(db)
+	}
+
+	return nil
+}
+
+func setupFromScript(db *sql.DB) error {
+	data, err := os.ReadFile("../../../sql/init.sql")
+	if err != nil {
+		return err
+	}
+
+	splitData := strings.Split(string(data), ";")
+	for _, statement := range splitData {
+		st := strings.TrimSpace(statement)
+		if st == "" {
+			continue
+		}
+
+		if _, err := db.Exec(st); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
 
 func dropTables(db *sql.DB, tables []string) error {
 	for _, table := range tables {
@@ -17,7 +52,7 @@ func dropTables(db *sql.DB, tables []string) error {
 
 func createTables(db *sql.DB, creates []string) error {
 	for _, create := range creates {
-		_, err := db.Exec(create)
+		_, err := db.Exec("CREATE TABLE " + create)
 		if err != nil {
 			return err
 		}
@@ -28,7 +63,7 @@ func createTables(db *sql.DB, creates []string) error {
 
 func populateTables(db *sql.DB, inserts []string) error {
 	for _, insert := range inserts {
-		_, err := db.Exec(insert)
+		_, err := db.Exec("INSERT INTO " + insert)
 		if err != nil {
 			return err
 		}
@@ -37,7 +72,7 @@ func populateTables(db *sql.DB, inserts []string) error {
 	return nil
 }
 
-func SetupDatabase(db *sql.DB) error {
+func setupHardcoded(db *sql.DB) error {
 	tables := []string{
 		"ksiazka",
 		"jezyk",
@@ -49,17 +84,17 @@ func SetupDatabase(db *sql.DB) error {
 	}
 
 	creates := []string{
-		`CREATE TABLE jezyk (
+		`jezyk (
 		    id      INT AUTO_INCREMENT,
 		    nazwa   VARCHAR(64) NOT NULL,
 		    PRIMARY KEY (id)
 		);`,
-		`CREATE TABLE gatunek (
+		`gatunek (
 		    id      INT AUTO_INCREMENT,
 		    nazwa   VARCHAR(128) NOT NULL,
 		    PRIMARY KEY (id)
 		);`,
-		`CREATE TABLE autor (
+		`autor (
 		    id              INT AUTO_INCREMENT,
 		    imie            VARCHAR(128) NOT NULL,
 		    nazwisko        VARCHAR(128) NOT NULL,
@@ -67,7 +102,7 @@ func SetupDatabase(db *sql.DB) error {
 		    rok_smierci     DECIMAL(5),
 		    PRIMARY KEY (id)
 		);`,
-		`CREATE TABLE ksiazka (
+		`ksiazka (
 		    id              INT AUTO_INCREMENT,
 		    tytul           VARCHAR(256) NOT NULL,
 		    rok_wydania     DECIMAL(5) NOT NULL,
@@ -87,7 +122,7 @@ func SetupDatabase(db *sql.DB) error {
 	}
 
 	inserts := []string{
-		`INSERT INTO jezyk (nazwa) VALUES
+		`jezyk (nazwa) VALUES
 		    ("Łaciński"),
 		    ("Polski"),
 		    ("Angielski"),
@@ -99,7 +134,7 @@ func SetupDatabase(db *sql.DB) error {
 		    ("Arabski"),
 		    ("Chiński"),
 		    ("Japoński");`,
-		`INSERT INTO gatunek (nazwa) VALUES
+		`gatunek (nazwa) VALUES
 		    ("Nowela"),
 		    ("Epopeja"),
 		    ("Opowiadanie"),
@@ -109,7 +144,7 @@ func SetupDatabase(db *sql.DB) error {
 		    ("Opowieść"),
 		    ("Zbiór poezji"),
 		    ("Dystopia");`,
-		`INSERT INTO autor (imie, nazwisko, rok_urodzenia, rok_smierci) VALUES
+		`autor (imie, nazwisko, rok_urodzenia, rok_smierci) VALUES
 		    ("Adam", "Mickiewicz", 1798, 1855),
 		    ("Witold", "Gombrowicz", 1904, 1969),
 		    ("Bolesław", "Prus", 1847, 1912),
@@ -119,7 +154,7 @@ func SetupDatabase(db *sql.DB) error {
 		    ("Ernest", "Hemingway", 1899, 1961),
 		    ("Henryk", "Sienkiewicz", 1846, 1916),
 		    ("George", "Orwell", 1903, 1950);`,
-		`INSERT INTO ksiazka (
+		`ksiazka (
 		    tytul, rok_wydania, liczba_stron, id_autora, id_gatunku, id_jezyka
 		) VALUES
 		    ("Pan Tadeusz, czyli ostatni zajazd na Litwie", 1834, 344, 1, 2, 2),

@@ -10,7 +10,6 @@ import (
 
 func TestNoConfigFile(t *testing.T) {
 	fileName := "foo.yaml"
-	defer os.Remove(fileName)
 
 	err := cfgyaml.Load(fileName)
 	if err == nil {

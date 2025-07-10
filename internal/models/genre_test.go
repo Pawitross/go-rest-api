@@ -18,7 +18,7 @@ func TestGenreValidation(t *testing.T) {
 			},
 			isInvalid: false,
 		},
-		"EmptyName": {
+		"InvalidEmptyName": {
 			genre: models.Genre{
 				Id:   1,
 				Name: "",

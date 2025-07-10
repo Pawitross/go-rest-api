@@ -31,37 +31,37 @@ func TestBookValidation(t *testing.T) {
 			book:      validBook,
 			isInvalid: false,
 		},
-		"EmptyTitle": {
+		"InvalidEmptyTitle": {
 			book: modifyBook(validBook, func(b *models.Book) {
 				b.Title = ""
 			}),
 			isInvalid: true,
 		},
-		"ZeroYear": {
+		"InvalidZeroYear": {
 			book: modifyBook(validBook, func(b *models.Book) {
 				b.Year = 0
 			}),
 			isInvalid: true,
 		},
-		"NegativePages": {
+		"InvalidNegativePages": {
 			book: modifyBook(validBook, func(b *models.Book) {
 				b.Pages = -1
 			}),
 			isInvalid: true,
 		},
-		"NegativeAuthor": {
+		"InvalidNegativeAuthor": {
 			book: modifyBook(validBook, func(b *models.Book) {
 				b.Author = -1
 			}),
 			isInvalid: true,
 		},
-		"NegativeGenre": {
+		"InvalidNegativeGenre": {
 			book: modifyBook(validBook, func(b *models.Book) {
 				b.Genre = -1
 			}),
 			isInvalid: true,
 		},
-		"NegativeLanguage": {
+		"InvalidNegativeLanguage": {
 			book: modifyBook(validBook, func(b *models.Book) {
 				b.Language = -1
 			}),

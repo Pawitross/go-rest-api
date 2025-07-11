@@ -1026,7 +1026,7 @@ paths:
   /login:
     post:
       description: |-
-        Return a valid JWT token used for authentication and authorization.
+        Return a valid JWT token used for authentication and authorization. Token expires after 30 minutes.
         Endpoint requires a JSON request body with a `return_admin_token` boolean field. Setting it to `true` returns an admin access token.
       parameters:
       - description: Return an admin token

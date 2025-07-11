@@ -1435,7 +1435,7 @@
         },
         "/login": {
             "post": {
-                "description": "Return a valid JWT token used for authentication and authorization.\nEndpoint requires a JSON request body with a `return_admin_token` boolean field. Setting it to `true` returns an admin access token.",
+                "description": "Return a valid JWT token used for authentication and authorization. Token expires after 30 minutes.\nEndpoint requires a JSON request body with a `return_admin_token` boolean field. Setting it to `true` returns an admin access token.",
                 "tags": [
                     "Auth"
                 ],

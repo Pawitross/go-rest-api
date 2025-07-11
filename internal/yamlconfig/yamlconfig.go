@@ -20,7 +20,7 @@ func Load(fPath string) error {
 	}
 
 	if len(cfg) == 0 {
-		return fmt.Errorf("Config file %q is empty.", fPath)
+		return fmt.Errorf("Config file %q is empty", fPath)
 	}
 
 	for k, v := range cfg {

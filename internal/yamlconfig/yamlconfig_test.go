@@ -8,7 +8,7 @@ import (
 	"pawrest/internal/yamlconfig"
 )
 
-func TestNoConfigFile(t *testing.T) {
+func TestLoad_NoConfigFile(t *testing.T) {
 	fileName := "foo.yaml"
 
 	err := yamlconfig.Load(fileName)
@@ -21,14 +21,14 @@ func TestNoConfigFile(t *testing.T) {
 	}
 }
 
-func TestEmptyFile(t *testing.T) {
+func TestLoad_EmptyFile(t *testing.T) {
 	fileName := "configtest.yaml"
-	defer os.Remove(fileName)
 
 	f, err := os.Create(fileName)
 	if err != nil {
 		t.Errorf("Error creating file: %v", err)
 	}
+	defer os.Remove(fileName)
 	f.Close()
 
 	err = yamlconfig.Load(fileName)
@@ -36,42 +36,36 @@ func TestEmptyFile(t *testing.T) {
 		t.Errorf("Should return an error.")
 	}
 
-	expectedErr := "Config file \"" + fileName + "\" is empty."
+	expectedErr := "Config file \"" + fileName + "\" is empty"
 	if err.Error() != expectedErr {
 		t.Errorf("Error loading file: %v", err)
 	}
 }
 
-func TestYAMLUnmarshalError(t *testing.T) {
+func TestLoad_YAMLUnmarshalError(t *testing.T) {
 	fileName := "configtest.yaml"
-	defer os.Remove(fileName)
 
-	f, err := os.Create(fileName)
+	data := []byte(`Foo: "bar`)
+	err := os.WriteFile(fileName, data, 0644)
 	if err != nil {
 		t.Errorf("Error creating file: %v", err)
 	}
-
-	f.Write([]byte(`Foo: "bar`))
-	f.Close()
+	defer os.Remove(fileName)
 
 	if err := yamlconfig.Load(fileName); err == nil {
 		t.Errorf("Should return an error.")
 	}
 }
 
-func TestSuccess(t *testing.T) {
+func TestLoad_Success(t *testing.T) {
 	fileName := "configtest.yaml"
-	defer os.Remove(fileName)
 
-	f, err := os.Create(fileName)
+	data := []byte("Foo: \"bar\"\nBaz: \"qux\"")
+	err := os.WriteFile(fileName, data, 0644)
 	if err != nil {
 		t.Errorf("Error creating file: %v", err)
 	}
-
-	f.Write([]byte(`Foo: "bar"`))
-	f.Write([]byte("\n"))
-	f.Write([]byte(`Baz: "qux"`))
-	f.Close()
+	defer os.Remove(fileName)
 
 	if err := yamlconfig.Load(fileName); err != nil {
 		t.Fatalf("Error loading config: %v", err)

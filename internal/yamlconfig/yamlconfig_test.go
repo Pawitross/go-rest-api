@@ -1,17 +1,17 @@
-package cfgyaml_test
+package yamlconfig_test
 
 import (
 	"errors"
 	"os"
 	"testing"
 
-	"pawrest/internal/cfgyaml"
+	"pawrest/internal/yamlconfig"
 )
 
 func TestNoConfigFile(t *testing.T) {
 	fileName := "foo.yaml"
 
-	err := cfgyaml.Load(fileName)
+	err := yamlconfig.Load(fileName)
 	if err == nil {
 		t.Errorf("Should return an error.")
 	}
@@ -31,7 +31,7 @@ func TestEmptyFile(t *testing.T) {
 	}
 	f.Close()
 
-	err = cfgyaml.Load(fileName)
+	err = yamlconfig.Load(fileName)
 	if err == nil {
 		t.Errorf("Should return an error.")
 	}
@@ -54,7 +54,7 @@ func TestYAMLUnmarshalError(t *testing.T) {
 	f.Write([]byte(`Foo: "bar`))
 	f.Close()
 
-	if err := cfgyaml.Load(fileName); err == nil {
+	if err := yamlconfig.Load(fileName); err == nil {
 		t.Errorf("Should return an error.")
 	}
 }
@@ -73,7 +73,7 @@ func TestSuccess(t *testing.T) {
 	f.Write([]byte(`Baz: "qux"`))
 	f.Close()
 
-	if err := cfgyaml.Load(fileName); err != nil {
+	if err := yamlconfig.Load(fileName); err != nil {
 		t.Fatalf("Error loading config: %v", err)
 	}
 

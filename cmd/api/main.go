@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"pawrest/internal/api/middleware"
 	"pawrest/internal/api/routes"
-	"pawrest/internal/cfgyaml"
+	"pawrest/internal/yamlconfig"
 	"pawrest/internal/db"
 )
 
@@ -43,7 +43,7 @@ func main() {
 	keyFlag := flag.String("key", "keys/server.key", "TLS private key file location")
 	flag.Parse()
 
-	if err := cfgyaml.Load("env.yaml"); err != nil {
+	if err := yamlconfig.Load("env.yaml"); err != nil {
 		log.Fatal(err)
 	}
 

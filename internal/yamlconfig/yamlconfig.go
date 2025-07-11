@@ -1,4 +1,4 @@
-package cfgyaml
+package yamlconfig
 
 import (
 	"fmt"

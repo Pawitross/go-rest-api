@@ -115,6 +115,8 @@ func setupTestRouter(db db.DatabaseInterface) *gin.Engine {
 		{
 			genres.GET("", h.GetGenres)
 			genres.GET("/:id", h.GetGenre)
+			genres.OPTIONS("", h.OptionsGenres)
+			genres.OPTIONS("/:id", h.OptionsGenre)
 
 			genres.POST("", h.PostGenre)
 

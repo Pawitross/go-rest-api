@@ -201,3 +201,32 @@ func (h *Handlers) DeleteGenre(c *gin.Context) {
 
 	c.Status(http.StatusNoContent)
 }
+
+// @Summary		Return allowed operations for genres
+// @Description	Responds with an empty response body.
+// @Tags			Genres
+// @Success		204	"No Content - Successfully responded with available options"
+// @Failure		401	{object}	models.Error	"Unauthorized - Invalid or missing token"
+// @Failure		403	{object}	models.Error	"Forbidden - Insufficient permissions"
+// @Header			204	{string}	Allow			"Allowed operations for the resource"
+// @Router			/genres [options]
+// @Security		ApiKeyAuth
+func (h *Handlers) OptionsGenres(c *gin.Context) {
+	c.Header("Allow", "GET, POST, OPTIONS")
+	c.Status(http.StatusNoContent)
+}
+
+// @Summary		Return allowed operations for genres
+// @Description	Responds with an empty response body.
+// @Tags			Genres
+// @Param			id	path	string	true	"Genre id"
+// @Success		204	"No Content - Successfully responded with available options"
+// @Failure		401	{object}	models.Error	"Unauthorized - Invalid or missing token"
+// @Failure		403	{object}	models.Error	"Forbidden - Insufficient permissions"
+// @Header			204	{string}	Allow			"Allowed operations for the resource"
+// @Router			/genres/{id} [options]
+// @Security		ApiKeyAuth
+func (h *Handlers) OptionsGenre(c *gin.Context) {
+	c.Header("Allow", "GET, PUT, DELETE, OPTIONS")
+	c.Status(http.StatusNoContent)
+}

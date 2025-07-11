@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"net/http"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -187,6 +188,38 @@ func TestDeleteGenre_Error(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			fullUrl := "/api/v1/genres" + tt.query
 			execAndCheckError(t, "DELETE", fullUrl, nil, tt.status)
+		})
+	}
+}
+
+// OPTIONS /genres
+// OPTIONS /genres/id
+func TestOptionsGenres_Success(t *testing.T) {
+	optionsTests := map[string]struct {
+		query   string
+		methods []string
+	}{
+		"BaseResource": {
+			"",
+			[]string{"GET", "POST", "OPTIONS"},
+		},
+		"PathId": {
+			"/1",
+			[]string{"GET", "PUT", "DELETE", "OPTIONS"},
+		},
+	}
+
+	for name, tt := range optionsTests {
+		t.Run(name, func(t *testing.T) {
+			fullUrl := "/api/v1/genres" + tt.query
+
+			w := execRequest("OPTIONS", fullUrl, nil)
+			assert.Equal(t, http.StatusNoContent, w.Code)
+
+			allowResp := w.Result().Header.Get("Allow")
+			splitAllow := strings.Split(allowResp, ", ")
+
+			assert.ElementsMatch(t, tt.methods, splitAllow)
 		})
 	}
 }

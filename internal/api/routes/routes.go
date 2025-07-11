@@ -93,6 +93,8 @@ func Router(router *gin.Engine, db db.DatabaseInterface) {
 			{
 				genres.GET("", h.GetGenres)
 				genres.GET("/:id", h.GetGenre)
+				genres.OPTIONS("", h.OptionsGenres)
+				genres.OPTIONS("/:id", h.OptionsGenre)
 
 				admin := genres.Group("", middleware.Authorize())
 				{

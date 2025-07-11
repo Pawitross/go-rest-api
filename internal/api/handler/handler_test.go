@@ -83,6 +83,8 @@ func setupTestRouter(db db.DatabaseInterface) *gin.Engine {
 		{
 			books.GET("", h.GetBooks)
 			books.GET("/:id", h.GetBook)
+			books.OPTIONS("", h.OptionsBooks)
+			books.OPTIONS("/:id", h.OptionsBook)
 
 			books.POST("", h.PostBook)
 

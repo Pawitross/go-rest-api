@@ -500,6 +500,28 @@ paths:
       summary: Get a list of all books
       tags:
       - Books
+    options:
+      description: Responds with an empty response body.
+      responses:
+        "204":
+          description: No Content - Successfully responded with available options
+          headers:
+            Allow:
+              description: Allowed operations for the resource
+              type: string
+        "401":
+          description: Unauthorized - Invalid or missing token
+          schema:
+            $ref: '#/definitions/models.Error'
+        "403":
+          description: Forbidden - Insufficient permissions
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Return allowed operations for books
+      tags:
+      - Books
     post:
       consumes:
       - application/json
@@ -616,6 +638,34 @@ paths:
       security:
       - ApiKeyAuth: []
       summary: Get one book
+      tags:
+      - Books
+    options:
+      description: Responds with an empty response body.
+      parameters:
+      - description: Book id
+        in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        "204":
+          description: No Content - Successfully responded with available options
+          headers:
+            Allow:
+              description: Allowed operations for the resource
+              type: string
+        "401":
+          description: Unauthorized - Invalid or missing token
+          schema:
+            $ref: '#/definitions/models.Error'
+        "403":
+          description: Forbidden - Insufficient permissions
+          schema:
+            $ref: '#/definitions/models.Error'
+      security:
+      - ApiKeyAuth: []
+      summary: Return allowed operations for books
       tags:
       - Books
     patch:

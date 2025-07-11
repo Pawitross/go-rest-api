@@ -258,3 +258,32 @@ func (h *Handlers) DeleteBook(c *gin.Context) {
 
 	c.Status(http.StatusNoContent)
 }
+
+// @Summary		Return allowed operations for books
+// @Description	Responds with an empty response body.
+// @Tags			Books
+// @Success		204	"No Content - Successfully responded with available options"
+// @Failure		401	{object}	models.Error	"Unauthorized - Invalid or missing token"
+// @Failure		403	{object}	models.Error	"Forbidden - Insufficient permissions"
+// @Header			204	{string}	Allow			"Allowed operations for the resource"
+// @Router			/books [options]
+// @Security		ApiKeyAuth
+func (h *Handlers) OptionsBooks(c *gin.Context) {
+	c.Header("Allow", "GET, POST, OPTIONS")
+	c.Status(http.StatusNoContent)
+}
+
+// @Summary		Return allowed operations for books
+// @Description	Responds with an empty response body.
+// @Tags			Books
+// @Param			id	path	string	true	"Book id"
+// @Success		204	"No Content - Successfully responded with available options"
+// @Failure		401	{object}	models.Error	"Unauthorized - Invalid or missing token"
+// @Failure		403	{object}	models.Error	"Forbidden - Insufficient permissions"
+// @Header			204	{string}	Allow			"Allowed operations for the resource"
+// @Router			/books/{id} [options]
+// @Security		ApiKeyAuth
+func (h *Handlers) OptionsBook(c *gin.Context) {
+	c.Header("Allow", "GET, POST, PUT, PATCH, DELETE, OPTIONS")
+	c.Status(http.StatusNoContent)
+}

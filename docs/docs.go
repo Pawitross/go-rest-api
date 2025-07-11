@@ -704,6 +704,41 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "options": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Responds with an empty response body.",
+                "tags": [
+                    "Books"
+                ],
+                "summary": "Return allowed operations for books",
+                "responses": {
+                    "204": {
+                        "description": "No Content - Successfully responded with available options",
+                        "headers": {
+                            "Allow": {
+                                "type": "string",
+                                "description": "Allowed operations for the resource"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Invalid or missing token",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Insufficient permissions",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
             }
         },
         "/books/{id}": {
@@ -881,6 +916,50 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    }
+                }
+            },
+            "options": {
+                "security": [
+                    {
+                        "ApiKeyAuth": []
+                    }
+                ],
+                "description": "Responds with an empty response body.",
+                "tags": [
+                    "Books"
+                ],
+                "summary": "Return allowed operations for books",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Book id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content - Successfully responded with available options",
+                        "headers": {
+                            "Allow": {
+                                "type": "string",
+                                "description": "Allowed operations for the resource"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Invalid or missing token",
+                        "schema": {
+                            "$ref": "#/definitions/models.Error"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden - Insufficient permissions",
                         "schema": {
                             "$ref": "#/definitions/models.Error"
                         }

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"net/http"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -294,6 +295,38 @@ func TestDeleteBook_Error(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			fullUrl := "/api/v1/books" + tt.query
 			execAndCheckError(t, "DELETE", fullUrl, nil, tt.status)
+		})
+	}
+}
+
+// OPTIONS /books
+// OPTIONS /books/id
+func TestOptionsBooks_Success(t *testing.T) {
+	optionsTests := map[string]struct {
+		query   string
+		methods []string
+	}{
+		"BaseResource": {
+			"",
+			[]string{"GET", "POST", "OPTIONS"},
+		},
+		"PathId": {
+			"/1",
+			[]string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+		},
+	}
+
+	for name, tt := range optionsTests {
+		t.Run(name, func(t *testing.T) {
+			fullUrl := "/api/v1/books" + tt.query
+
+			w := execRequest("OPTIONS", fullUrl, nil)
+			assert.Equal(t, http.StatusNoContent, w.Code)
+
+			allowResp := w.Result().Header.Get("Allow")
+			splitAllow := strings.Split(allowResp, ", ")
+
+			assert.ElementsMatch(t, tt.methods, splitAllow)
 		})
 	}
 }

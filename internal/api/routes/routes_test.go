@@ -25,6 +25,8 @@ var authRouteTests = []struct {
 	{"PUT", "/api/v1/books/1", []byte(`{"title":"Route put test","year":2025,"pages":30,"author":1,"genre":1,"language":1}`)},
 	{"PATCH", "/api/v1/books/1", []byte(`{"title":"Route patch test"}`)},
 	{"DELETE", "/api/v1/books/2", nil},
+	{"OPTIONS", "/api/v1/books", nil},
+	{"OPTIONS", "/api/v1/books/1", nil},
 
 	{"GET", "/api/v1/authors", nil},
 	{"GET", "/api/v1/authors/1", nil},

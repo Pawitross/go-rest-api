@@ -312,7 +312,7 @@ func TestOptionsBooks_Success(t *testing.T) {
 		},
 		"PathId": {
 			"/1",
-			[]string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+			[]string{"GET", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		},
 	}
 

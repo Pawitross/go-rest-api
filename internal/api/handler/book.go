@@ -284,6 +284,6 @@ func (h *Handlers) OptionsBooks(c *gin.Context) {
 // @Router			/books/{id} [options]
 // @Security		ApiKeyAuth
 func (h *Handlers) OptionsBook(c *gin.Context) {
-	c.Header("Allow", "GET, POST, PUT, PATCH, DELETE, OPTIONS")
+	c.Header("Allow", "GET, PUT, PATCH, DELETE, OPTIONS")
 	c.Status(http.StatusNoContent)
 }

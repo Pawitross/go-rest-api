@@ -267,6 +267,6 @@ func (h *Handlers) OptionsAuthors(c *gin.Context) {
 // @Router			/authors/{id} [options]
 // @Security		ApiKeyAuth
 func (h *Handlers) OptionsAuthor(c *gin.Context) {
-	c.Header("Allow", "GET, POST, PUT, PATCH, DELETE, OPTIONS")
+	c.Header("Allow", "GET, PUT, PATCH, DELETE, OPTIONS")
 	c.Status(http.StatusNoContent)
 }

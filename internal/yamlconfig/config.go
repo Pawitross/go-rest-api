@@ -17,7 +17,7 @@ type Config struct {
 
 func Parse(fPath string) (*Config, error) {
 	if err := Load(fPath); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to load: %w", err)
 	}
 
 	var missing []string

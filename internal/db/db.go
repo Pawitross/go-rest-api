@@ -42,11 +42,11 @@ func ConnectToDB(cfg *yamlconfig.Config) (*Database, error) {
 
 	db, err := sql.Open("mysql", dbCfg.FormatDSN())
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to open database: %w", err)
 	}
 
 	if err := db.Ping(); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to ping database: %w", err)
 	}
 
 	return &Database{pool: db}, nil

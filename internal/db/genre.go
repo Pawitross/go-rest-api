@@ -72,7 +72,7 @@ func (d *Database) UpdateWholeGenre(id int64, g models.Genre) error {
 }
 
 func (d *Database) UpdateGenre(id int64, g models.Genre) error {
-	return errors.New("This operation is not allowed.")
+	return errors.New("This operation is not allowed")
 }
 
 func (d *Database) DelGenre(id int64) error {

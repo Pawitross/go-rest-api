@@ -36,7 +36,7 @@ func TestLoad_EmptyFile(t *testing.T) {
 		t.Errorf("Should return an error.")
 	}
 
-	expectedErr := "Config file \"" + fileName + "\" is empty"
+	expectedErr := "config file \"" + fileName + "\" is empty"
 	if err.Error() != expectedErr {
 		t.Errorf("Error loading file: %v", err)
 	}

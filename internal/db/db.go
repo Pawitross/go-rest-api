@@ -5,11 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
-	"os"
 	"reflect"
 	"strings"
 
 	"github.com/go-sql-driver/mysql"
+	"pawrest/internal/yamlconfig"
 )
 
 var (
@@ -30,36 +30,17 @@ type Database struct {
 
 var _ DatabaseInterface = (*Database)(nil)
 
-func ConnectToDB() (*Database, error) {
-	dbUser := os.Getenv("DBUSER")
-	dbPass := os.Getenv("DBPASS")
-	dbName := os.Getenv("DBNAME")
+func ConnectToDB(cfg *yamlconfig.Config) (*Database, error) {
+	dbCfg := mysql.NewConfig()
 
-	if dbUser == "" || dbName == "" {
-		return nil, fmt.Errorf("Missing required environment variables: DBUSER, DBNAME")
-	}
+	dbCfg.User = cfg.DBUser
+	dbCfg.Passwd = cfg.DBPass
+	dbCfg.Net = "tcp"
+	dbCfg.Addr = cfg.DBHost + ":" + cfg.DBPort
+	dbCfg.DBName = cfg.DBName
+	dbCfg.ClientFoundRows = true
 
-	dbHost := os.Getenv("DBHOST")
-	dbPort := os.Getenv("DBPORT")
-
-	if dbHost == "" {
-		dbHost = "127.0.0.1"
-	}
-
-	if dbPort == "" {
-		dbPort = "3306"
-	}
-
-	cfg := mysql.NewConfig()
-
-	cfg.User = dbUser
-	cfg.Passwd = dbPass
-	cfg.Net = "tcp"
-	cfg.Addr = dbHost + ":" + dbPort
-	cfg.DBName = dbName
-	cfg.ClientFoundRows = true
-
-	db, err := sql.Open("mysql", cfg.FormatDSN())
+	db, err := sql.Open("mysql", dbCfg.FormatDSN())
 	if err != nil {
 		return nil, err
 	}

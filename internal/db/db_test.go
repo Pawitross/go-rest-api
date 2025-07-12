@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"pawrest/internal/yamlconfig"
 )
 
 var database *Database
@@ -28,12 +29,16 @@ func runMain(m *testing.M) (int, error) {
 		return 0, nil
 	}
 
-	os.Setenv("DBUSER", "root")
-	os.Setenv("DBPASS", "")
-	os.Setenv("DBNAME", "paw_test")
+	cfg := &yamlconfig.Config{
+		DBUser: "root",
+		DBPass: "",
+		DBName: "paw_test",
+		DBHost: "127.0.0.1",
+		DBPort: "3306",
+	}
 
 	var err error
-	database, err = ConnectToDB()
+	database, err = ConnectToDB(cfg)
 	if err != nil {
 		return 0, err
 	}

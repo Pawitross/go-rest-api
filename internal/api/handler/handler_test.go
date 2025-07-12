@@ -17,6 +17,7 @@ import (
 	"pawrest/internal/db/mock"
 	"pawrest/internal/models"
 	"pawrest/internal/testutil"
+	"pawrest/internal/yamlconfig"
 )
 
 var database db.DatabaseInterface
@@ -27,12 +28,16 @@ func runMain(m *testing.M) (int, error) {
 	if testing.Short() {
 		database = &mock.MockDatabase{}
 	} else {
-		os.Setenv("DBUSER", "root")
-		os.Setenv("DBPASS", "")
-		os.Setenv("DBNAME", "paw_test")
+		cfg := &yamlconfig.Config{
+			DBUser: "root",
+			DBPass: "",
+			DBName: "paw_test",
+			DBHost: "127.0.0.1",
+			DBPort: "3306",
+		}
 
 		var err error
-		database, err = db.ConnectToDB()
+		database, err = db.ConnectToDB(cfg)
 		if err != nil {
 			return 0, err
 		}

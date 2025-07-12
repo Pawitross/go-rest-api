@@ -9,8 +9,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"pawrest/internal/api/middleware"
 	"pawrest/internal/api/routes"
-	"pawrest/internal/yamlconfig"
 	"pawrest/internal/db"
+	"pawrest/internal/yamlconfig"
 )
 
 func isFlagPassed(flagName string) bool {
@@ -43,12 +43,13 @@ func main() {
 	keyFlag := flag.String("key", "keys/server.key", "TLS private key file location")
 	flag.Parse()
 
-	if err := yamlconfig.Load("env.yaml"); err != nil {
+	cfg, err := yamlconfig.Parse("env.yaml")
+	if err != nil {
 		log.Fatal(err)
 	}
 
 	fmt.Println("Connecting to the database...")
-	database, err := db.ConnectToDB()
+	database, err := db.ConnectToDB(cfg)
 	if err != nil {
 		log.Fatal(err)
 	}

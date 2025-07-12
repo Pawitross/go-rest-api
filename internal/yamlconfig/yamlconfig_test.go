@@ -26,7 +26,7 @@ func TestLoad_EmptyFile(t *testing.T) {
 
 	f, err := os.Create(fileName)
 	if err != nil {
-		t.Errorf("Error creating file: %v", err)
+		t.Fatalf("Error creating file: %v", err)
 	}
 	defer os.Remove(fileName)
 	f.Close()
@@ -44,11 +44,10 @@ func TestLoad_EmptyFile(t *testing.T) {
 
 func TestLoad_YAMLUnmarshalError(t *testing.T) {
 	fileName := "configtest.yaml"
-
 	data := []byte(`Foo: "bar`)
-	err := os.WriteFile(fileName, data, 0644)
-	if err != nil {
-		t.Errorf("Error creating file: %v", err)
+
+	if err := os.WriteFile(fileName, data, 0644); err != nil {
+		t.Fatalf("Error creating file: %v", err)
 	}
 	defer os.Remove(fileName)
 
@@ -57,13 +56,12 @@ func TestLoad_YAMLUnmarshalError(t *testing.T) {
 	}
 }
 
-func TestLoad_Success(t *testing.T) {
+func TestLoad_Success_NoOutsideEnvSet(t *testing.T) {
 	fileName := "configtest.yaml"
-
 	data := []byte("Foo: \"bar\"\nBaz: \"qux\"")
-	err := os.WriteFile(fileName, data, 0644)
-	if err != nil {
-		t.Errorf("Error creating file: %v", err)
+
+	if err := os.WriteFile(fileName, data, 0644); err != nil {
+		t.Fatalf("Error creating file: %v", err)
 	}
 	defer os.Remove(fileName)
 
@@ -71,21 +69,58 @@ func TestLoad_Success(t *testing.T) {
 		t.Fatalf("Error loading config: %v", err)
 	}
 
-	valFoo, foundFoo := os.LookupEnv("Foo")
-	if !foundFoo {
-		t.Errorf("Didn't found environment variable")
+	envVars := []struct {
+		envVar  string
+		wantVal string
+	}{
+		{"Foo", "bar"},
+		{"Baz", "qux"},
 	}
 
-	if valFoo != "bar" {
-		t.Errorf(`Value of Foo should be "bar"`)
+	for _, test := range envVars {
+		val, found := os.LookupEnv(test.envVar)
+		if !found {
+			t.Errorf("Didn't find environment variable %v", test.envVar)
+		}
+
+		if val != test.wantVal {
+			t.Errorf("Value of %v should be %v, not %v", test.envVar, test.wantVal, val)
+		}
+	}
+}
+
+func TestLoad_Success_OutsideEnvSet(t *testing.T) {
+	os.Setenv("SETVAR", "foo")
+	defer os.Unsetenv("SETVAR")
+
+	fileName := "configtest.yaml"
+	data := []byte("FILEVAR: \"bar\"\nSETVAR: \"file\"")
+
+	if err := os.WriteFile(fileName, data, 0644); err != nil {
+		t.Fatalf("Error creating file: %v", err)
+	}
+	defer os.Remove(fileName)
+
+	if err := yamlconfig.Load(fileName); err != nil {
+		t.Fatalf("Error loading config: %v", err)
 	}
 
-	valBaz, foundBaz := os.LookupEnv("Baz")
-	if !foundBaz {
-		t.Errorf("Didn't found environment variable")
+	envVars := []struct {
+		envVar  string
+		wantVal string
+	}{
+		{"FILEVAR", "bar"},
+		{"SETVAR", "foo"},
 	}
 
-	if valBaz != "qux" {
-		t.Errorf(`Value of baz should be "qux"`)
+	for _, test := range envVars {
+		val, found := os.LookupEnv(test.envVar)
+		if !found {
+			t.Errorf("Didn't find environment variable %v", test.envVar)
+		}
+
+		if val != test.wantVal {
+			t.Errorf("Value of %v should be %v, not %v", test.envVar, test.wantVal, val)
+		}
 	}
 }

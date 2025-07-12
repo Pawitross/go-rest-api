@@ -24,7 +24,9 @@ func Load(fPath string) error {
 	}
 
 	for k, v := range cfg {
-		os.Setenv(k, v)
+		if _, set := os.LookupEnv(k); !set {
+			os.Setenv(k, v)
+		}
 	}
 
 	return nil

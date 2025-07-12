@@ -14,7 +14,7 @@ type AdminBody struct {
 	RetAdmin *bool `json:"return_admin_token" binding:"required"`
 }
 
-func createToken(isAdmin bool) (string, error) {
+func createToken(isAdmin bool, secret string) (string, error) {
 	timeNow := time.Now().Unix()
 	halfHour := int64(time.Hour/time.Second) >> 1
 
@@ -28,7 +28,7 @@ func createToken(isAdmin bool) (string, error) {
 		},
 	)
 
-	s, err := t.SignedString([]byte("secret"))
+	s, err := t.SignedString([]byte(secret))
 	if err != nil {
 		return "", err
 	}
@@ -45,21 +45,23 @@ func createToken(isAdmin bool) (string, error) {
 // @Failure		400		{object}	models.Error	"Bad Request - Invalid parameter value"
 // @Failure		500		{object}	models.Error	"Internal Server Error - Failed to create JWT token"
 // @Router			/login [post]
-func ReturnToken(c *gin.Context) {
-	var body AdminBody
+func ReturnToken(secret string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var body AdminBody
 
-	if err := c.BindJSON(&body); err != nil {
-		c.JSON(http.StatusBadRequest, models.Error{Error: "Invalid JSON in request body"})
-		return
+		if err := c.BindJSON(&body); err != nil {
+			c.JSON(http.StatusBadRequest, models.Error{Error: "Invalid JSON in request body"})
+			return
+		}
+
+		boolAdmin := *body.RetAdmin
+
+		token, err := createToken(boolAdmin, secret)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, models.Error{Error: "Failed to create token"})
+			return
+		}
+
+		c.JSON(http.StatusOK, models.Token{Admin: boolAdmin, Token: token})
 	}
-
-	boolAdmin := *body.RetAdmin
-
-	token, err := createToken(boolAdmin)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, models.Error{Error: "Failed to create token"})
-		return
-	}
-
-	c.JSON(http.StatusOK, models.Token{Admin: boolAdmin, Token: token})
 }

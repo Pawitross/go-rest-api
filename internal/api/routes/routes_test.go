@@ -12,6 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"pawrest/internal/api/routes"
 	"pawrest/internal/db/mock"
+	"pawrest/internal/yamlconfig"
 )
 
 var authRouteTests = []struct {
@@ -52,7 +53,11 @@ func setupTestRouter() *gin.Engine {
 	gin.SetMode(gin.TestMode)
 	r := gin.New()
 
-	routes.Router(r, mockdb)
+	cfg := &yamlconfig.Config{
+		Secret: "secret-jwt-string",
+	}
+
+	routes.Router(r, mockdb, cfg)
 	return r
 }
 

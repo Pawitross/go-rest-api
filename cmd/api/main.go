@@ -65,7 +65,7 @@ func main() {
 	router := gin.Default()
 
 	router.Use(middleware.FileLogger())
-	routes.Router(router, database)
+	routes.Router(router, database, cfg)
 
 	useHTTPS := *httpsFlag || os.Getenv("HTTPS") == "true"
 	port := resolveStrFlag(portFlag, "port", "PORT")

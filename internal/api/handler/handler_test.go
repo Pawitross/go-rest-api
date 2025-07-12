@@ -130,7 +130,7 @@ func setupTestRouter(db db.DatabaseInterface) *gin.Engine {
 			genres.DELETE("/:id", h.DeleteGenre)
 		}
 
-		apiv1.POST("login", handler.ReturnToken)
+		apiv1.POST("login", handler.ReturnToken("random-string"))
 	}
 
 	return router

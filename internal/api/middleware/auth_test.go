@@ -17,16 +17,17 @@ import (
 func setupTestAuthRouter() *gin.Engine {
 	gin.SetMode(gin.TestMode)
 	router := gin.New()
+	secret := "secret"
 
-	router.GET("/authenticate", middleware.Authenticate(), func(c *gin.Context) {
+	router.GET("/authenticate", middleware.Authenticate(secret), func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"message": "You're in!"})
 	})
 
-	router.GET("/authorize", middleware.Authenticate(), middleware.Authorize(), func(c *gin.Context) {
+	router.GET("/authorize", middleware.Authenticate(secret), middleware.Authorize(), func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"message": "You're in!"})
 	})
 
-	router.POST("/login", handler.ReturnToken)
+	router.POST("/login", handler.ReturnToken(secret))
 
 	return router
 }

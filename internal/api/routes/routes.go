@@ -9,6 +9,7 @@ import (
 	"pawrest/internal/api/handler"
 	"pawrest/internal/api/middleware"
 	"pawrest/internal/db"
+	"pawrest/internal/yamlconfig"
 )
 
 // @title		Book managing API
@@ -50,14 +51,15 @@ import (
 
 // @externalDocs.description	OpenAPI Specification
 // @externalDocs.url			https://swagger.io/resources/open-api/
-func Router(router *gin.Engine, db db.DatabaseInterface) {
+func Router(router *gin.Engine, db db.DatabaseInterface, cfg *yamlconfig.Config) {
 	h := handler.Handlers{DB: db}
+	secret := cfg.Secret
 
 	api := router.Group("/api")
 	{
 		v1 := api.Group("/v1")
 		{
-			books := v1.Group("/books", middleware.Authenticate())
+			books := v1.Group("/books", middleware.Authenticate(secret))
 			{
 				books.GET("", h.GetBooks)
 				books.GET("/:id", h.GetBook)
@@ -73,7 +75,7 @@ func Router(router *gin.Engine, db db.DatabaseInterface) {
 				}
 			}
 
-			authors := v1.Group("/authors", middleware.Authenticate())
+			authors := v1.Group("/authors", middleware.Authenticate(secret))
 			{
 				authors.GET("", h.GetAuthors)
 				authors.GET("/:id", h.GetAuthor)
@@ -89,7 +91,7 @@ func Router(router *gin.Engine, db db.DatabaseInterface) {
 				}
 			}
 
-			genres := v1.Group("/genres", middleware.Authenticate())
+			genres := v1.Group("/genres", middleware.Authenticate(secret))
 			{
 				genres.GET("", h.GetGenres)
 				genres.GET("/:id", h.GetGenre)
@@ -104,7 +106,7 @@ func Router(router *gin.Engine, db db.DatabaseInterface) {
 				}
 			}
 
-			v1.POST("login", handler.ReturnToken)
+			v1.POST("login", handler.ReturnToken(secret))
 		}
 	}
 

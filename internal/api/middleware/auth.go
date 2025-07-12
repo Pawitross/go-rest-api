@@ -9,7 +9,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func Authenticate() gin.HandlerFunc {
+func Authenticate(secret string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		headerToken := c.GetHeader("Authorization")
 
@@ -25,7 +25,7 @@ func Authenticate() gin.HandlerFunc {
 		}
 
 		token, err := jwt.Parse(userToken, func(token *jwt.Token) (interface{}, error) {
-			return []byte("secret"), nil
+			return []byte(secret), nil
 		}, jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Alg()}))
 
 		if err != nil || !token.Valid {

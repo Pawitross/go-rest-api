@@ -45,6 +45,14 @@ var authRouteTests = []struct {
 	{"DELETE", "/api/v1/genres/2", nil},
 	{"OPTIONS", "/api/v1/genres", nil},
 	{"OPTIONS", "/api/v1/genres/1", nil},
+
+	{"GET", "/api/v1/languages", nil},
+	{"GET", "/api/v1/languages/1", nil},
+	{"POST", "/api/v1/languages", []byte(`{"name":"Route post"}`)},
+	{"PUT", "/api/v1/languages/1", []byte(`{"name":"Route put"}`)},
+	{"DELETE", "/api/v1/languages/2", nil},
+	{"OPTIONS", "/api/v1/languages", nil},
+	{"OPTIONS", "/api/v1/languages/1", nil},
 }
 
 func setupTestRouter() *gin.Engine {

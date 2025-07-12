@@ -90,13 +90,9 @@ func setupTestRouter(db db.DatabaseInterface) *gin.Engine {
 			books.GET("/:id", h.GetBook)
 			books.OPTIONS("", h.OptionsBooks)
 			books.OPTIONS("/:id", h.OptionsBook)
-
 			books.POST("", h.PostBook)
-
 			books.PUT("/:id", h.PutBook)
-
 			books.PATCH("/:id", h.PatchBook)
-
 			books.DELETE("/:id", h.DeleteBook)
 		}
 
@@ -106,13 +102,9 @@ func setupTestRouter(db db.DatabaseInterface) *gin.Engine {
 			authors.GET("/:id", h.GetAuthor)
 			authors.OPTIONS("", h.OptionsAuthors)
 			authors.OPTIONS("/:id", h.OptionsAuthor)
-
 			authors.POST("", h.PostAuthor)
-
 			authors.PUT("/:id", h.PutAuthor)
-
 			authors.PATCH("/:id", h.PatchAuthor)
-
 			authors.DELETE("/:id", h.DeleteAuthor)
 		}
 
@@ -122,12 +114,20 @@ func setupTestRouter(db db.DatabaseInterface) *gin.Engine {
 			genres.GET("/:id", h.GetGenre)
 			genres.OPTIONS("", h.OptionsGenres)
 			genres.OPTIONS("/:id", h.OptionsGenre)
-
 			genres.POST("", h.PostGenre)
-
 			genres.PUT("/:id", h.PutGenre)
-
 			genres.DELETE("/:id", h.DeleteGenre)
+		}
+
+		languages := apiv1.Group("/languages")
+		{
+			languages.GET("", h.GetLanguages)
+			languages.GET("/:id", h.GetLanguage)
+			languages.OPTIONS("", h.OptionsLanguages)
+			languages.OPTIONS("/:id", h.OptionsLanguage)
+			languages.POST("", h.PostLanguage)
+			languages.PUT("/:id", h.PutLanguage)
+			languages.DELETE("/:id", h.DeleteLanguage)
 		}
 
 		apiv1.POST("login", handler.ReturnToken("random-string"))

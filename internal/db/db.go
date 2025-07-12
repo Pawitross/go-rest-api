@@ -22,6 +22,7 @@ type DatabaseInterface interface {
 	BookDatabaseInterface
 	AuthorDatabaseInterface
 	GenreDatabaseInterface
+	LanguageDatabaseInterface
 }
 
 type Database struct {

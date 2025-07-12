@@ -106,6 +106,17 @@ func Router(router *gin.Engine, db db.DatabaseInterface, cfg *yamlconfig.Config)
 				}
 			}
 
+			languages := v1.Group("/languages")
+			{
+				languages.GET("", h.GetLanguages)
+				languages.GET("/:id", h.GetLanguage)
+				languages.OPTIONS("", h.OptionsLanguages)
+				languages.OPTIONS("/:id", h.OptionsLanguage)
+				languages.POST("", h.PostLanguage)
+				languages.PUT("/:id", h.PutLanguage)
+				languages.DELETE("/:id", h.DeleteLanguage)
+			}
+
 			v1.POST("login", handler.ReturnToken(secret))
 		}
 	}

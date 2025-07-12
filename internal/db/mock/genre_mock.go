@@ -41,17 +41,17 @@ func (m *MockDatabase) GetGenre(id int64) (models.Genre, error) {
 	return models.Genre{}, db.ErrNotFound
 }
 
-func (m *MockDatabase) InsertGenre(a models.Genre) (int64, error) {
-	a.Id = int64(len(genres) + 1)
-	genres = append(genres, a)
+func (m *MockDatabase) InsertGenre(g models.Genre) (int64, error) {
+	g.Id = int64(len(genres) + 1)
+	genres = append(genres, g)
 
-	return a.Id, nil
+	return g.Id, nil
 }
 
-func (m *MockDatabase) UpdateWholeGenre(id int64, a models.Genre) error {
+func (m *MockDatabase) UpdateWholeGenre(id int64, g models.Genre) error {
 	for i, genre := range genres {
 		if genre.Id == id {
-			genres[i] = a
+			genres[i] = g
 			genres[i].Id = id
 			return nil
 		}

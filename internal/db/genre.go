@@ -2,7 +2,6 @@ package db
 
 import (
 	"database/sql"
-	"errors"
 	"net/url"
 
 	"pawrest/internal/models"
@@ -13,7 +12,6 @@ type GenreDatabaseInterface interface {
 	GetGenre(id int64) (models.Genre, error)
 	InsertGenre(g models.Genre) (int64, error)
 	UpdateWholeGenre(id int64, g models.Genre) error
-	UpdateGenre(id int64, g models.Genre) error
 	DelGenre(id int64) error
 }
 
@@ -69,10 +67,6 @@ func (d *Database) UpdateWholeGenre(id int64, g models.Genre) error {
 	WHERE id = ?`
 
 	return d.updateWholeId(query, g.Name, id)
-}
-
-func (d *Database) UpdateGenre(id int64, g models.Genre) error {
-	return errors.New("This operation is not allowed")
 }
 
 func (d *Database) DelGenre(id int64) error {

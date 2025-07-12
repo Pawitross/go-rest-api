@@ -60,20 +60,6 @@ func (m *MockDatabase) UpdateWholeGenre(id int64, a models.Genre) error {
 	return db.ErrNotFound
 }
 
-func (m *MockDatabase) UpdateGenre(id int64, a models.Genre) error {
-	for i, genre := range genres {
-		if genre.Id == id {
-			if a.Name != "" {
-				genres[i].Name = a.Name
-			}
-
-			return nil
-		}
-	}
-
-	return db.ErrNotFound
-}
-
 func (m *MockDatabase) DelGenre(id int64) error {
 	for i, genre := range genres {
 		if genre.Id == id {

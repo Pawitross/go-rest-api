@@ -54,7 +54,7 @@ func setupTestLoggingRouter() *gin.Engine {
 
 	router.Use(middleware.FileLogger())
 	router.GET("/test", func(c *gin.Context) {
-		c.Status(201)
+		c.Status(http.StatusCreated)
 	})
 
 	return router
@@ -62,7 +62,7 @@ func setupTestLoggingRouter() *gin.Engine {
 
 func TestLogFileCreation(t *testing.T) {
 	if err := middleware.InitLogger(); err != nil {
-		t.Errorf("Failed to initialize logging middleware: %v\n", err)
+		t.Fatalf("Failed to initialize logging middleware: %v\n", err)
 	}
 	defer middleware.CloseLogger()
 
@@ -72,13 +72,13 @@ func TestLogFileCreation(t *testing.T) {
 	}
 
 	if !exists {
-		t.Errorf("File doesn't exist")
+		t.Errorf("Log file doesn't exist, but should")
 	}
 }
 
 func TestLogging(t *testing.T) {
 	if err := middleware.InitLogger(); err != nil {
-		t.Errorf("Failed to initialize logging middleware: %v\n", err)
+		t.Fatalf("Failed to initialize logging middleware: %v\n", err)
 	}
 	defer middleware.CloseLogger()
 

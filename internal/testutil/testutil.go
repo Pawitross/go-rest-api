@@ -2,6 +2,7 @@ package testutil
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -10,7 +11,6 @@ import (
 func SetupDatabase(db *sql.DB) error {
 	if err := setupFromScript(db); err != nil {
 		log.Println("Error when setting up the database from the script:", err)
-
 		log.Println("Setting up the database from hardcoded statements.")
 		return setupHardcoded(db)
 	}
@@ -21,7 +21,7 @@ func SetupDatabase(db *sql.DB) error {
 func setupFromScript(db *sql.DB) error {
 	data, err := os.ReadFile("../../../sql/02-schema.sql")
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to read file: %w", err)
 	}
 
 	splitData := strings.Split(string(data), ";")
@@ -32,7 +32,7 @@ func setupFromScript(db *sql.DB) error {
 		}
 
 		if _, err := db.Exec(st); err != nil {
-			return err
+			return fmt.Errorf("failed to exec: %w", err)
 		}
 	}
 
@@ -80,7 +80,7 @@ func setupHardcoded(db *sql.DB) error {
 		"autor",
 	}
 	if err := dropTables(db, tables); err != nil {
-		return err
+		return fmt.Errorf("failed to drop tables: %w", err)
 	}
 
 	creates := []string{
@@ -118,7 +118,7 @@ func setupHardcoded(db *sql.DB) error {
 		);`,
 	}
 	if err := createTables(db, creates); err != nil {
-		return err
+		return fmt.Errorf("failed to create tables: %w", err)
 	}
 
 	inserts := []string{
@@ -176,7 +176,7 @@ func setupHardcoded(db *sql.DB) error {
 		    ("Rok 1984", 1949, 312, 9, 9, 3);`,
 	}
 	if err := populateTables(db, inserts); err != nil {
-		return err
+		return fmt.Errorf("failed to populate tables: %w", err)
 	}
 
 	return nil

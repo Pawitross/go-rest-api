@@ -102,7 +102,7 @@ func getToken(t *testing.T, r *gin.Engine, adminToken bool) (string, bool) {
 func TestRoutes_NoAuth(t *testing.T) {
 	router := setupTestRouter()
 
-	routeTests := []struct {
+	noAuthRouteTests := []struct {
 		method   string
 		endpoint string
 		body     []byte
@@ -110,7 +110,7 @@ func TestRoutes_NoAuth(t *testing.T) {
 		{"GET", "/swagger/index.html", nil},
 	}
 
-	for _, tt := range routeTests {
+	for _, tt := range noAuthRouteTests {
 		t.Run(tt.method+tt.endpoint, func(t *testing.T) {
 			w := execRequest(router, tt.method, tt.endpoint, bytes.NewReader(tt.body), "")
 

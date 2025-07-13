@@ -7,14 +7,6 @@ import (
 	"pawrest/internal/models"
 )
 
-var genres = []models.Genre{
-	{Id: 1, Name: "Science fiction"},
-	{Id: 2, Name: "Dystopia"},
-	{Id: 3, Name: "Biografia"},
-	{Id: 4, Name: "Epopeja"},
-	{Id: 5, Name: "Nowela"},
-}
-
 func (m *MockDatabase) GetGenres(params url.Values) ([]models.Genre, error) {
 	allowedParams := map[string]string{
 		"id":   "id",
@@ -28,11 +20,11 @@ func (m *MockDatabase) GetGenres(params url.Values) ([]models.Genre, error) {
 		}
 	}
 
-	return genres, nil
+	return m.Genres, nil
 }
 
 func (m *MockDatabase) GetGenre(id int64) (models.Genre, error) {
-	for _, genre := range genres {
+	for _, genre := range m.Genres {
 		if genre.Id == id {
 			return genre, nil
 		}
@@ -42,17 +34,17 @@ func (m *MockDatabase) GetGenre(id int64) (models.Genre, error) {
 }
 
 func (m *MockDatabase) InsertGenre(g models.Genre) (int64, error) {
-	g.Id = int64(len(genres) + 1)
-	genres = append(genres, g)
+	g.Id = int64(len(m.Genres) + 1)
+	m.Genres = append(m.Genres, g)
 
 	return g.Id, nil
 }
 
 func (m *MockDatabase) UpdateWholeGenre(id int64, g models.Genre) error {
-	for i, genre := range genres {
+	for i, genre := range m.Genres {
 		if genre.Id == id {
-			genres[i] = g
-			genres[i].Id = id
+			m.Genres[i] = g
+			m.Genres[i].Id = id
 			return nil
 		}
 	}
@@ -61,9 +53,9 @@ func (m *MockDatabase) UpdateWholeGenre(id int64, g models.Genre) error {
 }
 
 func (m *MockDatabase) DelGenre(id int64) error {
-	for i, genre := range genres {
+	for i, genre := range m.Genres {
 		if genre.Id == id {
-			genres = append(genres[:i], genres[i+1:]...)
+			m.Genres = append(m.Genres[:i], m.Genres[i+1:]...)
 			return nil
 		}
 	}

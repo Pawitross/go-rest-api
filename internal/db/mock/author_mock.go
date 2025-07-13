@@ -7,12 +7,6 @@ import (
 	"pawrest/internal/models"
 )
 
-var authors = []models.Author{
-	{Id: 1, FirstName: "John", LastName: "Doe", BirthYear: 1949, DeathYear: models.I64Ptr(2023)},
-	{Id: 2, FirstName: "Alice", LastName: "Smith", BirthYear: 1988, DeathYear: nil},
-	{Id: 3, FirstName: "Richard", LastName: "Roe", BirthYear: 1921, DeathYear: models.I64Ptr(2009)},
-}
-
 func (m *MockDatabase) GetAuthors(params url.Values) ([]models.Author, error) {
 	allowedParams := map[string]string{
 		"id":         "id",
@@ -29,11 +23,11 @@ func (m *MockDatabase) GetAuthors(params url.Values) ([]models.Author, error) {
 		}
 	}
 
-	return authors, nil
+	return m.Authors, nil
 }
 
 func (m *MockDatabase) GetAuthor(id int64) (models.Author, error) {
-	for _, author := range authors {
+	for _, author := range m.Authors {
 		if author.Id == id {
 			return author, nil
 		}
@@ -43,17 +37,17 @@ func (m *MockDatabase) GetAuthor(id int64) (models.Author, error) {
 }
 
 func (m *MockDatabase) InsertAuthor(a models.Author) (int64, error) {
-	a.Id = int64(len(authors) + 1)
-	authors = append(authors, a)
+	a.Id = int64(len(m.Authors) + 1)
+	m.Authors = append(m.Authors, a)
 
 	return a.Id, nil
 }
 
 func (m *MockDatabase) UpdateWholeAuthor(id int64, a models.Author) error {
-	for i, author := range authors {
+	for i, author := range m.Authors {
 		if author.Id == id {
-			authors[i] = a
-			authors[i].Id = id
+			m.Authors[i] = a
+			m.Authors[i].Id = id
 			return nil
 		}
 	}
@@ -62,19 +56,19 @@ func (m *MockDatabase) UpdateWholeAuthor(id int64, a models.Author) error {
 }
 
 func (m *MockDatabase) UpdateAuthor(id int64, a models.Author) error {
-	for i, author := range authors {
+	for i, author := range m.Authors {
 		if author.Id == id {
 			if a.FirstName != "" {
-				authors[i].FirstName = a.FirstName
+				m.Authors[i].FirstName = a.FirstName
 			}
 			if a.LastName != "" {
-				authors[i].LastName = a.LastName
+				m.Authors[i].LastName = a.LastName
 			}
 			if a.BirthYear != 0 {
-				authors[i].BirthYear = a.BirthYear
+				m.Authors[i].BirthYear = a.BirthYear
 			}
 			if a.DeathYear != nil {
-				authors[i].DeathYear = a.DeathYear
+				m.Authors[i].DeathYear = a.DeathYear
 			}
 
 			return nil
@@ -85,9 +79,9 @@ func (m *MockDatabase) UpdateAuthor(id int64, a models.Author) error {
 }
 
 func (m *MockDatabase) DelAuthor(id int64) error {
-	for i, author := range authors {
+	for i, author := range m.Authors {
 		if author.Id == id {
-			authors = append(authors[:i], authors[i+1:]...)
+			m.Authors = append(m.Authors[:i], m.Authors[i+1:]...)
 			return nil
 		}
 	}

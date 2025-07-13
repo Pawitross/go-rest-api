@@ -26,7 +26,7 @@ func runMain(m *testing.M) (int, error) {
 	flag.Parse()
 
 	if testing.Short() {
-		database = &mock.MockDatabase{}
+		database = mock.NewMockDatabase()
 	} else {
 		cfg := &yamlconfig.Config{
 			DBUser: "root",

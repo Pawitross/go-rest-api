@@ -7,15 +7,6 @@ import (
 	"pawrest/internal/models"
 )
 
-var languages = []models.Language{
-	{Id: 1, Name: "Polski"},
-	{Id: 2, Name: "Angielski"},
-	{Id: 3, Name: "Łaciński"},
-	{Id: 4, Name: "Niemiecki"},
-	{Id: 5, Name: "Francuski"},
-	{Id: 6, Name: "Rosyjski"},
-}
-
 func (m *MockDatabase) GetLanguages(params url.Values) ([]models.Language, error) {
 	allowedParams := map[string]string{
 		"id":   "id",
@@ -29,11 +20,11 @@ func (m *MockDatabase) GetLanguages(params url.Values) ([]models.Language, error
 		}
 	}
 
-	return languages, nil
+	return m.Languages, nil
 }
 
 func (m *MockDatabase) GetLanguage(id int64) (models.Language, error) {
-	for _, language := range languages {
+	for _, language := range m.Languages {
 		if language.Id == id {
 			return language, nil
 		}
@@ -43,17 +34,17 @@ func (m *MockDatabase) GetLanguage(id int64) (models.Language, error) {
 }
 
 func (m *MockDatabase) InsertLanguage(l models.Language) (int64, error) {
-	l.Id = int64(len(languages) + 1)
-	languages = append(languages, l)
+	l.Id = int64(len(m.Languages) + 1)
+	m.Languages = append(m.Languages, l)
 
 	return l.Id, nil
 }
 
 func (m *MockDatabase) UpdateWholeLanguage(id int64, l models.Language) error {
-	for i, language := range languages {
+	for i, language := range m.Languages {
 		if language.Id == id {
-			languages[i] = l
-			languages[i].Id = id
+			m.Languages[i] = l
+			m.Languages[i].Id = id
 			return nil
 		}
 	}
@@ -62,9 +53,9 @@ func (m *MockDatabase) UpdateWholeLanguage(id int64, l models.Language) error {
 }
 
 func (m *MockDatabase) DelLanguage(id int64) error {
-	for i, language := range languages {
+	for i, language := range m.Languages {
 		if language.Id == id {
-			languages = append(languages[:i], languages[i+1:]...)
+			m.Languages = append(m.Languages[:i], m.Languages[i+1:]...)
 			return nil
 		}
 	}

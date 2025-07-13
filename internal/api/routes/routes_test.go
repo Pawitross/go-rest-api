@@ -56,7 +56,7 @@ var authRouteTests = []struct {
 }
 
 func setupTestRouter() *gin.Engine {
-	mockdb := &mock.MockDatabase{}
+	mockdb := mock.NewMockDatabase()
 
 	gin.SetMode(gin.TestMode)
 	r := gin.New()

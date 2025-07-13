@@ -7,33 +7,6 @@ import (
 	"pawrest/internal/models"
 )
 
-var books = []models.Book{
-	{Id: 1, Title: "Book 1", Year: 1999, Pages: 300, Author: 1, Genre: 1, Language: 1},
-	{Id: 2, Title: "Book 2", Year: 2005, Pages: 135, Author: 2, Genre: 1, Language: 2},
-	{Id: 3, Title: "Book 3", Year: 1863, Pages: 48, Author: 3, Genre: 2, Language: 3},
-}
-
-var booksExt = []models.BookExt{
-	{
-		Id: 1, Title: "Book 1", Year: 1999, Pages: 300,
-		Author:   models.Author{Id: 1, FirstName: "Adam", LastName: "Mickiewicz"},
-		Genre:    models.Genre{Id: 1, Name: "Nowela"},
-		Language: models.Language{Id: 1, Name: "Łaciński"},
-	},
-	{
-		Id: 2, Title: "Book 2", Year: 2005, Pages: 135,
-		Author:   models.Author{Id: 2, FirstName: "Witold", LastName: "Gombrowicz"},
-		Genre:    models.Genre{Id: 1, Name: "Nowela"},
-		Language: models.Language{Id: 2, Name: "Polski"},
-	},
-	{
-		Id: 3, Title: "Book 3", Year: 1863, Pages: 48,
-		Author:   models.Author{Id: 3, FirstName: "Bolesław", LastName: "Prus"},
-		Genre:    models.Genre{Id: 2, Name: "Epopeja"},
-		Language: models.Language{Id: 3, Name: "Angielski"},
-	},
-}
-
 func (m *MockDatabase) GetBooks(params url.Values) ([]models.Book, error) {
 	allowedParams := map[string]string{
 		"id":       "id",
@@ -52,7 +25,7 @@ func (m *MockDatabase) GetBooks(params url.Values) ([]models.Book, error) {
 		}
 	}
 
-	return books, nil
+	return m.Books, nil
 }
 
 func (m *MockDatabase) GetBooksExt(params url.Values) ([]models.BookExt, error) {
@@ -79,11 +52,11 @@ func (m *MockDatabase) GetBooksExt(params url.Values) ([]models.BookExt, error) 
 		}
 	}
 
-	return booksExt, nil
+	return m.BooksExt, nil
 }
 
 func (m *MockDatabase) GetBook(id int64) (models.Book, error) {
-	for _, book := range books {
+	for _, book := range m.Books {
 		if book.Id == id {
 			return book, nil
 		}
@@ -97,21 +70,21 @@ func (m *MockDatabase) InsertBook(b models.Book) (int64, error) {
 		return 0, db.ErrForeignKey
 	}
 
-	b.Id = int64(len(books) + 1)
-	books = append(books, b)
+	b.Id = int64(len(m.Books) + 1)
+	m.Books = append(m.Books, b)
 
 	return b.Id, nil
 }
 
 func (m *MockDatabase) UpdateWholeBook(id int64, b models.Book) error {
-	for i, book := range books {
+	for i, book := range m.Books {
 		if b.Language == 999 {
 			return db.ErrForeignKey
 		}
 
 		if book.Id == id {
-			books[i] = b
-			books[i].Id = id
+			m.Books[i] = b
+			m.Books[i].Id = id
 			return nil
 		}
 	}
@@ -120,29 +93,29 @@ func (m *MockDatabase) UpdateWholeBook(id int64, b models.Book) error {
 }
 
 func (m *MockDatabase) UpdateBook(id int64, b models.Book) error {
-	for i, book := range books {
+	for i, book := range m.Books {
 		if b.Language == 999 {
 			return db.ErrForeignKey
 		}
 
 		if book.Id == id {
 			if b.Title != "" {
-				books[i].Title = b.Title
+				m.Books[i].Title = b.Title
 			}
 			if b.Year != 0 {
-				books[i].Year = b.Year
+				m.Books[i].Year = b.Year
 			}
 			if b.Pages > 0 {
-				books[i].Pages = b.Pages
+				m.Books[i].Pages = b.Pages
 			}
 			if b.Author > 0 {
-				books[i].Author = b.Author
+				m.Books[i].Author = b.Author
 			}
 			if b.Genre > 0 {
-				books[i].Genre = b.Genre
+				m.Books[i].Genre = b.Genre
 			}
 			if b.Language > 0 {
-				books[i].Language = b.Language
+				m.Books[i].Language = b.Language
 			}
 
 			return nil
@@ -153,9 +126,9 @@ func (m *MockDatabase) UpdateBook(id int64, b models.Book) error {
 }
 
 func (m *MockDatabase) DelBook(id int64) error {
-	for i, book := range books {
+	for i, book := range m.Books {
 		if book.Id == id {
-			books = append(books[:i], books[i+1:]...)
+			m.Books = append(m.Books[:i], m.Books[i+1:]...)
 			return nil
 		}
 	}

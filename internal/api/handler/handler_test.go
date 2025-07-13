@@ -29,8 +29,8 @@ func runMain(m *testing.M) (int, error) {
 		database = mock.NewMockDatabase()
 	} else {
 		cfg := &yamlconfig.Config{
-			DBUser: "root",
-			DBPass: "",
+			DBUser: "user_test",
+			DBPass: "testpass",
 			DBName: "paw_test",
 			DBHost: "127.0.0.1",
 			DBPort: "3306",

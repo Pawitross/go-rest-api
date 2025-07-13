@@ -1,0 +1,8 @@
+CREATE DATABASE IF NOT EXISTS paw;
+CREATE DATABASE IF NOT EXISTS paw_test;
+
+CREATE USER IF NOT EXISTS 'user'@'%' IDENTIFIED BY 'userpass';
+GRANT ALL PRIVILEGES ON paw.* TO 'user'@'%';
+
+CREATE USER IF NOT EXISTS 'user_test'@'%' IDENTIFIED BY 'testpass';
+GRANT ALL PRIVILEGES ON paw_test.* TO 'user_test'@'%';

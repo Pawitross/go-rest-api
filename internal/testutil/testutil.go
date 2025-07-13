@@ -19,7 +19,7 @@ func SetupDatabase(db *sql.DB) error {
 }
 
 func setupFromScript(db *sql.DB) error {
-	data, err := os.ReadFile("../../../sql/init.sql")
+	data, err := os.ReadFile("../../../sql/02-schema.sql")
 	if err != nil {
 		return err
 	}

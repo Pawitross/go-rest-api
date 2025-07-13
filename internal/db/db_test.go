@@ -30,8 +30,8 @@ func runMain(m *testing.M) (int, error) {
 	}
 
 	cfg := &yamlconfig.Config{
-		DBUser: "root",
-		DBPass: "",
+		DBUser: "user_test",
+		DBPass: "testpass",
 		DBName: "paw_test",
 		DBHost: "127.0.0.1",
 		DBPort: "3306",

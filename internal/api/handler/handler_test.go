@@ -6,8 +6,10 @@ import (
 	"flag"
 	"io"
 	"log"
+	"net/http"
 	"net/http/httptest"
 	"os"
+	"strings"
 	"testing"
 
 	"github.com/gin-gonic/gin"
@@ -19,6 +21,12 @@ import (
 	"pawrest/internal/testutil"
 	"pawrest/internal/yamlconfig"
 )
+
+type ErrorTests struct {
+	body   []byte
+	query  string
+	status int
+}
 
 var database db.DatabaseInterface
 
@@ -78,6 +86,7 @@ func execAndCheckError(t *testing.T, method, url string, body []byte, status int
 }
 
 func setupTestRouter(db db.DatabaseInterface) *gin.Engine {
+	const secret = "random-string"
 	gin.SetMode(gin.TestMode)
 	router := gin.New()
 
@@ -131,7 +140,7 @@ func setupTestRouter(db db.DatabaseInterface) *gin.Engine {
 			languages.DELETE("/:id", h.DeleteLanguage)
 		}
 
-		apiv1.POST("login", handler.ReturnToken("random-string"))
+		apiv1.POST("login", handler.ReturnToken(secret))
 	}
 
 	return router
@@ -159,4 +168,32 @@ func marshalCheckNoError(t *testing.T, obj any) []byte {
 	assert.NoError(t, err, "JSON marshalling error")
 
 	return j
+}
+
+func runTestErrors(t *testing.T, method, resource string, tests map[string]ErrorTests) {
+	t.Helper()
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
+			fullUrl := "/api/v1/" + resource + tt.query
+			execAndCheckError(t, method, fullUrl, tt.body, tt.status)
+		})
+	}
+}
+
+func runTestOptionsSuccess(t *testing.T, resource string, tests map[string]struct {
+	query   string
+	methods []string
+}) {
+	t.Helper()
+	for name, tt := range tests {
+		t.Run(name, func(t *testing.T) {
+			fullUrl := "/api/v1/" + resource + tt.query
+			w := execAndCheck(t, "OPTIONS", fullUrl, nil, http.StatusNoContent, nil)
+
+			allowResp := w.Result().Header.Get("Allow")
+			splitAllow := strings.Split(allowResp, ", ")
+
+			assert.ElementsMatch(t, tt.methods, splitAllow)
+		})
+	}
 }

@@ -3,7 +3,6 @@ package handler_test
 import (
 	"fmt"
 	"net/http"
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -31,26 +30,20 @@ func TestGetLanguage_Success(t *testing.T) {
 }
 
 func TestGetLanguage_Error(t *testing.T) {
-	getTests := map[string]struct {
-		query  string
-		status int
-	}{
+	getTests := map[string]ErrorTests{
 		"NotFound_BigPathId": {
-			"/9999",
-			http.StatusNotFound,
+			body:   nil,
+			query:  "/9999",
+			status: http.StatusNotFound,
 		},
 		"BadRequest_StringPathId": {
-			"/string",
-			http.StatusBadRequest,
+			body:   nil,
+			query:  "/string",
+			status: http.StatusBadRequest,
 		},
 	}
 
-	for name, tt := range getTests {
-		t.Run(name, func(t *testing.T) {
-			fullUrl := "/api/v1/languages" + tt.query
-			execAndCheckError(t, "GET", fullUrl, nil, tt.status)
-		})
-	}
+	runTestErrors(t, "GET", "languages", getTests)
 }
 
 // POST /languages
@@ -77,24 +70,17 @@ func TestPostLanguage_BadRequest_MalformedJSON(t *testing.T) {
 }
 
 func TestPostLanguage_Error(t *testing.T) {
-	postTests := map[string]struct {
-		testLanguage models.Language
-		status       int
-	}{
+	postTests := map[string]ErrorTests{
 		"BadRequest_ValidationErr_EmptyName": {
-			models.Language{
+			body: marshalCheckNoError(t, models.Language{
 				Name: "",
-			},
-			http.StatusBadRequest,
+			}),
+			query:  "",
+			status: http.StatusBadRequest,
 		},
 	}
 
-	for name, tt := range postTests {
-		t.Run(name, func(t *testing.T) {
-			jsonLanguage := marshalCheckNoError(t, tt.testLanguage)
-			execAndCheckError(t, "POST", "/api/v1/languages", jsonLanguage, tt.status)
-		})
-	}
+	runTestErrors(t, "POST", "languages", postTests)
 }
 
 // PUT /languages/id
@@ -116,39 +102,29 @@ func TestPutLanguage_BadRequest_MalformedJSON(t *testing.T) {
 }
 
 func TestPutLanguage_Error(t *testing.T) {
-	putTests := map[string]struct {
-		testLanguage models.Language
-		query        string
-		status       int
-	}{
+	putTests := map[string]ErrorTests{
 		"NotFound_BigPathId": {
-			models.Language{
+			body: marshalCheckNoError(t, models.Language{
 				Name: "Put test",
-			},
-			"/9999",
-			http.StatusNotFound,
+			}),
+			query:  "/9999",
+			status: http.StatusNotFound,
 		},
 		"BadRequest_StringId": {
-			models.Language{
+			body: marshalCheckNoError(t, models.Language{
 				Name: "Put test",
-			},
-			"/string",
-			http.StatusBadRequest,
+			}),
+			query:  "/string",
+			status: http.StatusBadRequest,
 		},
 		"BadRequest_BadJSON": {
-			models.Language{},
-			"/1",
-			http.StatusBadRequest,
+			body:   marshalCheckNoError(t, models.Language{}),
+			query:  "/1",
+			status: http.StatusBadRequest,
 		},
 	}
 
-	for name, tt := range putTests {
-		t.Run(name, func(t *testing.T) {
-			fullUrl := "/api/v1/languages" + tt.query
-			jsonLanguage := marshalCheckNoError(t, tt.testLanguage)
-			execAndCheckError(t, "PUT", fullUrl, jsonLanguage, tt.status)
-		})
-	}
+	runTestErrors(t, "PUT", "languages", putTests)
 }
 
 // DELETE /languages/id
@@ -166,26 +142,20 @@ func TestDeleteLanguage_Success(t *testing.T) {
 }
 
 func TestDeleteLanguage_Error(t *testing.T) {
-	deleteTests := map[string]struct {
-		query  string
-		status int
-	}{
+	deleteTests := map[string]ErrorTests{
 		"NotFound_BigPathId": {
-			"/9999",
-			http.StatusNotFound,
+			body:   nil,
+			query:  "/9999",
+			status: http.StatusNotFound,
 		},
 		"BadRequest_StringPathId": {
-			"/string",
-			http.StatusBadRequest,
+			body:   nil,
+			query:  "/string",
+			status: http.StatusBadRequest,
 		},
 	}
 
-	for name, tt := range deleteTests {
-		t.Run(name, func(t *testing.T) {
-			fullUrl := "/api/v1/languages" + tt.query
-			execAndCheckError(t, "DELETE", fullUrl, nil, tt.status)
-		})
-	}
+	runTestErrors(t, "DELETE", "languages", deleteTests)
 }
 
 // OPTIONS /languages
@@ -205,15 +175,5 @@ func TestOptionsLanguages_Success(t *testing.T) {
 		},
 	}
 
-	for name, tt := range optionsTests {
-		t.Run(name, func(t *testing.T) {
-			fullUrl := "/api/v1/languages" + tt.query
-			w := execAndCheck(t, "OPTIONS", fullUrl, nil, http.StatusNoContent, nil)
-
-			allowResp := w.Result().Header.Get("Allow")
-			splitAllow := strings.Split(allowResp, ", ")
-
-			assert.ElementsMatch(t, tt.methods, splitAllow)
-		})
-	}
+	runTestOptionsSuccess(t, "languages", optionsTests)
 }

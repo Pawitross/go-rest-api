@@ -3,7 +3,6 @@ package handler_test
 import (
 	"fmt"
 	"net/http"
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -32,26 +31,20 @@ func TestGetAuthor_Success(t *testing.T) {
 }
 
 func TestGetAuthor_Error(t *testing.T) {
-	getTests := map[string]struct {
-		query  string
-		status int
-	}{
+	getTests := map[string]ErrorTests{
 		"NotFound_BigPathId": {
-			"/9999",
-			http.StatusNotFound,
+			body:   nil,
+			query:  "/9999",
+			status: http.StatusNotFound,
 		},
 		"BadRequest_StringPathId": {
-			"/string",
-			http.StatusBadRequest,
+			body:   nil,
+			query:  "/string",
+			status: http.StatusBadRequest,
 		},
 	}
 
-	for name, tt := range getTests {
-		t.Run(name, func(t *testing.T) {
-			fullUrl := "/api/v1/authors" + tt.query
-			execAndCheckError(t, "GET", fullUrl, nil, tt.status)
-		})
-	}
+	runTestErrors(t, "GET", "authors", getTests)
 }
 
 // POST /authors
@@ -84,36 +77,30 @@ func TestPostAuthor_BadRequest_MalformedJSON(t *testing.T) {
 }
 
 func TestPostAuthor_Error(t *testing.T) {
-	postTests := map[string]struct {
-		testAuthor models.Author
-		status     int
-	}{
+	postTests := map[string]ErrorTests{
 		"BadRequest_ValidationErr_EmptyName": {
-			models.Author{
+			body: marshalCheckNoError(t, models.Author{
 				FirstName: "",
 				LastName:  "test",
 				BirthYear: 1970,
 				DeathYear: models.I64Ptr(2043),
-			},
-			http.StatusBadRequest,
+			}),
+			query:  "",
+			status: http.StatusBadRequest,
 		},
 		"BadRequest_ValidationErr_BirthGreaterThanDeath": {
-			models.Author{
+			body: marshalCheckNoError(t, models.Author{
 				FirstName: "",
 				LastName:  "test",
 				BirthYear: 2000,
 				DeathYear: models.I64Ptr(1900),
-			},
-			http.StatusBadRequest,
+			}),
+			query:  "",
+			status: http.StatusBadRequest,
 		},
 	}
 
-	for name, tt := range postTests {
-		t.Run(name, func(t *testing.T) {
-			jsonAuthor := marshalCheckNoError(t, tt.testAuthor)
-			execAndCheckError(t, "POST", "/api/v1/authors", jsonAuthor, tt.status)
-		})
-	}
+	runTestErrors(t, "POST", "authors", postTests)
 }
 
 // PUT /authors/id
@@ -141,47 +128,37 @@ func TestPutAuthor_BadRequest_MalformedJSON(t *testing.T) {
 }
 
 func TestPutAuthor_Error(t *testing.T) {
-	putTests := map[string]struct {
-		testAuthor models.Author
-		query      string
-		status     int
-	}{
+	putTests := map[string]ErrorTests{
 		"NotFound_BigPathId": {
-			models.Author{
+			body: marshalCheckNoError(t, models.Author{
 				FirstName: "Put",
 				LastName:  "test",
 				BirthYear: 1970,
 				DeathYear: models.I64Ptr(2043),
-			},
-			"/9999",
-			http.StatusNotFound,
+			}),
+			query:  "/9999",
+			status: http.StatusNotFound,
 		},
 		"BadRequest_StringId": {
-			models.Author{
+			body: marshalCheckNoError(t, models.Author{
 				FirstName: "Put",
 				LastName:  "test",
 				BirthYear: 1970,
 				DeathYear: models.I64Ptr(2043),
-			},
-			"/string",
-			http.StatusBadRequest,
+			}),
+			query:  "/string",
+			status: http.StatusBadRequest,
 		},
 		"BadRequest_BadJSON": {
-			models.Author{
+			body: marshalCheckNoError(t, models.Author{
 				FirstName: "Put",
-			},
-			"/1",
-			http.StatusBadRequest,
+			}),
+			query:  "/1",
+			status: http.StatusBadRequest,
 		},
 	}
 
-	for name, tt := range putTests {
-		t.Run(name, func(t *testing.T) {
-			fullUrl := "/api/v1/authors" + tt.query
-			jsonAuthor := marshalCheckNoError(t, tt.testAuthor)
-			execAndCheckError(t, "PUT", fullUrl, jsonAuthor, tt.status)
-		})
-	}
+	runTestErrors(t, "PUT", "authors", putTests)
 }
 
 // PATCH /authors/id
@@ -197,34 +174,25 @@ func TestPatchAuthor_Success(t *testing.T) {
 }
 
 func TestPatchAuthor_Error(t *testing.T) {
-	patchTests := map[string]struct {
-		jsonStr string
-		query   string
-		status  int
-	}{
+	patchTests := map[string]ErrorTests{
 		"NotFound_BigPathId": {
-			`{"first_name":"Patch test"}`,
-			"/9999",
-			http.StatusNotFound,
+			body:   []byte(`{"first_name":"Patch test"}`),
+			query:  "/9999",
+			status: http.StatusNotFound,
 		},
 		"BadRequest_StringPathId": {
-			`{"first_name":"Patch test"}`,
-			"/string",
-			http.StatusBadRequest,
+			body:   []byte(`{"first_name":"Patch test"}`),
+			query:  "/string",
+			status: http.StatusBadRequest,
 		},
 		"BadRequest_BadJSON": {
-			`{"first_name":9999999}`,
-			"/1",
-			http.StatusBadRequest,
+			body:   []byte(`{"first_name":9999999}`),
+			query:  "/1",
+			status: http.StatusBadRequest,
 		},
 	}
 
-	for name, tt := range patchTests {
-		t.Run(name, func(t *testing.T) {
-			fullUrl := "/api/v1/authors" + tt.query
-			execAndCheckError(t, "PATCH", fullUrl, []byte(tt.jsonStr), tt.status)
-		})
-	}
+	runTestErrors(t, "PATCH", "authors", patchTests)
 }
 
 // DELETE /authors/id
@@ -245,26 +213,20 @@ func TestDeleteAuthor_Success(t *testing.T) {
 }
 
 func TestDeleteAuthor_Error(t *testing.T) {
-	deleteTests := map[string]struct {
-		query  string
-		status int
-	}{
+	deleteTests := map[string]ErrorTests{
 		"NotFound_BigPathId": {
-			"/9999",
-			http.StatusNotFound,
+			body:   nil,
+			query:  "/9999",
+			status: http.StatusNotFound,
 		},
 		"BadRequest_StringPathId": {
-			"/string",
-			http.StatusBadRequest,
+			body:   nil,
+			query:  "/string",
+			status: http.StatusBadRequest,
 		},
 	}
 
-	for name, tt := range deleteTests {
-		t.Run(name, func(t *testing.T) {
-			fullUrl := "/api/v1/authors" + tt.query
-			execAndCheckError(t, "DELETE", fullUrl, nil, tt.status)
-		})
-	}
+	runTestErrors(t, "DELETE", "authors", deleteTests)
 }
 
 // OPTIONS /authors
@@ -284,15 +246,5 @@ func TestOptionsAuthors_Success(t *testing.T) {
 		},
 	}
 
-	for name, tt := range optionsTests {
-		t.Run(name, func(t *testing.T) {
-			fullUrl := "/api/v1/authors" + tt.query
-			w := execAndCheck(t, "OPTIONS", fullUrl, nil, http.StatusNoContent, nil)
-
-			allowResp := w.Result().Header.Get("Allow")
-			splitAllow := strings.Split(allowResp, ", ")
-
-			assert.ElementsMatch(t, tt.methods, splitAllow)
-		})
-	}
+	runTestOptionsSuccess(t, "authors", optionsTests)
 }

@@ -3,7 +3,6 @@ package handler_test
 import (
 	"fmt"
 	"net/http"
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -31,26 +30,20 @@ func TestGetGenre_Success(t *testing.T) {
 }
 
 func TestGetGenre_Error(t *testing.T) {
-	getTests := map[string]struct {
-		query  string
-		status int
-	}{
+	getTests := map[string]ErrorTests{
 		"NotFound_BigPathId": {
-			"/9999",
-			http.StatusNotFound,
+			body:   nil,
+			query:  "/9999",
+			status: http.StatusNotFound,
 		},
 		"BadRequest_StringPathId": {
-			"/string",
-			http.StatusBadRequest,
+			body:   nil,
+			query:  "/string",
+			status: http.StatusBadRequest,
 		},
 	}
 
-	for name, tt := range getTests {
-		t.Run(name, func(t *testing.T) {
-			fullUrl := "/api/v1/genres" + tt.query
-			execAndCheckError(t, "GET", fullUrl, nil, tt.status)
-		})
-	}
+	runTestErrors(t, "GET", "genres", getTests)
 }
 
 // POST /genres
@@ -77,24 +70,17 @@ func TestPostGenre_BadRequest_MalformedJSON(t *testing.T) {
 }
 
 func TestPostGenre_Error(t *testing.T) {
-	postTests := map[string]struct {
-		testGenre models.Genre
-		status    int
-	}{
+	postTests := map[string]ErrorTests{
 		"BadRequest_ValidationErr_EmptyName": {
-			models.Genre{
+			body: marshalCheckNoError(t, models.Genre{
 				Name: "",
-			},
-			http.StatusBadRequest,
+			}),
+			query:  "",
+			status: http.StatusBadRequest,
 		},
 	}
 
-	for name, tt := range postTests {
-		t.Run(name, func(t *testing.T) {
-			jsonGenre := marshalCheckNoError(t, tt.testGenre)
-			execAndCheckError(t, "POST", "/api/v1/genres", jsonGenre, tt.status)
-		})
-	}
+	runTestErrors(t, "POST", "genres", postTests)
 }
 
 // PUT /genres/id
@@ -116,39 +102,29 @@ func TestPutGenre_BadRequest_MalformedJSON(t *testing.T) {
 }
 
 func TestPutGenre_Error(t *testing.T) {
-	putTests := map[string]struct {
-		testGenre models.Genre
-		query     string
-		status    int
-	}{
+	putTests := map[string]ErrorTests{
 		"NotFound_BigPathId": {
-			models.Genre{
+			body: marshalCheckNoError(t, models.Genre{
 				Name: "Put test",
-			},
-			"/9999",
-			http.StatusNotFound,
+			}),
+			query:  "/9999",
+			status: http.StatusNotFound,
 		},
 		"BadRequest_StringId": {
-			models.Genre{
+			body: marshalCheckNoError(t, models.Genre{
 				Name: "Put test",
-			},
-			"/string",
-			http.StatusBadRequest,
+			}),
+			query:  "/string",
+			status: http.StatusBadRequest,
 		},
 		"BadRequest_BadJSON": {
-			models.Genre{},
-			"/1",
-			http.StatusBadRequest,
+			body:   marshalCheckNoError(t, models.Genre{}),
+			query:  "/1",
+			status: http.StatusBadRequest,
 		},
 	}
 
-	for name, tt := range putTests {
-		t.Run(name, func(t *testing.T) {
-			fullUrl := "/api/v1/genres" + tt.query
-			jsonGenre := marshalCheckNoError(t, tt.testGenre)
-			execAndCheckError(t, "PUT", fullUrl, jsonGenre, tt.status)
-		})
-	}
+	runTestErrors(t, "PUT", "genres", putTests)
 }
 
 // DELETE /genres/id
@@ -166,26 +142,20 @@ func TestDeleteGenre_Success(t *testing.T) {
 }
 
 func TestDeleteGenre_Error(t *testing.T) {
-	deleteTests := map[string]struct {
-		query  string
-		status int
-	}{
+	deleteTests := map[string]ErrorTests{
 		"NotFound_BigPathId": {
-			"/9999",
-			http.StatusNotFound,
+			body:   nil,
+			query:  "/9999",
+			status: http.StatusNotFound,
 		},
 		"BadRequest_StringPathId": {
-			"/string",
-			http.StatusBadRequest,
+			body:   nil,
+			query:  "/string",
+			status: http.StatusBadRequest,
 		},
 	}
 
-	for name, tt := range deleteTests {
-		t.Run(name, func(t *testing.T) {
-			fullUrl := "/api/v1/genres" + tt.query
-			execAndCheckError(t, "DELETE", fullUrl, nil, tt.status)
-		})
-	}
+	runTestErrors(t, "DELETE", "genres", deleteTests)
 }
 
 // OPTIONS /genres
@@ -205,15 +175,5 @@ func TestOptionsGenres_Success(t *testing.T) {
 		},
 	}
 
-	for name, tt := range optionsTests {
-		t.Run(name, func(t *testing.T) {
-			fullUrl := "/api/v1/genres" + tt.query
-			w := execAndCheck(t, "OPTIONS", fullUrl, nil, http.StatusNoContent, nil)
-
-			allowResp := w.Result().Header.Get("Allow")
-			splitAllow := strings.Split(allowResp, ", ")
-
-			assert.ElementsMatch(t, tt.methods, splitAllow)
-		})
-	}
+	runTestOptionsSuccess(t, "genres", optionsTests)
 }

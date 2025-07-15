@@ -3,7 +3,6 @@ package handler_test
 import (
 	"fmt"
 	"net/http"
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -41,26 +40,20 @@ func TestGetBook_Success(t *testing.T) {
 }
 
 func TestGetBook_Error(t *testing.T) {
-	getTests := map[string]struct {
-		query  string
-		status int
-	}{
+	getTests := map[string]ErrorTests{
 		"NotFound_BigPathId": {
-			"/9999",
-			http.StatusNotFound,
+			body:   nil,
+			query:  "/9999",
+			status: http.StatusNotFound,
 		},
 		"BadRequest_StringPathId": {
-			"/string",
-			http.StatusBadRequest,
+			body:   nil,
+			query:  "/string",
+			status: http.StatusBadRequest,
 		},
 	}
 
-	for name, tt := range getTests {
-		t.Run(name, func(t *testing.T) {
-			fullUrl := "/api/v1/books" + tt.query
-			execAndCheckError(t, "GET", fullUrl, nil, tt.status)
-		})
-	}
+	runTestErrors(t, "GET", "books", getTests)
 }
 
 // POST /books
@@ -97,40 +90,34 @@ func TestPostBook_BadRequest_MalformedJSON(t *testing.T) {
 }
 
 func TestPostBook_Error(t *testing.T) {
-	postTests := map[string]struct {
-		testBook models.Book
-		status   int
-	}{
+	postTests := map[string]ErrorTests{
 		"BadRequest_ValidationErr": {
-			models.Book{
+			body: marshalCheckNoError(t, models.Book{
 				Title:    "",
 				Year:     1996,
 				Pages:    200,
 				Author:   1,
 				Genre:    1,
 				Language: 1,
-			},
-			http.StatusBadRequest,
+			}),
+			query:  "",
+			status: http.StatusBadRequest,
 		},
 		"BadRequest_ForeignKeyErr": {
-			models.Book{
+			body: marshalCheckNoError(t, models.Book{
 				Title:    "Post foreign key test",
 				Year:     1996,
 				Pages:    200,
 				Author:   1,
 				Genre:    1,
 				Language: 999,
-			},
-			http.StatusBadRequest,
+			}),
+			query:  "",
+			status: http.StatusBadRequest,
 		},
 	}
 
-	for name, tt := range postTests {
-		t.Run(name, func(t *testing.T) {
-			jsonBook := marshalCheckNoError(t, tt.testBook)
-			execAndCheckError(t, "POST", "/api/v1/books", jsonBook, tt.status)
-		})
-	}
+	runTestErrors(t, "POST", "books", postTests)
 }
 
 // PUT /books/id
@@ -162,65 +149,55 @@ func TestPutBook_BadRequest_MalformedJSON(t *testing.T) {
 }
 
 func TestPutBook_Error(t *testing.T) {
-	putTests := map[string]struct {
-		testBook models.Book
-		query    string
-		status   int
-	}{
+	putTests := map[string]ErrorTests{
 		"NotFound_BigPathId": {
-			models.Book{
+			body: marshalCheckNoError(t, models.Book{
 				Title:    "Put book test",
 				Year:     1996,
 				Pages:    593,
 				Author:   1,
 				Genre:    1,
 				Language: 1,
-			},
-			"/9999",
-			http.StatusNotFound,
+			}),
+			query:  "/9999",
+			status: http.StatusNotFound,
 		},
 		"BadRequest_ForeignKeyErr": {
-			models.Book{
+			body: marshalCheckNoError(t, models.Book{
 				Title:    "Put foreign key test",
 				Year:     1996,
 				Pages:    593,
 				Author:   1,
 				Genre:    1,
 				Language: 999,
-			},
-			"/1",
-			http.StatusBadRequest,
+			}),
+			query:  "/1",
+			status: http.StatusBadRequest,
 		},
 		"BadRequest_StringId": {
-			models.Book{
+			body: marshalCheckNoError(t, models.Book{
 				Title:    "Put book test",
 				Year:     1996,
 				Pages:    593,
 				Author:   1,
 				Genre:    1,
 				Language: 1,
-			},
-			"/string",
-			http.StatusBadRequest,
+			}),
+			query:  "/string",
+			status: http.StatusBadRequest,
 		},
 		"BadRequest_BadJSON": {
-			models.Book{
+			body: marshalCheckNoError(t, models.Book{
 				Title: "Put book test",
 				Year:  1996,
 				Pages: 593,
-			},
-			"/1",
-			http.StatusBadRequest,
+			}),
+			query:  "/1",
+			status: http.StatusBadRequest,
 		},
 	}
 
-	for name, tt := range putTests {
-		t.Run(name, func(t *testing.T) {
-			fullUrl := "/api/v1/books" + tt.query
-			jsonBook := marshalCheckNoError(t, tt.testBook)
-			execAndCheckError(t, "PUT", fullUrl, jsonBook, tt.status)
-		})
-	}
+	runTestErrors(t, "PUT", "books", putTests)
 }
 
 // PATCH /books/id
@@ -234,34 +211,25 @@ func TestPatchBook_Success(t *testing.T) {
 }
 
 func TestPatchBook_Error(t *testing.T) {
-	patchTests := map[string]struct {
-		jsonStr string
-		query   string
-		status  int
-	}{
+	patchTests := map[string]ErrorTests{
 		"NotFound_BigPathId": {
-			`{"title":"Patch book test", "pages":999}`,
-			"/9999",
-			http.StatusNotFound,
+			body:   []byte(`{"title":"Patch book test", "pages":999}`),
+			query:  "/9999",
+			status: http.StatusNotFound,
 		},
 		"BadRequest_StringPathId": {
-			`{"title":"Patch book test", "pages":999}`,
-			"/string",
-			http.StatusBadRequest,
+			body:   []byte(`{"title":"Patch book test", "pages":999}`),
+			query:  "/string",
+			status: http.StatusBadRequest,
 		},
 		"BadRequest_BadJSON": {
-			`{"title":"Patch book test", "pages":Should be number"}`,
-			"/1",
-			http.StatusBadRequest,
+			body:   []byte(`{"title":"Patch book test", "pages":Should be number"}`),
+			query:  "/1",
+			status: http.StatusBadRequest,
 		},
 	}
 
-	for name, tt := range patchTests {
-		t.Run(name, func(t *testing.T) {
-			fullUrl := "/api/v1/books" + tt.query
-			execAndCheckError(t, "PATCH", fullUrl, []byte(tt.jsonStr), tt.status)
-		})
-	}
+	runTestErrors(t, "PATCH", "books", patchTests)
 }
 
 // DELETE /books/id
@@ -273,26 +241,20 @@ func TestDeleteBook_Success(t *testing.T) {
 }
 
 func TestDeleteBook_Error(t *testing.T) {
-	deleteTests := map[string]struct {
-		query  string
-		status int
-	}{
+	deleteTests := map[string]ErrorTests{
 		"NotFound_BigPathId": {
-			"/9999",
-			http.StatusNotFound,
+			body:   nil,
+			query:  "/9999",
+			status: http.StatusNotFound,
 		},
 		"BadRequest_StringPathId": {
-			"/string",
-			http.StatusBadRequest,
+			body:   nil,
+			query:  "/string",
+			status: http.StatusBadRequest,
 		},
 	}
 
-	for name, tt := range deleteTests {
-		t.Run(name, func(t *testing.T) {
-			fullUrl := "/api/v1/books" + tt.query
-			execAndCheckError(t, "DELETE", fullUrl, nil, tt.status)
-		})
-	}
+	runTestErrors(t, "DELETE", "books", deleteTests)
 }
 
 // OPTIONS /books
@@ -312,15 +274,5 @@ func TestOptionsBooks_Success(t *testing.T) {
 		},
 	}
 
-	for name, tt := range optionsTests {
-		t.Run(name, func(t *testing.T) {
-			fullUrl := "/api/v1/books" + tt.query
-			w := execAndCheck(t, "OPTIONS", fullUrl, nil, http.StatusNoContent, nil)
-
-			allowResp := w.Result().Header.Get("Allow")
-			splitAllow := strings.Split(allowResp, ", ")
-
-			assert.ElementsMatch(t, tt.methods, splitAllow)
-		})
-	}
+	runTestOptionsSuccess(t, "books", optionsTests)
 }

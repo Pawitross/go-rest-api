@@ -56,14 +56,14 @@ var authRouteTests = []struct {
 }
 
 func setupTestRouter() *gin.Engine {
+	cfg := &yamlconfig.Config{
+		Secret: "secret-jwt-string",
+	}
+
 	mockdb := mock.NewMockDatabase()
 
 	gin.SetMode(gin.TestMode)
 	r := gin.New()
-
-	cfg := &yamlconfig.Config{
-		Secret: "secret-jwt-string",
-	}
 
 	routes.Router(r, mockdb, cfg)
 	return r
@@ -81,12 +81,11 @@ func execRequest(r *gin.Engine, method, target string, body io.Reader, authHeade
 }
 
 func getToken(t *testing.T, r *gin.Engine, adminToken bool) (string, bool) {
-	jsonIn := []byte(nil)
+	t.Helper()
+	jsonIn := []byte(`{"return_admin_token":false}`)
 
 	if adminToken {
 		jsonIn = []byte(`{"return_admin_token":true}`)
-	} else {
-		jsonIn = []byte(`{"return_admin_token":false}`)
 	}
 
 	w := execRequest(r, "POST", "/api/v1/login", bytes.NewReader(jsonIn), "")
@@ -113,7 +112,6 @@ func TestRoutes_NoAuth(t *testing.T) {
 	for _, tt := range noAuthRouteTests {
 		t.Run(tt.method+tt.endpoint, func(t *testing.T) {
 			w := execRequest(router, tt.method, tt.endpoint, bytes.NewReader(tt.body), "")
-
 			assert.Equal(t, http.StatusOK, w.Code)
 		})
 	}
@@ -125,7 +123,6 @@ func TestRoutes_NoToken(t *testing.T) {
 	for _, tt := range authRouteTests {
 		t.Run(tt.method+tt.endpoint, func(t *testing.T) {
 			w := execRequest(router, tt.method, tt.endpoint, bytes.NewReader(tt.body), "")
-
 			assert.Equal(t, http.StatusUnauthorized, w.Code)
 		})
 	}

@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/csv"
 	"errors"
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -17,27 +16,6 @@ import (
 	"pawrest/internal/api/middleware"
 )
 
-func runMain(m *testing.M) (int, error) {
-	defer func() {
-		if exists, _ := fileExists("log.csv"); exists {
-			if err := os.Remove("log.csv"); err != nil {
-				log.Println(err)
-			}
-		}
-	}()
-
-	return m.Run(), nil
-}
-
-func TestMain(m *testing.M) {
-	code, err := runMain(m)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	os.Exit(code)
-}
-
 func fileExists(fName string) (bool, error) {
 	if _, err := os.Stat(fName); err != nil {
 		if errors.Is(err, os.ErrNotExist) {
@@ -46,6 +24,15 @@ func fileExists(fName string) (bool, error) {
 		return false, err
 	}
 	return true, nil
+}
+
+func removeLogFile(t *testing.T) {
+	t.Helper()
+	if exists, _ := fileExists("log.csv"); exists {
+		if err := os.Remove("log.csv"); err != nil {
+			t.Errorf("Failed to remove log file: %v", err)
+		}
+	}
 }
 
 func setupTestLoggingRouter() *gin.Engine {
@@ -64,6 +51,7 @@ func TestLogFileCreation(t *testing.T) {
 	if err := middleware.InitLogger(); err != nil {
 		t.Fatalf("Failed to initialize logging middleware: %v\n", err)
 	}
+	defer removeLogFile(t)
 	defer middleware.CloseLogger()
 
 	exists, err := fileExists("log.csv")
@@ -80,6 +68,7 @@ func TestLogging(t *testing.T) {
 	if err := middleware.InitLogger(); err != nil {
 		t.Fatalf("Failed to initialize logging middleware: %v\n", err)
 	}
+	defer removeLogFile(t)
 	defer middleware.CloseLogger()
 
 	router := setupTestLoggingRouter()

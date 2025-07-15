@@ -15,9 +15,9 @@ import (
 )
 
 func setupTestAuthRouter() *gin.Engine {
+	const secret = "secret"
 	gin.SetMode(gin.TestMode)
 	router := gin.New()
-	secret := "secret"
 
 	router.GET("/authenticate", middleware.Authenticate(secret), func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"message": "You're in!"})
@@ -33,12 +33,11 @@ func setupTestAuthRouter() *gin.Engine {
 }
 
 func getToken(t *testing.T, r *gin.Engine, adminToken bool) string {
-	jsonIn := []byte(nil)
+	t.Helper()
+	jsonIn := []byte(`{"return_admin_token":false}`)
 
 	if adminToken {
 		jsonIn = []byte(`{"return_admin_token":true}`)
-	} else {
-		jsonIn = []byte(`{"return_admin_token":false}`)
 	}
 
 	w := httptest.NewRecorder()
@@ -54,8 +53,7 @@ func getToken(t *testing.T, r *gin.Engine, adminToken bool) string {
 
 func TestAuthentication(t *testing.T) {
 	router := setupTestAuthRouter()
-
-	token := getToken(t, router, false)
+	validToken := getToken(t, router, false)
 
 	authTests := map[string]struct {
 		header string
@@ -88,7 +86,7 @@ func TestAuthentication(t *testing.T) {
 			"Token has expired",
 		},
 		"ValidToken": {
-			"Bearer " + token,
+			"Bearer " + validToken,
 			http.StatusOK,
 			"",
 		},

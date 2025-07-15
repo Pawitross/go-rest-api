@@ -1,7 +1,6 @@
 package handler_test
 
 import (
-	"bytes"
 	"fmt"
 	"net/http"
 	"strings"
@@ -64,12 +63,9 @@ func TestPostAuthor_Success(t *testing.T) {
 		DeathYear: models.I64Ptr(2043),
 	}
 
-	jsonAuthor := marshalCheckNoError(t, testAuthor)
-	w := execRequest("POST", "/api/v1/authors", bytes.NewReader(jsonAuthor))
-	assert.Equal(t, http.StatusCreated, w.Code)
-
 	var rAuthor models.Author
-	decodeJSONBodyCheckEmpty(w, t, &rAuthor)
+	jsonAuthor := marshalCheckNoError(t, testAuthor)
+	w := execAndCheck(t, "POST", "/api/v1/authors", jsonAuthor, http.StatusCreated, &rAuthor)
 	defer database.DelAuthor(rAuthor.Id)
 
 	expLoc := fmt.Sprintf("/api/v1/authors/%v", rAuthor.Id)
@@ -291,9 +287,7 @@ func TestOptionsAuthors_Success(t *testing.T) {
 	for name, tt := range optionsTests {
 		t.Run(name, func(t *testing.T) {
 			fullUrl := "/api/v1/authors" + tt.query
-
-			w := execRequest("OPTIONS", fullUrl, nil)
-			assert.Equal(t, http.StatusNoContent, w.Code)
+			w := execAndCheck(t, "OPTIONS", fullUrl, nil, http.StatusNoContent, nil)
 
 			allowResp := w.Result().Header.Get("Allow")
 			splitAllow := strings.Split(allowResp, ", ")

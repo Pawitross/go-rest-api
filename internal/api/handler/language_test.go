@@ -1,7 +1,6 @@
 package handler_test
 
 import (
-	"bytes"
 	"fmt"
 	"net/http"
 	"strings"
@@ -60,12 +59,9 @@ func TestPostLanguage_Success(t *testing.T) {
 		Name: "Post test",
 	}
 
-	jsonLanguage := marshalCheckNoError(t, testLanguage)
-	w := execRequest("POST", "/api/v1/languages", bytes.NewReader(jsonLanguage))
-	assert.Equal(t, http.StatusCreated, w.Code)
-
 	var rLanguage models.Language
-	decodeJSONBodyCheckEmpty(w, t, &rLanguage)
+	jsonLanguage := marshalCheckNoError(t, testLanguage)
+	w := execAndCheck(t, "POST", "/api/v1/languages", jsonLanguage, http.StatusCreated, &rLanguage)
 	defer database.DelLanguage(rLanguage.Id)
 
 	expLoc := fmt.Sprintf("/api/v1/languages/%v", rLanguage.Id)
@@ -212,9 +208,7 @@ func TestOptionsLanguages_Success(t *testing.T) {
 	for name, tt := range optionsTests {
 		t.Run(name, func(t *testing.T) {
 			fullUrl := "/api/v1/languages" + tt.query
-
-			w := execRequest("OPTIONS", fullUrl, nil)
-			assert.Equal(t, http.StatusNoContent, w.Code)
+			w := execAndCheck(t, "OPTIONS", fullUrl, nil, http.StatusNoContent, nil)
 
 			allowResp := w.Result().Header.Get("Allow")
 			splitAllow := strings.Split(allowResp, ", ")

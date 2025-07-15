@@ -1,7 +1,6 @@
 package handler_test
 
 import (
-	"bytes"
 	"fmt"
 	"net/http"
 	"strings"
@@ -60,12 +59,9 @@ func TestPostGenre_Success(t *testing.T) {
 		Name: "Post test",
 	}
 
-	jsonGenre := marshalCheckNoError(t, testGenre)
-	w := execRequest("POST", "/api/v1/genres", bytes.NewReader(jsonGenre))
-	assert.Equal(t, http.StatusCreated, w.Code)
-
 	var rGenre models.Genre
-	decodeJSONBodyCheckEmpty(w, t, &rGenre)
+	jsonGenre := marshalCheckNoError(t, testGenre)
+	w := execAndCheck(t, "POST", "/api/v1/genres", jsonGenre, http.StatusCreated, &rGenre)
 	defer database.DelGenre(rGenre.Id)
 
 	expLoc := fmt.Sprintf("/api/v1/genres/%v", rGenre.Id)
@@ -212,9 +208,7 @@ func TestOptionsGenres_Success(t *testing.T) {
 	for name, tt := range optionsTests {
 		t.Run(name, func(t *testing.T) {
 			fullUrl := "/api/v1/genres" + tt.query
-
-			w := execRequest("OPTIONS", fullUrl, nil)
-			assert.Equal(t, http.StatusNoContent, w.Code)
+			w := execAndCheck(t, "OPTIONS", fullUrl, nil, http.StatusNoContent, nil)
 
 			allowResp := w.Result().Header.Get("Allow")
 			splitAllow := strings.Split(allowResp, ", ")

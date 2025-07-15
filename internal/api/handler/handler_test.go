@@ -60,20 +60,21 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
-func execAndCheck(t *testing.T, method, url string, body []byte, status int, o any) {
+func execAndCheck(t *testing.T, method, url string, body []byte, status int, o any) *httptest.ResponseRecorder {
+	t.Helper()
 	w := execRequest(method, url, bytes.NewReader(body))
 	assert.Equal(t, status, w.Code)
 
 	if o != nil {
-		decodeJSONBodyCheckEmpty(w, t, o)
+		decodeJSONBodyCheckEmpty(t, w, o)
 	}
+
+	return w
 }
 
 func execAndCheckError(t *testing.T, method, url string, body []byte, status int) {
-	w := execRequest(method, url, bytes.NewReader(body))
-	assert.Equal(t, status, w.Code)
-
-	checkErrorBodyNotEmpty(w, t)
+	var rError models.Error
+	execAndCheck(t, method, url, body, status, &rError)
 }
 
 func setupTestRouter(db db.DatabaseInterface) *gin.Engine {
@@ -142,24 +143,20 @@ func execRequest(method, target string, body io.Reader) *httptest.ResponseRecord
 	req := httptest.NewRequest(method, target, body)
 
 	router.ServeHTTP(w, req)
-
 	return w
 }
 
-func marshalCheckNoError(t *testing.T, obj any) []byte {
-	j, err := json.Marshal(obj)
-	assert.NoError(t, err, "JSON marshalling error")
-
-	return j
-}
-
-func decodeJSONBodyCheckEmpty(w *httptest.ResponseRecorder, t *testing.T, obj any) {
+func decodeJSONBodyCheckEmpty(t *testing.T, w *httptest.ResponseRecorder, obj any) {
+	t.Helper()
 	err := json.NewDecoder(w.Body).Decode(obj)
 	assert.NoError(t, err, "Error decoding response data:", err)
 	assert.NotEmpty(t, obj, "Obj should not be empty")
 }
 
-func checkErrorBodyNotEmpty(w *httptest.ResponseRecorder, t *testing.T) {
-	var rError models.Error
-	decodeJSONBodyCheckEmpty(w, t, &rError)
+func marshalCheckNoError(t *testing.T, obj any) []byte {
+	t.Helper()
+	j, err := json.Marshal(obj)
+	assert.NoError(t, err, "JSON marshalling error")
+
+	return j
 }

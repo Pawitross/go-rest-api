@@ -1,7 +1,6 @@
 package handler_test
 
 import (
-	"bytes"
 	"fmt"
 	"net/http"
 	"strings"
@@ -75,12 +74,9 @@ func TestPostBook_Success(t *testing.T) {
 		Language: 1,
 	}
 
-	jsonBook := marshalCheckNoError(t, testBook)
-	w := execRequest("POST", "/api/v1/books", bytes.NewReader(jsonBook))
-	assert.Equal(t, http.StatusCreated, w.Code)
-
 	var rBook models.Book
-	decodeJSONBodyCheckEmpty(w, t, &rBook)
+	jsonBook := marshalCheckNoError(t, testBook)
+	w := execAndCheck(t, "POST", "/api/v1/books", jsonBook, http.StatusCreated, &rBook)
 	defer database.DelBook(rBook.Id)
 
 	expLoc := fmt.Sprintf("/api/v1/books/%v", rBook.Id)
@@ -319,9 +315,7 @@ func TestOptionsBooks_Success(t *testing.T) {
 	for name, tt := range optionsTests {
 		t.Run(name, func(t *testing.T) {
 			fullUrl := "/api/v1/books" + tt.query
-
-			w := execRequest("OPTIONS", fullUrl, nil)
-			assert.Equal(t, http.StatusNoContent, w.Code)
+			w := execAndCheck(t, "OPTIONS", fullUrl, nil, http.StatusNoContent, nil)
 
 			allowResp := w.Result().Header.Get("Allow")
 			splitAllow := strings.Split(allowResp, ", ")

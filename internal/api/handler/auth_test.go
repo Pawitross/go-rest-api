@@ -29,7 +29,7 @@ func TestLoginToken_Success(t *testing.T) {
 			assert.Equal(t, http.StatusOK, w.Code)
 
 			var rToken models.Token
-			decodeJSONBodyCheckEmpty(w, t, &rToken)
+			decodeJSONBodyCheckEmpty(t, w, &rToken)
 
 			token := rToken.Token
 			checkTokenStructure(t, token)
@@ -60,7 +60,8 @@ func TestLoginToken_BadRequest(t *testing.T) {
 			w := execRequest("POST", "/api/v1/login", bytes.NewReader([]byte(tc)))
 			assert.Equal(t, http.StatusBadRequest, w.Code)
 
-			checkErrorBodyNotEmpty(w, t)
+			var rError models.Error
+			decodeJSONBodyCheckEmpty(t, w, &rError)
 		})
 	}
 }

@@ -1,10 +1,15 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"pawrest/internal/api/middleware"
@@ -78,17 +83,49 @@ func run(flags serverFlags) error {
 		}
 	}
 
+	srv := &http.Server{
+		Addr:    ":" + port,
+		Handler: router,
+	}
+
 	log.Printf("Started listening on port %v...\n", port)
-	if useHTTPS {
-		if err := router.RunTLS(":"+port, cert, key); err != nil {
-			return err
+	serveErr := make(chan error, 1)
+	go func() {
+		var err error
+
+		if useHTTPS {
+			err = srv.ListenAndServeTLS(cert, key)
+		} else {
+			err = srv.ListenAndServe()
 		}
-	} else {
-		if err := router.Run(":" + port); err != nil {
-			return err
+
+		if err != http.ErrServerClosed {
+			serveErr <- err
+		} else {
+			serveErr <- nil
+		}
+	}()
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+
+	select {
+	case <-quit:
+		log.Println("Shutting down server...")
+	case err := <-serveErr:
+		if err != nil {
+			return fmt.Errorf("server error: %v", err)
 		}
 	}
 
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	if err := srv.Shutdown(ctx); err != nil {
+		return fmt.Errorf("server forced to shutdown: %v", err)
+	}
+
+	log.Println("Server successfully closed")
 	return nil
 }
 

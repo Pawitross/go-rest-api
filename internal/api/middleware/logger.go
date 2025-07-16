@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"encoding/csv"
+	"fmt"
 	"log"
 	"os"
 	"strconv"
@@ -23,13 +24,14 @@ type logRecord struct {
 	status  int
 }
 
-func InitLogger() error {
-	fileName := "log.csv"
-
+func InitLogger(fPath string) error {
 	var err error
-	logFile, err = os.OpenFile(fileName, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	logFile, err = os.OpenFile(fPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		return fmt.Errorf("failed to init logger: %v", err)
+	}
 
-	return err
+	return nil
 }
 
 func CloseLogger() {
@@ -52,7 +54,7 @@ func logToFile(r logRecord) error {
 	w.Comma = ';'
 
 	if err := w.Write(strRecord); err != nil {
-		return err
+		return fmt.Errorf("log write: %v", err)
 	}
 
 	w.Flush()

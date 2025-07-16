@@ -58,7 +58,7 @@ func run(flags serverFlags) error {
 	}
 	defer database.CloseDB()
 
-	if err := middleware.InitLogger(); err != nil {
+	if err := middleware.InitLogger("log.csv"); err != nil {
 		return fmt.Errorf("failed to initialize logging middleware: %v", err)
 	}
 	defer middleware.CloseLogger()

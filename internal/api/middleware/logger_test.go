@@ -16,6 +16,8 @@ import (
 	"pawrest/internal/api/middleware"
 )
 
+const logFileName = "testlog.csv"
+
 func fileExists(fName string) (bool, error) {
 	if _, err := os.Stat(fName); err != nil {
 		if errors.Is(err, os.ErrNotExist) {
@@ -28,8 +30,8 @@ func fileExists(fName string) (bool, error) {
 
 func removeLogFile(t *testing.T) {
 	t.Helper()
-	if exists, _ := fileExists("log.csv"); exists {
-		if err := os.Remove("log.csv"); err != nil {
+	if exists, _ := fileExists(logFileName); exists {
+		if err := os.Remove(logFileName); err != nil {
 			t.Errorf("Failed to remove log file: %v", err)
 		}
 	}
@@ -48,13 +50,13 @@ func setupTestLoggingRouter() *gin.Engine {
 }
 
 func TestLogFileCreation(t *testing.T) {
-	if err := middleware.InitLogger(); err != nil {
+	if err := middleware.InitLogger(logFileName); err != nil {
 		t.Fatalf("Failed to initialize logging middleware: %v\n", err)
 	}
 	defer removeLogFile(t)
 	defer middleware.CloseLogger()
 
-	exists, err := fileExists("log.csv")
+	exists, err := fileExists(logFileName)
 	if err != nil {
 		t.Errorf("Error checking file existence: %v", err)
 	}
@@ -65,7 +67,7 @@ func TestLogFileCreation(t *testing.T) {
 }
 
 func TestLogging(t *testing.T) {
-	if err := middleware.InitLogger(); err != nil {
+	if err := middleware.InitLogger(logFileName); err != nil {
 		t.Fatalf("Failed to initialize logging middleware: %v\n", err)
 	}
 	defer removeLogFile(t)
@@ -97,7 +99,7 @@ func TestLogging(t *testing.T) {
 
 	numberOfSentReq := len(requests)
 
-	f, err := os.OpenFile("log.csv", os.O_RDONLY, 0644)
+	f, err := os.OpenFile(logFileName, os.O_RDONLY, 0644)
 	if err != nil {
 		t.Errorf("Error opening log file: %v", err)
 	}

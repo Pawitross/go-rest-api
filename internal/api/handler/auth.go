@@ -12,7 +12,7 @@ import (
 // https://github.com/gin-gonic/gin/issues/814
 type AdminBody struct {
 	RetAdmin *bool `json:"return_admin_token" binding:"required"`
-}
+} // @Name TokenRequest
 
 func createToken(isAdmin bool, secret string) (string, error) {
 	timeNow := time.Now().Unix()

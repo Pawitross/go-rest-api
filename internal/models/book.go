@@ -8,7 +8,7 @@ type Book struct {
 	Author   int64  `json:"author"`
 	Genre    int64  `json:"genre"`
 	Language int64  `json:"language"`
-}
+} // @Name Book
 
 func (b *Book) IsNotValid() bool {
 	return b.Title == "" ||
@@ -27,4 +27,4 @@ type BookExt struct {
 	Author   Author   `json:"author"`
 	Genre    Genre    `json:"genre"`
 	Language Language `json:"language"`
-}
+} // @name BookExtended

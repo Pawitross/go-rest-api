@@ -1,13 +1,6 @@
 basePath: /api/v1
 definitions:
-  handler.AdminBody:
-    properties:
-      return_admin_token:
-        type: boolean
-    required:
-    - return_admin_token
-    type: object
-  models.Author:
+  Author:
     properties:
       birth_year:
         type: integer
@@ -20,7 +13,7 @@ definitions:
       last_name:
         type: string
     type: object
-  models.Book:
+  Book:
     properties:
       author:
         type: integer
@@ -37,26 +30,33 @@ definitions:
       year:
         type: integer
     type: object
-  models.Error:
+  ErrorResponse:
     properties:
       error:
         type: string
     type: object
-  models.Genre:
+  Genre:
     properties:
       id:
         type: integer
       name:
         type: string
     type: object
-  models.Language:
+  Language:
     properties:
       id:
         type: integer
       name:
         type: string
     type: object
-  models.Token:
+  TokenRequest:
+    properties:
+      return_admin_token:
+        type: boolean
+    required:
+    - return_admin_token
+    type: object
+  TokenResponse:
     properties:
       admin:
         type: boolean
@@ -142,20 +142,20 @@ paths:
           description: OK - Fetched authors
           schema:
             items:
-              $ref: '#/definitions/models.Author'
+              $ref: '#/definitions/Author'
             type: array
         "400":
           description: Bad Request - Invalid input
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "401":
           description: Unauthorized - Invalid or missing token
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Get a list of all authors
@@ -173,11 +173,11 @@ paths:
         "401":
           description: Unauthorized - Invalid or missing token
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "403":
           description: Forbidden - Insufficient permissions
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Return allowed operations for authors
@@ -194,7 +194,7 @@ paths:
         name: author
         required: true
         schema:
-          $ref: '#/definitions/models.Author'
+          $ref: '#/definitions/Author'
       produces:
       - application/json
       responses:
@@ -205,23 +205,23 @@ paths:
               description: Path of the newly created author
               type: string
           schema:
-            $ref: '#/definitions/models.Author'
+            $ref: '#/definitions/Author'
         "400":
           description: Bad Request - Invalid input or JSON
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "401":
           description: Unauthorized - Invalid or missing token
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "403":
           description: Forbidden - Insufficient permissions
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Create a new author
@@ -243,23 +243,23 @@ paths:
         "400":
           description: Bad Request - Invalid author id
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "401":
           description: Unauthorized - Invalid or missing token
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "403":
           description: Forbidden - Insufficient permissions
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "404":
           description: Not Found -  No resource found
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Delete an existing author
@@ -279,23 +279,23 @@ paths:
         "200":
           description: OK - Fetched author
           schema:
-            $ref: '#/definitions/models.Author'
+            $ref: '#/definitions/Author'
         "400":
           description: Bad Request - Invalid author id
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "401":
           description: Unauthorized - Invalid or missing token
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "404":
           description: Not Found - No resource found
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Get one author
@@ -319,11 +319,11 @@ paths:
         "401":
           description: Unauthorized - Invalid or missing token
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "403":
           description: Forbidden - Insufficient permissions
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Return allowed operations for author
@@ -346,30 +346,30 @@ paths:
         name: author
         required: true
         schema:
-          $ref: '#/definitions/models.Author'
+          $ref: '#/definitions/Author'
       responses:
         "204":
           description: No Content - Successfully patched the author
         "400":
           description: Bad Request - Invalid input or JSON
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "401":
           description: Unauthorized - Invalid or missing token
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "403":
           description: Forbidden - Insufficient permissions
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "404":
           description: Not Found -  No resource found
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Patch an existing author
@@ -391,30 +391,30 @@ paths:
         name: author
         required: true
         schema:
-          $ref: '#/definitions/models.Author'
+          $ref: '#/definitions/Author'
       responses:
         "204":
           description: No content - Updated the author
         "400":
           description: Bad Request - Invalid input or JSON
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "401":
           description: Unauthorized - Invalid or missing token
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "403":
           description: Forbidden - Insufficient permissions
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "404":
           description: Not Found -  No resource found
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Update an existing author
@@ -488,20 +488,20 @@ paths:
           description: OK - Fetched books
           schema:
             items:
-              $ref: '#/definitions/models.Book'
+              $ref: '#/definitions/Book'
             type: array
         "400":
           description: Bad Request - Invalid input
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "401":
           description: Unauthorized - Invalid or missing token
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Get a list of all books
@@ -519,11 +519,11 @@ paths:
         "401":
           description: Unauthorized - Invalid or missing token
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "403":
           description: Forbidden - Insufficient permissions
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Return allowed operations for books
@@ -540,7 +540,7 @@ paths:
         name: book
         required: true
         schema:
-          $ref: '#/definitions/models.Book'
+          $ref: '#/definitions/Book'
       produces:
       - application/json
       responses:
@@ -551,23 +551,23 @@ paths:
               description: Path of the newly created book
               type: string
           schema:
-            $ref: '#/definitions/models.Book'
+            $ref: '#/definitions/Book'
         "400":
           description: Bad Request - Invalid input or JSON
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "401":
           description: Unauthorized - Invalid or missing token
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "403":
           description: Forbidden - Insufficient permissions
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Create a new book
@@ -589,23 +589,23 @@ paths:
         "400":
           description: Bad Request - Invalid book id
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "401":
           description: Unauthorized - Invalid or missing token
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "403":
           description: Forbidden - Insufficient permissions
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "404":
           description: Not Found -  No resource found
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Delete an existing book
@@ -625,23 +625,23 @@ paths:
         "200":
           description: OK - Fetched book
           schema:
-            $ref: '#/definitions/models.Book'
+            $ref: '#/definitions/Book'
         "400":
           description: Bad Request - Invalid book id
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "401":
           description: Unauthorized - Invalid or missing token
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "404":
           description: Not Found - No resource found
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Get one book
@@ -665,11 +665,11 @@ paths:
         "401":
           description: Unauthorized - Invalid or missing token
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "403":
           description: Forbidden - Insufficient permissions
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Return allowed operations for books
@@ -692,30 +692,30 @@ paths:
         name: book
         required: true
         schema:
-          $ref: '#/definitions/models.Book'
+          $ref: '#/definitions/Book'
       responses:
         "204":
           description: No Content - Successfully patched the book
         "400":
           description: Bad Request - Invalid input or JSON
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "401":
           description: Unauthorized - Invalid or missing token
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "403":
           description: Forbidden - Insufficient permissions
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "404":
           description: Not Found -  No resource found
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Patch an existing book
@@ -737,30 +737,30 @@ paths:
         name: book
         required: true
         schema:
-          $ref: '#/definitions/models.Book'
+          $ref: '#/definitions/Book'
       responses:
         "204":
           description: No content - Updated the book
         "400":
           description: Bad Request - Invalid input or JSON
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "401":
           description: Unauthorized - Invalid or missing token
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "403":
           description: Forbidden - Insufficient permissions
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "404":
           description: Not Found -  No resource found
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Update an existing book
@@ -798,20 +798,20 @@ paths:
           description: OK - Fetched genres
           schema:
             items:
-              $ref: '#/definitions/models.Genre'
+              $ref: '#/definitions/Genre'
             type: array
         "400":
           description: Bad Request - Invalid input
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "401":
           description: Unauthorized - Invalid or missing token
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Get a list of all genres
@@ -829,11 +829,11 @@ paths:
         "401":
           description: Unauthorized - Invalid or missing token
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "403":
           description: Forbidden - Insufficient permissions
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Return allowed operations for genres
@@ -850,7 +850,7 @@ paths:
         name: genre
         required: true
         schema:
-          $ref: '#/definitions/models.Genre'
+          $ref: '#/definitions/Genre'
       produces:
       - application/json
       responses:
@@ -861,23 +861,23 @@ paths:
               description: Path of the newly created genre
               type: string
           schema:
-            $ref: '#/definitions/models.Genre'
+            $ref: '#/definitions/Genre'
         "400":
           description: Bad Request - Invalid input or JSON
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "401":
           description: Unauthorized - Invalid or missing token
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "403":
           description: Forbidden - Insufficient permissions
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Create a new genre
@@ -899,23 +899,23 @@ paths:
         "400":
           description: Bad Request - Invalid genre id
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "401":
           description: Unauthorized - Invalid or missing token
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "403":
           description: Forbidden - Insufficient permissions
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "404":
           description: Not Found -  No resource found
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Delete an existing genre
@@ -935,23 +935,23 @@ paths:
         "200":
           description: OK - Fetched genre
           schema:
-            $ref: '#/definitions/models.Genre'
+            $ref: '#/definitions/Genre'
         "400":
           description: Bad Request - Invalid genre id
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "401":
           description: Unauthorized - Invalid or missing token
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "404":
           description: Not Found - No resource found
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Get one genre
@@ -975,11 +975,11 @@ paths:
         "401":
           description: Unauthorized - Invalid or missing token
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "403":
           description: Forbidden - Insufficient permissions
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Return allowed operations for genres
@@ -1001,30 +1001,30 @@ paths:
         name: genre
         required: true
         schema:
-          $ref: '#/definitions/models.Genre'
+          $ref: '#/definitions/Genre'
       responses:
         "204":
           description: No content - Updated the genre
         "400":
           description: Bad Request - Invalid input or JSON
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "401":
           description: Unauthorized - Invalid or missing token
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "403":
           description: Forbidden - Insufficient permissions
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "404":
           description: Not Found -  No resource found
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Update an existing genre
@@ -1062,20 +1062,20 @@ paths:
           description: OK - Fetched languages
           schema:
             items:
-              $ref: '#/definitions/models.Language'
+              $ref: '#/definitions/Language'
             type: array
         "400":
           description: Bad Request - Invalid input
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "401":
           description: Unauthorized - Invalid or missing token
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Get a list of all languages
@@ -1093,11 +1093,11 @@ paths:
         "401":
           description: Unauthorized - Invalid or missing token
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "403":
           description: Forbidden - Insufficient permissions
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Return allowed operations for languages
@@ -1114,7 +1114,7 @@ paths:
         name: language
         required: true
         schema:
-          $ref: '#/definitions/models.Language'
+          $ref: '#/definitions/Language'
       produces:
       - application/json
       responses:
@@ -1125,23 +1125,23 @@ paths:
               description: Path of the newly created language
               type: string
           schema:
-            $ref: '#/definitions/models.Language'
+            $ref: '#/definitions/Language'
         "400":
           description: Bad Request - Invalid input or JSON
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "401":
           description: Unauthorized - Invalid or missing token
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "403":
           description: Forbidden - Insufficient permissions
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Create a new language
@@ -1163,23 +1163,23 @@ paths:
         "400":
           description: Bad Request - Invalid language id
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "401":
           description: Unauthorized - Invalid or missing token
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "403":
           description: Forbidden - Insufficient permissions
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "404":
           description: Not Found -  No resource found
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Delete an existing language
@@ -1199,23 +1199,23 @@ paths:
         "200":
           description: OK - Fetched language
           schema:
-            $ref: '#/definitions/models.Language'
+            $ref: '#/definitions/Language'
         "400":
           description: Bad Request - Invalid language id
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "401":
           description: Unauthorized - Invalid or missing token
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "404":
           description: Not Found - No resource found
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Get one language
@@ -1239,11 +1239,11 @@ paths:
         "401":
           description: Unauthorized - Invalid or missing token
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "403":
           description: Forbidden - Insufficient permissions
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Return allowed operations for languages
@@ -1265,30 +1265,30 @@ paths:
         name: language
         required: true
         schema:
-          $ref: '#/definitions/models.Language'
+          $ref: '#/definitions/Language'
       responses:
         "204":
           description: No content - Updated the language
         "400":
           description: Bad Request - Invalid input or JSON
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "401":
           description: Unauthorized - Invalid or missing token
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "403":
           description: Forbidden - Insufficient permissions
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "404":
           description: Not Found -  No resource found
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
       security:
       - ApiKeyAuth: []
       summary: Update an existing language
@@ -1305,20 +1305,20 @@ paths:
         name: admin
         required: true
         schema:
-          $ref: '#/definitions/handler.AdminBody'
+          $ref: '#/definitions/TokenRequest'
       responses:
         "200":
           description: OK - Response body contains JWT token
           schema:
-            $ref: '#/definitions/models.Token'
+            $ref: '#/definitions/TokenResponse'
         "400":
           description: Bad Request - Invalid parameter value
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
         "500":
           description: Internal Server Error - Failed to create JWT token
           schema:
-            $ref: '#/definitions/models.Error'
+            $ref: '#/definitions/ErrorResponse'
       summary: Get a JWT token
       tags:
       - Auth

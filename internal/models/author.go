@@ -6,7 +6,7 @@ type Author struct {
 	LastName  string `json:"last_name"`
 	BirthYear int64  `json:"birth_year"`
 	DeathYear *int64 `json:"death_year"`
-}
+} // @Name Author
 
 func (a *Author) IsNotValid() bool {
 	return a.FirstName == "" ||

@@ -86,26 +86,26 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.Author"
+                                "$ref": "#/definitions/Author"
                             }
                         }
                     },
                     "400": {
                         "description": "Bad Request - Invalid input",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized - Invalid or missing token",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -134,7 +134,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Author"
+                            "$ref": "#/definitions/Author"
                         }
                     }
                 ],
@@ -142,7 +142,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created - Added new author",
                         "schema": {
-                            "$ref": "#/definitions/models.Author"
+                            "$ref": "#/definitions/Author"
                         },
                         "headers": {
                             "Location": {
@@ -154,25 +154,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request - Invalid input or JSON",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized - Invalid or missing token",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden - Insufficient permissions",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -201,13 +201,13 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized - Invalid or missing token",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden - Insufficient permissions",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -241,31 +241,31 @@ const docTemplate = `{
                     "200": {
                         "description": "OK - Fetched author",
                         "schema": {
-                            "$ref": "#/definitions/models.Author"
+                            "$ref": "#/definitions/Author"
                         }
                     },
                     "400": {
                         "description": "Bad Request - Invalid author id",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized - Invalid or missing token",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found - No resource found",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -298,7 +298,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Author"
+                            "$ref": "#/definitions/Author"
                         }
                     }
                 ],
@@ -309,31 +309,31 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request - Invalid input or JSON",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized - Invalid or missing token",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden - Insufficient permissions",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found -  No resource found",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -365,31 +365,31 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request - Invalid author id",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized - Invalid or missing token",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden - Insufficient permissions",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found -  No resource found",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -427,13 +427,13 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized - Invalid or missing token",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden - Insufficient permissions",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -466,7 +466,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Author"
+                            "$ref": "#/definitions/Author"
                         }
                     }
                 ],
@@ -477,31 +477,31 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request - Invalid input or JSON",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized - Invalid or missing token",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden - Insufficient permissions",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found -  No resource found",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -614,26 +614,26 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.Book"
+                                "$ref": "#/definitions/Book"
                             }
                         }
                     },
                     "400": {
                         "description": "Bad Request - Invalid input",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized - Invalid or missing token",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -662,7 +662,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Book"
+                            "$ref": "#/definitions/Book"
                         }
                     }
                 ],
@@ -670,7 +670,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created - Added new book",
                         "schema": {
-                            "$ref": "#/definitions/models.Book"
+                            "$ref": "#/definitions/Book"
                         },
                         "headers": {
                             "Location": {
@@ -682,25 +682,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request - Invalid input or JSON",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized - Invalid or missing token",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden - Insufficient permissions",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -729,13 +729,13 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized - Invalid or missing token",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden - Insufficient permissions",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -769,31 +769,31 @@ const docTemplate = `{
                     "200": {
                         "description": "OK - Fetched book",
                         "schema": {
-                            "$ref": "#/definitions/models.Book"
+                            "$ref": "#/definitions/Book"
                         }
                     },
                     "400": {
                         "description": "Bad Request - Invalid book id",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized - Invalid or missing token",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found - No resource found",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -826,7 +826,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Book"
+                            "$ref": "#/definitions/Book"
                         }
                     }
                 ],
@@ -837,31 +837,31 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request - Invalid input or JSON",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized - Invalid or missing token",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden - Insufficient permissions",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found -  No resource found",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -893,31 +893,31 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request - Invalid book id",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized - Invalid or missing token",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden - Insufficient permissions",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found -  No resource found",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -955,13 +955,13 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized - Invalid or missing token",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden - Insufficient permissions",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -994,7 +994,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Book"
+                            "$ref": "#/definitions/Book"
                         }
                     }
                 ],
@@ -1005,31 +1005,31 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request - Invalid input or JSON",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized - Invalid or missing token",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden - Insufficient permissions",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found -  No resource found",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -1088,26 +1088,26 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.Genre"
+                                "$ref": "#/definitions/Genre"
                             }
                         }
                     },
                     "400": {
                         "description": "Bad Request - Invalid input",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized - Invalid or missing token",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -1136,7 +1136,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Genre"
+                            "$ref": "#/definitions/Genre"
                         }
                     }
                 ],
@@ -1144,7 +1144,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created - Added new genre",
                         "schema": {
-                            "$ref": "#/definitions/models.Genre"
+                            "$ref": "#/definitions/Genre"
                         },
                         "headers": {
                             "Location": {
@@ -1156,25 +1156,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request - Invalid input or JSON",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized - Invalid or missing token",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden - Insufficient permissions",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -1203,13 +1203,13 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized - Invalid or missing token",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden - Insufficient permissions",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -1243,31 +1243,31 @@ const docTemplate = `{
                     "200": {
                         "description": "OK - Fetched genre",
                         "schema": {
-                            "$ref": "#/definitions/models.Genre"
+                            "$ref": "#/definitions/Genre"
                         }
                     },
                     "400": {
                         "description": "Bad Request - Invalid genre id",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized - Invalid or missing token",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found - No resource found",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -1300,7 +1300,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Genre"
+                            "$ref": "#/definitions/Genre"
                         }
                     }
                 ],
@@ -1311,31 +1311,31 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request - Invalid input or JSON",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized - Invalid or missing token",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden - Insufficient permissions",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found -  No resource found",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -1367,31 +1367,31 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request - Invalid genre id",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized - Invalid or missing token",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden - Insufficient permissions",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found -  No resource found",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -1429,13 +1429,13 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized - Invalid or missing token",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden - Insufficient permissions",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -1494,26 +1494,26 @@ const docTemplate = `{
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/models.Language"
+                                "$ref": "#/definitions/Language"
                             }
                         }
                     },
                     "400": {
                         "description": "Bad Request - Invalid input",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized - Invalid or missing token",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -1542,7 +1542,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Language"
+                            "$ref": "#/definitions/Language"
                         }
                     }
                 ],
@@ -1550,7 +1550,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created - Added new language",
                         "schema": {
-                            "$ref": "#/definitions/models.Language"
+                            "$ref": "#/definitions/Language"
                         },
                         "headers": {
                             "Location": {
@@ -1562,25 +1562,25 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request - Invalid input or JSON",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized - Invalid or missing token",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden - Insufficient permissions",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -1609,13 +1609,13 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized - Invalid or missing token",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden - Insufficient permissions",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -1649,31 +1649,31 @@ const docTemplate = `{
                     "200": {
                         "description": "OK - Fetched language",
                         "schema": {
-                            "$ref": "#/definitions/models.Language"
+                            "$ref": "#/definitions/Language"
                         }
                     },
                     "400": {
                         "description": "Bad Request - Invalid language id",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized - Invalid or missing token",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found - No resource found",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -1706,7 +1706,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.Language"
+                            "$ref": "#/definitions/Language"
                         }
                     }
                 ],
@@ -1717,31 +1717,31 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request - Invalid input or JSON",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized - Invalid or missing token",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden - Insufficient permissions",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found -  No resource found",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -1773,31 +1773,31 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad Request - Invalid language id",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "401": {
                         "description": "Unauthorized - Invalid or missing token",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden - Insufficient permissions",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "404": {
                         "description": "Not Found -  No resource found",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -1835,13 +1835,13 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized - Invalid or missing token",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "403": {
                         "description": "Forbidden - Insufficient permissions",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -1861,7 +1861,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/handler.AdminBody"
+                            "$ref": "#/definitions/TokenRequest"
                         }
                     }
                 ],
@@ -1869,19 +1869,19 @@ const docTemplate = `{
                     "200": {
                         "description": "OK - Response body contains JWT token",
                         "schema": {
-                            "$ref": "#/definitions/models.Token"
+                            "$ref": "#/definitions/TokenResponse"
                         }
                     },
                     "400": {
                         "description": "Bad Request - Invalid parameter value",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     },
                     "500": {
                         "description": "Internal Server Error - Failed to create JWT token",
                         "schema": {
-                            "$ref": "#/definitions/models.Error"
+                            "$ref": "#/definitions/ErrorResponse"
                         }
                     }
                 }
@@ -1889,18 +1889,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "handler.AdminBody": {
-            "type": "object",
-            "required": [
-                "return_admin_token"
-            ],
-            "properties": {
-                "return_admin_token": {
-                    "type": "boolean"
-                }
-            }
-        },
-        "models.Author": {
+        "Author": {
             "type": "object",
             "properties": {
                 "birth_year": {
@@ -1920,7 +1909,7 @@ const docTemplate = `{
                 }
             }
         },
-        "models.Book": {
+        "Book": {
             "type": "object",
             "properties": {
                 "author": {
@@ -1946,7 +1935,7 @@ const docTemplate = `{
                 }
             }
         },
-        "models.Error": {
+        "ErrorResponse": {
             "type": "object",
             "properties": {
                 "error": {
@@ -1954,7 +1943,7 @@ const docTemplate = `{
                 }
             }
         },
-        "models.Genre": {
+        "Genre": {
             "type": "object",
             "properties": {
                 "id": {
@@ -1965,7 +1954,7 @@ const docTemplate = `{
                 }
             }
         },
-        "models.Language": {
+        "Language": {
             "type": "object",
             "properties": {
                 "id": {
@@ -1976,7 +1965,18 @@ const docTemplate = `{
                 }
             }
         },
-        "models.Token": {
+        "TokenRequest": {
+            "type": "object",
+            "required": [
+                "return_admin_token"
+            ],
+            "properties": {
+                "return_admin_token": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "TokenResponse": {
             "type": "object",
             "properties": {
                 "admin": {

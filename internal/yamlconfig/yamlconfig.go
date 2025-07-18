@@ -25,7 +25,9 @@ func Load(fPath string) error {
 
 	for k, v := range cfg {
 		if _, set := os.LookupEnv(k); !set {
-			os.Setenv(k, v)
+			if err := os.Setenv(k, v); err != nil {
+				return fmt.Errorf("cannot set environment variable: %v", err)
+			}
 		}
 	}
 

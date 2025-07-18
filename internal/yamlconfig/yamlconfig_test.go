@@ -90,8 +90,7 @@ func TestLoad_Success_NoOutsideEnvSet(t *testing.T) {
 }
 
 func TestLoad_Success_OutsideEnvSet(t *testing.T) {
-	os.Setenv("SETVAR", "foo")
-	defer os.Unsetenv("SETVAR")
+	t.Setenv("SETVAR", "foo")
 
 	fileName := "configtest.yaml"
 	data := []byte("FILEVAR: \"bar\"\nSETVAR: \"file\"")

@@ -222,6 +222,10 @@ func (d *Database) updatePartId(r any, table string, id int64, fToDb map[string]
 func (d *Database) deleteId(query string, id int64) error {
 	res, err := d.pool.Exec(query, id)
 	if err != nil {
+		if isErrForeignKey(err) {
+			return ErrForeignKey
+		}
+
 		return fmt.Errorf("Failed to delete (%v)", err)
 	}
 
@@ -241,7 +245,8 @@ func isErrForeignKey(err error) bool {
 	var mysqlerr *mysql.MySQLError
 
 	if errors.As(err, &mysqlerr) {
-		return mysqlerr.Number == 1452
+		return mysqlerr.Number == 1452 ||
+			mysqlerr.Number == 1451
 	}
 
 	return false

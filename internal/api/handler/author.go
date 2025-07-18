@@ -229,13 +229,7 @@ func (h *Handlers) DeleteAuthor(c *gin.Context) {
 	}
 
 	if err := h.DB.DelAuthor(int64(id)); err != nil {
-		if errors.Is(err, db.ErrNotFound) {
-			c.JSON(http.StatusNotFound, models.Error{Error: err.Error()})
-			return
-		}
-
-		log.Println(err.Error())
-		c.JSON(http.StatusInternalServerError, models.Error{Error: "An Internal Server Error occurred"})
+		handleDBError(c, err)
 		return
 	}
 

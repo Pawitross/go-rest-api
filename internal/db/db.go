@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"reflect"
 	"strings"
+	"time"
 
 	"github.com/go-sql-driver/mysql"
 	"pawrest/internal/yamlconfig"
@@ -45,6 +46,10 @@ func ConnectToDB(cfg *yamlconfig.Config) (*Database, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to open database: %w", err)
 	}
+
+	db.SetConnMaxLifetime(4 * time.Minute)
+	db.SetMaxOpenConns(150)
+	db.SetMaxIdleConns(150)
 
 	if err := db.Ping(); err != nil {
 		return nil, fmt.Errorf("failed to ping database: %w", err)

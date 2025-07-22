@@ -118,9 +118,9 @@ func (h *Handlers) PostGenre(c *gin.Context) {
 		return
 	}
 
-	newGenre.Id = id
+	newGenre.ID = id
 
-	location := c.FullPath() + "/" + strconv.FormatInt(newGenre.Id, 10)
+	location := c.FullPath() + "/" + strconv.FormatInt(newGenre.ID, 10)
 	c.Header("Location", location)
 
 	c.JSON(http.StatusCreated, newGenre)

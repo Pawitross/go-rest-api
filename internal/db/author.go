@@ -30,7 +30,7 @@ func (d *Database) GetAuthors(params url.Values) ([]models.Author, error) {
 	}
 
 	authorFunc := func(a *models.Author, rows *sql.Rows) error {
-		return rows.Scan(&a.Id, &a.FirstName, &a.LastName, &a.BirthYear, &a.DeathYear)
+		return rows.Scan(&a.ID, &a.FirstName, &a.LastName, &a.BirthYear, &a.DeathYear)
 	}
 
 	return queryWithParams[models.Author](
@@ -49,10 +49,10 @@ func (d *Database) GetAuthor(id int64) (models.Author, error) {
 	WHERE id = ?`
 
 	authorFunc := func(a *models.Author, row *sql.Row) error {
-		return row.Scan(&a.Id, &a.FirstName, &a.LastName, &a.BirthYear, &a.DeathYear)
+		return row.Scan(&a.ID, &a.FirstName, &a.LastName, &a.BirthYear, &a.DeathYear)
 	}
 
-	return queryId[models.Author](d, query, id, authorFunc)
+	return queryID[models.Author](d, query, id, authorFunc)
 }
 
 func (d *Database) InsertAuthor(a models.Author) (int64, error) {
@@ -73,22 +73,22 @@ func (d *Database) UpdateWholeAuthor(id int64, a models.Author) error {
 		rok_smierci = ?
 	WHERE id = ?`
 
-	return d.updateWholeId(query, a.FirstName, a.LastName, a.BirthYear, a.DeathYear, id)
+	return d.updateWholeID(query, a.FirstName, a.LastName, a.BirthYear, a.DeathYear, id)
 }
 
 func (d *Database) UpdateAuthor(id int64, a models.Author) error {
-	fieldToDb := map[string]string{
+	fieldToDB := map[string]string{
 		"FirstName": "imie",
 		"LastName":  "nazwisko",
 		"BirthYear": "rok_urodzenia",
 		"DeathYear": "rok_smierci",
 	}
 
-	return d.updatePartId(a, "autor", id, fieldToDb)
+	return d.updatePartID(a, "autor", id, fieldToDB)
 }
 
 func (d *Database) DelAuthor(id int64) error {
 	query := "DELETE FROM autor WHERE id = ?"
 
-	return d.deleteId(query, id)
+	return d.deleteID(query, id)
 }

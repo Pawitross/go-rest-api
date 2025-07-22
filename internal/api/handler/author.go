@@ -121,9 +121,9 @@ func (h *Handlers) PostAuthor(c *gin.Context) {
 		return
 	}
 
-	newAuthor.Id = id
+	newAuthor.ID = id
 
-	location := c.FullPath() + "/" + strconv.FormatInt(newAuthor.Id, 10)
+	location := c.FullPath() + "/" + strconv.FormatInt(newAuthor.ID, 10)
 	c.Header("Location", location)
 
 	c.JSON(http.StatusCreated, newAuthor)

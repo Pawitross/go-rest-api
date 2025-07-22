@@ -118,9 +118,9 @@ func (h *Handlers) PostLanguage(c *gin.Context) {
 		return
 	}
 
-	newLanguage.Id = id
+	newLanguage.ID = id
 
-	location := c.FullPath() + "/" + strconv.FormatInt(newLanguage.Id, 10)
+	location := c.FullPath() + "/" + strconv.FormatInt(newLanguage.ID, 10)
 	c.Header("Location", location)
 
 	c.JSON(http.StatusCreated, newLanguage)

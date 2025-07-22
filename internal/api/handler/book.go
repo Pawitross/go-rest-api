@@ -138,9 +138,9 @@ func (h *Handlers) PostBook(c *gin.Context) {
 		return
 	}
 
-	newBook.Id = id
+	newBook.ID = id
 
-	location := c.FullPath() + "/" + strconv.FormatInt(newBook.Id, 10)
+	location := c.FullPath() + "/" + strconv.FormatInt(newBook.ID, 10)
 	c.Header("Location", location)
 
 	c.JSON(http.StatusCreated, newBook)

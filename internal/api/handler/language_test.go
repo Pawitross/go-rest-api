@@ -31,12 +31,12 @@ func TestGetLanguage_Success(t *testing.T) {
 
 func TestGetLanguage_Error(t *testing.T) {
 	getTests := map[string]ErrorTests{
-		"NotFound_BigPathId": {
+		"NotFound_BigPathID": {
 			body:   nil,
 			query:  "/9999",
 			status: http.StatusNotFound,
 		},
-		"BadRequest_StringPathId": {
+		"BadRequest_StringPathID": {
 			body:   nil,
 			query:  "/string",
 			status: http.StatusBadRequest,
@@ -55,12 +55,12 @@ func TestPostLanguage_Success(t *testing.T) {
 	var rLanguage models.Language
 	jsonLanguage := marshalCheckNoError(t, testLanguage)
 	w := execAndCheck(t, "POST", "/api/v1/languages", jsonLanguage, http.StatusCreated, &rLanguage)
-	defer database.DelLanguage(rLanguage.Id)
+	defer database.DelLanguage(rLanguage.ID)
 
-	expLoc := fmt.Sprintf("/api/v1/languages/%v", rLanguage.Id)
+	expLoc := fmt.Sprintf("/api/v1/languages/%v", rLanguage.ID)
 	assert.Equal(t, expLoc, w.Result().Header.Get("Location"))
 
-	assert.NotZero(t, rLanguage.Id, "Auto generatated, non zero ID")
+	assert.NotZero(t, rLanguage.ID, "Auto generatated, non zero ID")
 	assert.Equal(t, testLanguage.Name, rLanguage.Name)
 }
 
@@ -103,14 +103,14 @@ func TestPutLanguage_BadRequest_MalformedJSON(t *testing.T) {
 
 func TestPutLanguage_Error(t *testing.T) {
 	putTests := map[string]ErrorTests{
-		"NotFound_BigPathId": {
+		"NotFound_BigPathID": {
 			body: marshalCheckNoError(t, models.Language{
 				Name: "Put test",
 			}),
 			query:  "/9999",
 			status: http.StatusNotFound,
 		},
-		"BadRequest_StringId": {
+		"BadRequest_StringID": {
 			body: marshalCheckNoError(t, models.Language{
 				Name: "Put test",
 			}),
@@ -129,26 +129,26 @@ func TestPutLanguage_Error(t *testing.T) {
 
 // DELETE /languages/id
 func TestDeleteLanguage_Success(t *testing.T) {
-	newId, err := database.InsertLanguage(models.Language{
+	newID, err := database.InsertLanguage(models.Language{
 		Name: "Delete tester",
 	})
 	assert.NoError(t, err)
 
-	newLanguageLoc := fmt.Sprintf("/api/v1/languages/%v", newId)
+	newLanguageLoc := fmt.Sprintf("/api/v1/languages/%v", newID)
 	execAndCheck(t, "DELETE", newLanguageLoc, nil, http.StatusNoContent, nil)
 
-	_, err = database.GetLanguage(newId)
+	_, err = database.GetLanguage(newID)
 	assert.ErrorIs(t, err, db.ErrNotFound)
 }
 
 func TestDeleteLanguage_Error(t *testing.T) {
 	deleteTests := map[string]ErrorTests{
-		"NotFound_BigPathId": {
+		"NotFound_BigPathID": {
 			body:   nil,
 			query:  "/9999",
 			status: http.StatusNotFound,
 		},
-		"BadRequest_StringPathId": {
+		"BadRequest_StringPathID": {
 			body:   nil,
 			query:  "/string",
 			status: http.StatusBadRequest,
@@ -169,7 +169,7 @@ func TestOptionsLanguages_Success(t *testing.T) {
 			"",
 			[]string{"GET", "POST", "OPTIONS"},
 		},
-		"PathId": {
+		"PathID": {
 			"/1",
 			[]string{"GET", "PUT", "DELETE", "OPTIONS"},
 		},

@@ -26,7 +26,7 @@ func (d *Database) GetGenres(params url.Values) ([]models.Genre, error) {
 	}
 
 	genreFunc := func(g *models.Genre, rows *sql.Rows) error {
-		return rows.Scan(&g.Id, &g.Name)
+		return rows.Scan(&g.ID, &g.Name)
 	}
 
 	return queryWithParams[models.Genre](
@@ -45,10 +45,10 @@ func (d *Database) GetGenre(id int64) (models.Genre, error) {
 	WHERE id = ?`
 
 	genreFunc := func(g *models.Genre, row *sql.Row) error {
-		return row.Scan(&g.Id, &g.Name)
+		return row.Scan(&g.ID, &g.Name)
 	}
 
-	return queryId[models.Genre](d, query, id, genreFunc)
+	return queryID[models.Genre](d, query, id, genreFunc)
 }
 
 func (d *Database) InsertGenre(g models.Genre) (int64, error) {
@@ -66,11 +66,11 @@ func (d *Database) UpdateWholeGenre(id int64, g models.Genre) error {
 		nazwa = ?
 	WHERE id = ?`
 
-	return d.updateWholeId(query, g.Name, id)
+	return d.updateWholeID(query, g.Name, id)
 }
 
 func (d *Database) DelGenre(id int64) error {
 	query := "DELETE FROM gatunek WHERE id = ?"
 
-	return d.deleteId(query, id)
+	return d.deleteID(query, id)
 }

@@ -25,7 +25,7 @@ func (m *MockDatabase) GetLanguages(params url.Values) ([]models.Language, error
 
 func (m *MockDatabase) GetLanguage(id int64) (models.Language, error) {
 	for _, language := range m.Languages {
-		if language.Id == id {
+		if language.ID == id {
 			return language, nil
 		}
 	}
@@ -34,17 +34,17 @@ func (m *MockDatabase) GetLanguage(id int64) (models.Language, error) {
 }
 
 func (m *MockDatabase) InsertLanguage(l models.Language) (int64, error) {
-	l.Id = int64(len(m.Languages) + 1)
+	l.ID = int64(len(m.Languages) + 1)
 	m.Languages = append(m.Languages, l)
 
-	return l.Id, nil
+	return l.ID, nil
 }
 
 func (m *MockDatabase) UpdateWholeLanguage(id int64, l models.Language) error {
 	for i, language := range m.Languages {
-		if language.Id == id {
+		if language.ID == id {
 			m.Languages[i] = l
-			m.Languages[i].Id = id
+			m.Languages[i].ID = id
 			return nil
 		}
 	}
@@ -54,7 +54,7 @@ func (m *MockDatabase) UpdateWholeLanguage(id int64, l models.Language) error {
 
 func (m *MockDatabase) DelLanguage(id int64) error {
 	for i, language := range m.Languages {
-		if language.Id == id {
+		if language.ID == id {
 			m.Languages = append(m.Languages[:i], m.Languages[i+1:]...)
 			return nil
 		}

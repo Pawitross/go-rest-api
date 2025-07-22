@@ -112,7 +112,7 @@ func queryWithParams[T any](
 	return records, nil
 }
 
-func queryId[T any](
+func queryID[T any](
 	d *Database,
 	query string,
 	id int64,
@@ -150,7 +150,7 @@ func (d *Database) insert(query string, args ...any) (int64, error) {
 	return id, nil
 }
 
-func (d *Database) updateWholeId(query string, args ...any) error {
+func (d *Database) updateWholeID(query string, args ...any) error {
 	res, err := d.pool.Exec(query, args...)
 	if err != nil {
 		if isErrForeignKey(err) {
@@ -172,7 +172,7 @@ func (d *Database) updateWholeId(query string, args ...any) error {
 	return nil
 }
 
-func (d *Database) updatePartId(r any, table string, id int64, fToDb map[string]string) error {
+func (d *Database) updatePartID(r any, table string, id int64, fToDB map[string]string) error {
 	var (
 		updates []string
 		args    []any
@@ -187,7 +187,7 @@ func (d *Database) updatePartId(r any, table string, id int64, fToDb map[string]
 			continue
 		}
 
-		columnName, ok := fToDb[f.Name]
+		columnName, ok := fToDB[f.Name]
 		if !ok {
 			continue
 		}
@@ -224,7 +224,7 @@ func (d *Database) updatePartId(r any, table string, id int64, fToDb map[string]
 	return nil
 }
 
-func (d *Database) deleteId(query string, id int64) error {
+func (d *Database) deleteID(query string, id int64) error {
 	res, err := d.pool.Exec(query, id)
 	if err != nil {
 		if isErrForeignKey(err) {

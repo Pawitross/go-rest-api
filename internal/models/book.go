@@ -1,7 +1,7 @@
 package models
 
 type Book struct {
-	Id       int64  `json:"id"`
+	ID       int64  `json:"id"`
 	Title    string `json:"title"`
 	Year     int64  `json:"year"`
 	Pages    int64  `json:"pages"`
@@ -20,7 +20,7 @@ func (b *Book) IsNotValid() bool {
 }
 
 type BookExt struct {
-	Id       int64    `json:"id"`
+	ID       int64    `json:"id"`
 	Title    string   `json:"title"`
 	Year     int64    `json:"year"`
 	Pages    int64    `json:"pages"`

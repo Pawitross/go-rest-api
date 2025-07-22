@@ -41,12 +41,12 @@ func TestGetBook_Success(t *testing.T) {
 
 func TestGetBook_Error(t *testing.T) {
 	getTests := map[string]ErrorTests{
-		"NotFound_BigPathId": {
+		"NotFound_BigPathID": {
 			body:   nil,
 			query:  "/9999",
 			status: http.StatusNotFound,
 		},
-		"BadRequest_StringPathId": {
+		"BadRequest_StringPathID": {
 			body:   nil,
 			query:  "/string",
 			status: http.StatusBadRequest,
@@ -70,12 +70,12 @@ func TestPostBook_Success(t *testing.T) {
 	var rBook models.Book
 	jsonBook := marshalCheckNoError(t, testBook)
 	w := execAndCheck(t, "POST", "/api/v1/books", jsonBook, http.StatusCreated, &rBook)
-	defer database.DelBook(rBook.Id)
+	defer database.DelBook(rBook.ID)
 
-	expLoc := fmt.Sprintf("/api/v1/books/%v", rBook.Id)
+	expLoc := fmt.Sprintf("/api/v1/books/%v", rBook.ID)
 	assert.Equal(t, expLoc, w.Result().Header.Get("Location"))
 
-	assert.NotZero(t, rBook.Id, "Auto generatated, non zero ID")
+	assert.NotZero(t, rBook.ID, "Auto generatated, non zero ID")
 	assert.Equal(t, testBook.Title, rBook.Title)
 	assert.Equal(t, testBook.Year, rBook.Year)
 	assert.Equal(t, testBook.Pages, rBook.Pages)
@@ -150,7 +150,7 @@ func TestPutBook_BadRequest_MalformedJSON(t *testing.T) {
 
 func TestPutBook_Error(t *testing.T) {
 	putTests := map[string]ErrorTests{
-		"NotFound_BigPathId": {
+		"NotFound_BigPathID": {
 			body: marshalCheckNoError(t, models.Book{
 				Title:    "Put book test",
 				Year:     1996,
@@ -174,7 +174,7 @@ func TestPutBook_Error(t *testing.T) {
 			query:  "/1",
 			status: http.StatusBadRequest,
 		},
-		"BadRequest_StringId": {
+		"BadRequest_StringID": {
 			body: marshalCheckNoError(t, models.Book{
 				Title:    "Put book test",
 				Year:     1996,
@@ -212,12 +212,12 @@ func TestPatchBook_Success(t *testing.T) {
 
 func TestPatchBook_Error(t *testing.T) {
 	patchTests := map[string]ErrorTests{
-		"NotFound_BigPathId": {
+		"NotFound_BigPathID": {
 			body:   []byte(`{"title":"Patch book test", "pages":999}`),
 			query:  "/9999",
 			status: http.StatusNotFound,
 		},
-		"BadRequest_StringPathId": {
+		"BadRequest_StringPathID": {
 			body:   []byte(`{"title":"Patch book test", "pages":999}`),
 			query:  "/string",
 			status: http.StatusBadRequest,
@@ -242,12 +242,12 @@ func TestDeleteBook_Success(t *testing.T) {
 
 func TestDeleteBook_Error(t *testing.T) {
 	deleteTests := map[string]ErrorTests{
-		"NotFound_BigPathId": {
+		"NotFound_BigPathID": {
 			body:   nil,
 			query:  "/9999",
 			status: http.StatusNotFound,
 		},
-		"BadRequest_StringPathId": {
+		"BadRequest_StringPathID": {
 			body:   nil,
 			query:  "/string",
 			status: http.StatusBadRequest,
@@ -268,7 +268,7 @@ func TestOptionsBooks_Success(t *testing.T) {
 			"",
 			[]string{"GET", "POST", "OPTIONS"},
 		},
-		"PathId": {
+		"PathID": {
 			"/1",
 			[]string{"GET", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		},

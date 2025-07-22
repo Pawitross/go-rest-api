@@ -26,7 +26,7 @@ func (d *Database) GetLanguages(params url.Values) ([]models.Language, error) {
 	}
 
 	langFunc := func(l *models.Language, rows *sql.Rows) error {
-		return rows.Scan(&l.Id, &l.Name)
+		return rows.Scan(&l.ID, &l.Name)
 	}
 
 	return queryWithParams[models.Language](
@@ -45,10 +45,10 @@ func (d *Database) GetLanguage(id int64) (models.Language, error) {
 	WHERE id = ?`
 
 	langFunc := func(l *models.Language, row *sql.Row) error {
-		return row.Scan(&l.Id, &l.Name)
+		return row.Scan(&l.ID, &l.Name)
 	}
 
-	return queryId[models.Language](d, query, id, langFunc)
+	return queryID[models.Language](d, query, id, langFunc)
 }
 
 func (d *Database) InsertLanguage(l models.Language) (int64, error) {
@@ -66,11 +66,11 @@ func (d *Database) UpdateWholeLanguage(id int64, l models.Language) error {
 		nazwa = ?
 	WHERE id = ?`
 
-	return d.updateWholeId(query, l.Name, id)
+	return d.updateWholeID(query, l.Name, id)
 }
 
 func (d *Database) DelLanguage(id int64) error {
 	query := "DELETE FROM jezyk WHERE id = ?"
 
-	return d.deleteId(query, id)
+	return d.deleteID(query, id)
 }

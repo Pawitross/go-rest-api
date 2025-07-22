@@ -13,14 +13,14 @@ func TestLanguageValidation(t *testing.T) {
 	}{
 		"Valid": {
 			language: models.Language{
-				Id:   1,
+				ID:   1,
 				Name: "Horror",
 			},
 			isInvalid: false,
 		},
 		"InvalidEmptyName": {
 			language: models.Language{
-				Id:   1,
+				ID:   1,
 				Name: "",
 			},
 			isInvalid: true,

@@ -41,7 +41,7 @@ func (d *Database) GetBooks(params url.Values) ([]models.Book, error) {
 	}
 
 	bookFunc := func(b *models.Book, rows *sql.Rows) error {
-		return rows.Scan(&b.Id, &b.Title, &b.Year, &b.Pages, &b.Author, &b.Genre, &b.Language)
+		return rows.Scan(&b.ID, &b.Title, &b.Year, &b.Pages, &b.Author, &b.Genre, &b.Language)
 	}
 
 	return queryWithParams[models.Book](
@@ -92,18 +92,18 @@ func (d *Database) GetBooksExt(params url.Values) ([]models.BookExt, error) {
 
 	bookFunc := func(b *models.BookExt, rows *sql.Rows) error {
 		return rows.Scan(
-			&b.Id,
+			&b.ID,
 			&b.Title,
 			&b.Year,
 			&b.Pages,
-			&b.Author.Id,
+			&b.Author.ID,
 			&b.Author.FirstName,
 			&b.Author.LastName,
 			&b.Author.BirthYear,
 			&b.Author.DeathYear,
-			&b.Genre.Id,
+			&b.Genre.ID,
 			&b.Genre.Name,
-			&b.Language.Id,
+			&b.Language.ID,
 			&b.Language.Name,
 		)
 	}
@@ -136,10 +136,10 @@ func (d *Database) GetBook(id int64) (models.Book, error) {
 	WHERE id = ?`
 
 	bookFunc := func(b *models.Book, row *sql.Row) error {
-		return row.Scan(&b.Id, &b.Title, &b.Year, &b.Pages, &b.Author, &b.Genre, &b.Language)
+		return row.Scan(&b.ID, &b.Title, &b.Year, &b.Pages, &b.Author, &b.Genre, &b.Language)
 	}
 
-	return queryId[models.Book](d, query, id, bookFunc)
+	return queryID[models.Book](d, query, id, bookFunc)
 }
 
 func (d *Database) InsertBook(b models.Book) (int64, error) {
@@ -169,11 +169,11 @@ func (d *Database) UpdateWholeBook(id int64, b models.Book) error {
 		id_jezyka = ?
 	WHERE id = ?`
 
-	return d.updateWholeId(query, b.Title, b.Year, b.Pages, b.Author, b.Genre, b.Language, id)
+	return d.updateWholeID(query, b.Title, b.Year, b.Pages, b.Author, b.Genre, b.Language, id)
 }
 
 func (d *Database) UpdateBook(id int64, b models.Book) error {
-	fieldToDb := map[string]string{
+	fieldToDB := map[string]string{
 		"Title":    "tytul",
 		"Year":     "rok_wydania",
 		"Pages":    "liczba_stron",
@@ -182,11 +182,11 @@ func (d *Database) UpdateBook(id int64, b models.Book) error {
 		"Language": "id_jezyka",
 	}
 
-	return d.updatePartId(b, "ksiazka", id, fieldToDb)
+	return d.updatePartID(b, "ksiazka", id, fieldToDB)
 }
 
 func (d *Database) DelBook(id int64) error {
 	query := "DELETE FROM ksiazka WHERE id = ?"
 
-	return d.deleteId(query, id)
+	return d.deleteID(query, id)
 }

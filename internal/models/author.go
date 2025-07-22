@@ -1,7 +1,7 @@
 package models
 
 type Author struct {
-	Id        int64  `json:"id"`
+	ID        int64  `json:"id"`
 	FirstName string `json:"first_name"`
 	LastName  string `json:"last_name"`
 	BirthYear int64  `json:"birth_year"`

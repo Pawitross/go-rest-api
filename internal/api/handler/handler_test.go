@@ -174,8 +174,8 @@ func runTestErrors(t *testing.T, method, resource string, tests map[string]Error
 	t.Helper()
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
-			fullUrl := "/api/v1/" + resource + tt.query
-			execAndCheckError(t, method, fullUrl, tt.body, tt.status)
+			fullURL := "/api/v1/" + resource + tt.query
+			execAndCheckError(t, method, fullURL, tt.body, tt.status)
 		})
 	}
 }
@@ -187,8 +187,8 @@ func runTestOptionsSuccess(t *testing.T, resource string, tests map[string]struc
 	t.Helper()
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
-			fullUrl := "/api/v1/" + resource + tt.query
-			w := execAndCheck(t, "OPTIONS", fullUrl, nil, http.StatusNoContent, nil)
+			fullURL := "/api/v1/" + resource + tt.query
+			w := execAndCheck(t, "OPTIONS", fullURL, nil, http.StatusNoContent, nil)
 
 			allowResp := w.Result().Header.Get("Allow")
 			splitAllow := strings.Split(allowResp, ", ")

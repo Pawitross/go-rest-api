@@ -13,7 +13,7 @@ func TestAuthorValidation(t *testing.T) {
 	}{
 		"ValidFull": {
 			author: models.Author{
-				Id:        1,
+				ID:        1,
 				FirstName: "Jane",
 				LastName:  "Doe",
 				BirthYear: 1970,
@@ -23,7 +23,7 @@ func TestAuthorValidation(t *testing.T) {
 		},
 		"ValidNilDeathYear": {
 			author: models.Author{
-				Id:        1,
+				ID:        1,
 				FirstName: "Jane",
 				LastName:  "Doe",
 				BirthYear: 1970,
@@ -33,7 +33,7 @@ func TestAuthorValidation(t *testing.T) {
 		},
 		"InvalidEmptyFirstName": {
 			author: models.Author{
-				Id:        1,
+				ID:        1,
 				FirstName: "",
 				LastName:  "Doe",
 				BirthYear: 1970,
@@ -43,7 +43,7 @@ func TestAuthorValidation(t *testing.T) {
 		},
 		"InvalidEmptyLastName": {
 			author: models.Author{
-				Id:        1,
+				ID:        1,
 				FirstName: "Jane",
 				LastName:  "",
 				BirthYear: 1970,
@@ -53,7 +53,7 @@ func TestAuthorValidation(t *testing.T) {
 		},
 		"InvalidBirthYearGreaterThanDeathYear": {
 			author: models.Author{
-				Id:        1,
+				ID:        1,
 				FirstName: "Jane",
 				LastName:  "Doe",
 				BirthYear: 2000,

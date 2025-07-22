@@ -25,7 +25,7 @@ func (m *MockDatabase) GetGenres(params url.Values) ([]models.Genre, error) {
 
 func (m *MockDatabase) GetGenre(id int64) (models.Genre, error) {
 	for _, genre := range m.Genres {
-		if genre.Id == id {
+		if genre.ID == id {
 			return genre, nil
 		}
 	}
@@ -34,17 +34,17 @@ func (m *MockDatabase) GetGenre(id int64) (models.Genre, error) {
 }
 
 func (m *MockDatabase) InsertGenre(g models.Genre) (int64, error) {
-	g.Id = int64(len(m.Genres) + 1)
+	g.ID = int64(len(m.Genres) + 1)
 	m.Genres = append(m.Genres, g)
 
-	return g.Id, nil
+	return g.ID, nil
 }
 
 func (m *MockDatabase) UpdateWholeGenre(id int64, g models.Genre) error {
 	for i, genre := range m.Genres {
-		if genre.Id == id {
+		if genre.ID == id {
 			m.Genres[i] = g
-			m.Genres[i].Id = id
+			m.Genres[i].ID = id
 			return nil
 		}
 	}
@@ -54,7 +54,7 @@ func (m *MockDatabase) UpdateWholeGenre(id int64, g models.Genre) error {
 
 func (m *MockDatabase) DelGenre(id int64) error {
 	for i, genre := range m.Genres {
-		if genre.Id == id {
+		if genre.ID == id {
 			m.Genres = append(m.Genres[:i], m.Genres[i+1:]...)
 			return nil
 		}

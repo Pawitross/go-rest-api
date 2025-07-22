@@ -13,14 +13,14 @@ func TestGenreValidation(t *testing.T) {
 	}{
 		"Valid": {
 			genre: models.Genre{
-				Id:   1,
+				ID:   1,
 				Name: "Horror",
 			},
 			isInvalid: false,
 		},
 		"InvalidEmptyName": {
 			genre: models.Genre{
-				Id:   1,
+				ID:   1,
 				Name: "",
 			},
 			isInvalid: true,

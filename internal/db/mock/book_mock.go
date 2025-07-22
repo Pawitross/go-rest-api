@@ -57,7 +57,7 @@ func (m *MockDatabase) GetBooksExt(params url.Values) ([]models.BookExt, error) 
 
 func (m *MockDatabase) GetBook(id int64) (models.Book, error) {
 	for _, book := range m.Books {
-		if book.Id == id {
+		if book.ID == id {
 			return book, nil
 		}
 	}
@@ -70,10 +70,10 @@ func (m *MockDatabase) InsertBook(b models.Book) (int64, error) {
 		return 0, db.ErrForeignKey
 	}
 
-	b.Id = int64(len(m.Books) + 1)
+	b.ID = int64(len(m.Books) + 1)
 	m.Books = append(m.Books, b)
 
-	return b.Id, nil
+	return b.ID, nil
 }
 
 func (m *MockDatabase) UpdateWholeBook(id int64, b models.Book) error {
@@ -82,9 +82,9 @@ func (m *MockDatabase) UpdateWholeBook(id int64, b models.Book) error {
 			return db.ErrForeignKey
 		}
 
-		if book.Id == id {
+		if book.ID == id {
 			m.Books[i] = b
-			m.Books[i].Id = id
+			m.Books[i].ID = id
 			return nil
 		}
 	}
@@ -98,7 +98,7 @@ func (m *MockDatabase) UpdateBook(id int64, b models.Book) error {
 			return db.ErrForeignKey
 		}
 
-		if book.Id == id {
+		if book.ID == id {
 			if b.Title != "" {
 				m.Books[i].Title = b.Title
 			}
@@ -127,7 +127,7 @@ func (m *MockDatabase) UpdateBook(id int64, b models.Book) error {
 
 func (m *MockDatabase) DelBook(id int64) error {
 	for i, book := range m.Books {
-		if book.Id == id {
+		if book.ID == id {
 			m.Books = append(m.Books[:i], m.Books[i+1:]...)
 			return nil
 		}

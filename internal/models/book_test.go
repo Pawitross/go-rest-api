@@ -14,7 +14,7 @@ func modifyBook(book models.Book, modify func(b *models.Book)) models.Book {
 
 func TestBookValidation(t *testing.T) {
 	validBook := models.Book{
-		Id:       1,
+		ID:       1,
 		Title:    "Foo",
 		Year:     1998,
 		Pages:    100,

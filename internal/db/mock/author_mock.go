@@ -28,7 +28,7 @@ func (m *MockDatabase) GetAuthors(params url.Values) ([]models.Author, error) {
 
 func (m *MockDatabase) GetAuthor(id int64) (models.Author, error) {
 	for _, author := range m.Authors {
-		if author.Id == id {
+		if author.ID == id {
 			return author, nil
 		}
 	}
@@ -37,17 +37,17 @@ func (m *MockDatabase) GetAuthor(id int64) (models.Author, error) {
 }
 
 func (m *MockDatabase) InsertAuthor(a models.Author) (int64, error) {
-	a.Id = int64(len(m.Authors) + 1)
+	a.ID = int64(len(m.Authors) + 1)
 	m.Authors = append(m.Authors, a)
 
-	return a.Id, nil
+	return a.ID, nil
 }
 
 func (m *MockDatabase) UpdateWholeAuthor(id int64, a models.Author) error {
 	for i, author := range m.Authors {
-		if author.Id == id {
+		if author.ID == id {
 			m.Authors[i] = a
-			m.Authors[i].Id = id
+			m.Authors[i].ID = id
 			return nil
 		}
 	}
@@ -57,7 +57,7 @@ func (m *MockDatabase) UpdateWholeAuthor(id int64, a models.Author) error {
 
 func (m *MockDatabase) UpdateAuthor(id int64, a models.Author) error {
 	for i, author := range m.Authors {
-		if author.Id == id {
+		if author.ID == id {
 			if a.FirstName != "" {
 				m.Authors[i].FirstName = a.FirstName
 			}
@@ -80,7 +80,7 @@ func (m *MockDatabase) UpdateAuthor(id int64, a models.Author) error {
 
 func (m *MockDatabase) DelAuthor(id int64) error {
 	for i, author := range m.Authors {
-		if author.Id == id {
+		if author.ID == id {
 			m.Authors = append(m.Authors[:i], m.Authors[i+1:]...)
 			return nil
 		}

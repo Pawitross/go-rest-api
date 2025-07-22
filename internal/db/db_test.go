@@ -15,10 +15,10 @@ import (
 var database *Database
 
 type quote struct {
-	Id      int64
+	ID      int64
 	Quote   string
 	Ranking int64
-	Fk      int64
+	FK      int64
 }
 
 func runMain(m *testing.M) (int, error) {
@@ -63,22 +63,22 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
-func TestQueryId(t *testing.T) {
+func TestQueryID(t *testing.T) {
 	tests := map[string]struct {
-		giveId    int64
+		giveID    int64
 		wantQuote string
 		wantRank  int64
-		wantFk    int64
+		wantFK    int64
 		wantErrIs error
 	}{
 		"Success": {
-			giveId:    1,
+			giveID:    1,
 			wantQuote: "Lorem ipsum dolor sit amet",
 			wantRank:  3,
-			wantFk:    1,
+			wantFK:    1,
 		},
 		"ErrNotFound": {
-			giveId:    1000,
+			giveID:    1000,
 			wantErrIs: ErrNotFound,
 		},
 	}
@@ -92,18 +92,18 @@ func TestQueryId(t *testing.T) {
 				WHERE id = ?`
 
 			quoteFunc := func(q *quote, row *sql.Row) error {
-				return row.Scan(&q.Id, &q.Quote, &q.Ranking, &q.Fk)
+				return row.Scan(&q.ID, &q.Quote, &q.Ranking, &q.FK)
 			}
 
 			if tt.wantErrIs == nil {
-				q, err := queryId[quote](database, query, tt.giveId, quoteFunc)
+				q, err := queryID[quote](database, query, tt.giveID, quoteFunc)
 				assert.NoError(t, err)
 
 				assert.Equal(t, q.Quote, tt.wantQuote)
 				assert.Equal(t, q.Ranking, tt.wantRank)
-				assert.Equal(t, q.Fk, tt.wantFk)
+				assert.Equal(t, q.FK, tt.wantFK)
 			} else {
-				_, err := queryId[quote](database, query, tt.giveId, quoteFunc)
+				_, err := queryID[quote](database, query, tt.giveID, quoteFunc)
 				assert.Error(t, err)
 				assert.ErrorIs(t, err, tt.wantErrIs)
 			}
@@ -119,7 +119,7 @@ func TestQueryWithParams(t *testing.T) {
 		"SuccessNoParams": {
 			giveParams: url.Values{},
 		},
-		"SuccessIdParam": {
+		"SuccessIDParam": {
 			giveParams: url.Values{"id": {"1"}},
 		},
 		"SuccessQuoteParam": {
@@ -128,28 +128,28 @@ func TestQueryWithParams(t *testing.T) {
 		"SuccessRankingParam": {
 			giveParams: url.Values{"ranking": {"1"}},
 		},
-		"SuccessIdParamSortDefault": {
+		"SuccessIDParamSortDefault": {
 			giveParams: url.Values{"sort_by": {"id"}},
 		},
-		"SuccessIdParamSortDescending": {
+		"SuccessIDParamSortDescending": {
 			giveParams: url.Values{"sort_by": {"-id"}},
 		},
-		"SuccessIdParamEq": {
+		"SuccessIDParamEq": {
 			giveParams: url.Values{"id.eq": {"1"}},
 		},
-		"SuccessIdParamNotEq": {
+		"SuccessIDParamNotEq": {
 			giveParams: url.Values{"id.neq": {"1"}},
 		},
-		"SuccessIdParamGt": {
+		"SuccessIDParamGt": {
 			giveParams: url.Values{"id.gt": {"1"}},
 		},
-		"SuccessIdParamGte": {
+		"SuccessIDParamGte": {
 			giveParams: url.Values{"id.gte": {"1"}},
 		},
-		"SuccessIdParamLt": {
+		"SuccessIDParamLt": {
 			giveParams: url.Values{"id.lt": {"3"}},
 		},
-		"SuccessIdParamLte": {
+		"SuccessIDParamLte": {
 			giveParams: url.Values{"id.lte": {"3"}},
 		},
 		"SuccessRankingParamNeqNull": {
@@ -209,7 +209,7 @@ func TestQueryWithParams(t *testing.T) {
 			}
 
 			quoteFunc := func(q *quote, rows *sql.Rows) error {
-				return rows.Scan(&q.Id, &q.Quote, &q.Ranking)
+				return rows.Scan(&q.ID, &q.Quote, &q.Ranking)
 			}
 
 			if tt.wantErrIs == nil {
@@ -230,25 +230,25 @@ func TestInsert(t *testing.T) {
 	tests := map[string]struct {
 		giveQuote any
 		giveRank  any
-		giveFk    int64
+		giveFK    int64
 		wantErr   bool
 		wantErrIs error
 	}{
 		"Success": {
 			giveQuote: "Test quote",
 			giveRank:  int64(5),
-			giveFk:    1,
+			giveFK:    1,
 		},
 		"ErrStringRank": {
 			giveQuote: "Test quote",
 			giveRank:  "Should be a number",
-			giveFk:    1,
+			giveFK:    1,
 			wantErr:   true,
 		},
 		"ErrForeignKey": {
 			giveQuote: "Test quote",
 			giveRank:  int64(5),
-			giveFk:    1000,
+			giveFK:    1000,
 			wantErr:   true,
 			wantErrIs: ErrForeignKey,
 		},
@@ -262,11 +262,11 @@ func TestInsert(t *testing.T) {
 				VALUES (?, ?, ?)`
 
 			if !tt.wantErr {
-				id, err := database.insert(query, tt.giveQuote, tt.giveRank, tt.giveFk)
+				id, err := database.insert(query, tt.giveQuote, tt.giveRank, tt.giveFK)
 				assert.NoError(t, err)
 				assert.NotEmpty(t, id)
 			} else {
-				_, err := database.insert(query, tt.giveQuote, tt.giveRank, tt.giveFk)
+				_, err := database.insert(query, tt.giveQuote, tt.giveRank, tt.giveFK)
 				assert.Error(t, err)
 
 				if tt.wantErrIs != nil {
@@ -277,48 +277,48 @@ func TestInsert(t *testing.T) {
 	}
 }
 
-func TestUpdateWholeId(t *testing.T) {
+func TestUpdateWholeID(t *testing.T) {
 	tests := map[string]struct {
 		giveQuote string
 		giveRank  any
-		giveFk    int64
-		giveId    any
+		giveFK    int64
+		giveID    any
 		wantErr   bool
 		wantErrIs error
 	}{
 		"Success": {
 			giveQuote: "Update test quote",
 			giveRank:  int64(10),
-			giveFk:    1,
-			giveId:    int64(2),
+			giveFK:    1,
+			giveID:    int64(2),
 		},
 		"ErrStringRank": {
 			giveQuote: "Update test quote",
 			giveRank:  "string",
-			giveFk:    1,
-			giveId:    int64(2),
+			giveFK:    1,
+			giveID:    int64(2),
 			wantErr:   true,
 		},
-		"ErrStringId": {
+		"ErrStringID": {
 			giveQuote: "Update test quote",
 			giveRank:  int64(10),
-			giveFk:    1,
-			giveId:    "string",
+			giveFK:    1,
+			giveID:    "string",
 			wantErr:   true,
 		},
 		"ErrNotFound": {
 			giveQuote: "Update test quote",
 			giveRank:  int64(10),
-			giveFk:    1,
-			giveId:    int64(1000),
+			giveFK:    1,
+			giveID:    int64(1000),
 			wantErr:   true,
 			wantErrIs: ErrNotFound,
 		},
 		"ErrForeignKey": {
 			giveQuote: "Update test quote",
 			giveRank:  int64(10),
-			giveFk:    1000,
-			giveId:    int64(1),
+			giveFK:    1000,
+			giveID:    int64(1),
 			wantErr:   true,
 			wantErrIs: ErrForeignKey,
 		},
@@ -334,7 +334,7 @@ func TestUpdateWholeId(t *testing.T) {
 					fk = ?
 				WHERE id = ?`
 
-			err := database.updateWholeId(query, tt.giveQuote, tt.giveRank, tt.giveFk, tt.giveId)
+			err := database.updateWholeID(query, tt.giveQuote, tt.giveRank, tt.giveFK, tt.giveID)
 			if !tt.wantErr {
 				assert.NoError(t, err)
 			} else {
@@ -348,10 +348,10 @@ func TestUpdateWholeId(t *testing.T) {
 	}
 }
 
-func TestUpdatePartId(t *testing.T) {
+func TestUpdatePartID(t *testing.T) {
 	tests := map[string]struct {
 		giveQuote quote
-		giveId    int64
+		giveID    int64
 		wantErr   bool
 		wantErrIs error
 	}{
@@ -359,46 +359,46 @@ func TestUpdatePartId(t *testing.T) {
 			giveQuote: quote{
 				Quote: "Updating quote",
 			},
-			giveId: 1,
+			giveID: 1,
 		},
 		"SuccessRanking": {
 			giveQuote: quote{
 				Ranking: 100,
 			},
-			giveId: 1,
+			giveID: 1,
 		},
-		"SuccessFk": {
+		"SuccessFK": {
 			giveQuote: quote{
-				Fk: 1,
+				FK: 1,
 			},
-			giveId: 1,
+			giveID: 1,
 		},
 		"SuccessWholeObj": {
 			giveQuote: quote{
 				Quote:   "Updating quote",
 				Ranking: 100,
-				Fk:      1,
+				FK:      1,
 			},
-			giveId: 1,
+			giveID: 1,
 		},
 		"ErrEmptyObj": {
 			giveQuote: quote{},
-			giveId:    1,
+			giveID:    1,
 			wantErr:   true,
 		},
 		"ErrNotFound": {
 			giveQuote: quote{
 				Quote: "Updating quote",
 			},
-			giveId:    1000,
+			giveID:    1000,
 			wantErr:   true,
 			wantErrIs: ErrNotFound,
 		},
 		"ErrForeignKey": {
 			giveQuote: quote{
-				Fk: 1000,
+				FK: 1000,
 			},
-			giveId:    1,
+			giveID:    1,
 			wantErr:   true,
 			wantErrIs: ErrForeignKey,
 		},
@@ -406,13 +406,13 @@ func TestUpdatePartId(t *testing.T) {
 
 	for name, tt := range tests {
 		t.Run(name, func(t *testing.T) {
-			fieldToDb := map[string]string{
+			fieldToDB := map[string]string{
 				"Quote":   "quote",
 				"Ranking": "ranking",
-				"Fk":      "fk",
+				"FK":      "fk",
 			}
 
-			err := database.updatePartId(tt.giveQuote, "test_table", tt.giveId, fieldToDb)
+			err := database.updatePartID(tt.giveQuote, "test_table", tt.giveID, fieldToDB)
 			if !tt.wantErr {
 				assert.NoError(t, err)
 			} else {
@@ -444,7 +444,7 @@ func TestDelete(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			query := "DELETE FROM test_table WHERE id = ?"
 
-			err := database.deleteId(query, tt.id)
+			err := database.deleteID(query, tt.id)
 			if tt.wantErr == nil {
 				assert.NoError(t, err)
 			} else {

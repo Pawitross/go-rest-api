@@ -32,12 +32,12 @@ func TestGetAuthor_Success(t *testing.T) {
 
 func TestGetAuthor_Error(t *testing.T) {
 	getTests := map[string]ErrorTests{
-		"NotFound_BigPathId": {
+		"NotFound_BigPathID": {
 			body:   nil,
 			query:  "/9999",
 			status: http.StatusNotFound,
 		},
-		"BadRequest_StringPathId": {
+		"BadRequest_StringPathID": {
 			body:   nil,
 			query:  "/string",
 			status: http.StatusBadRequest,
@@ -59,12 +59,12 @@ func TestPostAuthor_Success(t *testing.T) {
 	var rAuthor models.Author
 	jsonAuthor := marshalCheckNoError(t, testAuthor)
 	w := execAndCheck(t, "POST", "/api/v1/authors", jsonAuthor, http.StatusCreated, &rAuthor)
-	defer database.DelAuthor(rAuthor.Id)
+	defer database.DelAuthor(rAuthor.ID)
 
-	expLoc := fmt.Sprintf("/api/v1/authors/%v", rAuthor.Id)
+	expLoc := fmt.Sprintf("/api/v1/authors/%v", rAuthor.ID)
 	assert.Equal(t, expLoc, w.Result().Header.Get("Location"))
 
-	assert.NotZero(t, rAuthor.Id, "Auto generatated, non zero ID")
+	assert.NotZero(t, rAuthor.ID, "Auto generatated, non zero ID")
 	assert.Equal(t, testAuthor.FirstName, rAuthor.FirstName)
 	assert.Equal(t, testAuthor.LastName, rAuthor.LastName)
 	assert.Equal(t, testAuthor.BirthYear, rAuthor.BirthYear)
@@ -129,7 +129,7 @@ func TestPutAuthor_BadRequest_MalformedJSON(t *testing.T) {
 
 func TestPutAuthor_Error(t *testing.T) {
 	putTests := map[string]ErrorTests{
-		"NotFound_BigPathId": {
+		"NotFound_BigPathID": {
 			body: marshalCheckNoError(t, models.Author{
 				FirstName: "Put",
 				LastName:  "test",
@@ -139,7 +139,7 @@ func TestPutAuthor_Error(t *testing.T) {
 			query:  "/9999",
 			status: http.StatusNotFound,
 		},
-		"BadRequest_StringId": {
+		"BadRequest_StringID": {
 			body: marshalCheckNoError(t, models.Author{
 				FirstName: "Put",
 				LastName:  "test",
@@ -175,12 +175,12 @@ func TestPatchAuthor_Success(t *testing.T) {
 
 func TestPatchAuthor_Error(t *testing.T) {
 	patchTests := map[string]ErrorTests{
-		"NotFound_BigPathId": {
+		"NotFound_BigPathID": {
 			body:   []byte(`{"first_name":"Patch test"}`),
 			query:  "/9999",
 			status: http.StatusNotFound,
 		},
-		"BadRequest_StringPathId": {
+		"BadRequest_StringPathID": {
 			body:   []byte(`{"first_name":"Patch test"}`),
 			query:  "/string",
 			status: http.StatusBadRequest,
@@ -197,7 +197,7 @@ func TestPatchAuthor_Error(t *testing.T) {
 
 // DELETE /authors/id
 func TestDeleteAuthor_Success(t *testing.T) {
-	newId, err := database.InsertAuthor(models.Author{
+	newID, err := database.InsertAuthor(models.Author{
 		FirstName: "Delete",
 		LastName:  "tester",
 		BirthYear: 1900,
@@ -205,21 +205,21 @@ func TestDeleteAuthor_Success(t *testing.T) {
 	})
 	assert.NoError(t, err)
 
-	newAuthorLoc := fmt.Sprintf("/api/v1/authors/%v", newId)
+	newAuthorLoc := fmt.Sprintf("/api/v1/authors/%v", newID)
 	execAndCheck(t, "DELETE", newAuthorLoc, nil, http.StatusNoContent, nil)
 
-	_, err = database.GetAuthor(newId)
+	_, err = database.GetAuthor(newID)
 	assert.ErrorIs(t, err, db.ErrNotFound)
 }
 
 func TestDeleteAuthor_Error(t *testing.T) {
 	deleteTests := map[string]ErrorTests{
-		"NotFound_BigPathId": {
+		"NotFound_BigPathID": {
 			body:   nil,
 			query:  "/9999",
 			status: http.StatusNotFound,
 		},
-		"BadRequest_StringPathId": {
+		"BadRequest_StringPathID": {
 			body:   nil,
 			query:  "/string",
 			status: http.StatusBadRequest,
@@ -240,7 +240,7 @@ func TestOptionsAuthors_Success(t *testing.T) {
 			"",
 			[]string{"GET", "POST", "OPTIONS"},
 		},
-		"PathId": {
+		"PathID": {
 			"/1",
 			[]string{"GET", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		},

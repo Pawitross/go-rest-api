@@ -31,12 +31,12 @@ func TestGetGenre_Success(t *testing.T) {
 
 func TestGetGenre_Error(t *testing.T) {
 	getTests := map[string]ErrorTests{
-		"NotFound_BigPathId": {
+		"NotFound_BigPathID": {
 			body:   nil,
 			query:  "/9999",
 			status: http.StatusNotFound,
 		},
-		"BadRequest_StringPathId": {
+		"BadRequest_StringPathID": {
 			body:   nil,
 			query:  "/string",
 			status: http.StatusBadRequest,
@@ -55,12 +55,12 @@ func TestPostGenre_Success(t *testing.T) {
 	var rGenre models.Genre
 	jsonGenre := marshalCheckNoError(t, testGenre)
 	w := execAndCheck(t, "POST", "/api/v1/genres", jsonGenre, http.StatusCreated, &rGenre)
-	defer database.DelGenre(rGenre.Id)
+	defer database.DelGenre(rGenre.ID)
 
-	expLoc := fmt.Sprintf("/api/v1/genres/%v", rGenre.Id)
+	expLoc := fmt.Sprintf("/api/v1/genres/%v", rGenre.ID)
 	assert.Equal(t, expLoc, w.Result().Header.Get("Location"))
 
-	assert.NotZero(t, rGenre.Id, "Auto generatated, non zero ID")
+	assert.NotZero(t, rGenre.ID, "Auto generatated, non zero ID")
 	assert.Equal(t, testGenre.Name, rGenre.Name)
 }
 
@@ -103,14 +103,14 @@ func TestPutGenre_BadRequest_MalformedJSON(t *testing.T) {
 
 func TestPutGenre_Error(t *testing.T) {
 	putTests := map[string]ErrorTests{
-		"NotFound_BigPathId": {
+		"NotFound_BigPathID": {
 			body: marshalCheckNoError(t, models.Genre{
 				Name: "Put test",
 			}),
 			query:  "/9999",
 			status: http.StatusNotFound,
 		},
-		"BadRequest_StringId": {
+		"BadRequest_StringID": {
 			body: marshalCheckNoError(t, models.Genre{
 				Name: "Put test",
 			}),
@@ -129,26 +129,26 @@ func TestPutGenre_Error(t *testing.T) {
 
 // DELETE /genres/id
 func TestDeleteGenre_Success(t *testing.T) {
-	newId, err := database.InsertGenre(models.Genre{
+	newID, err := database.InsertGenre(models.Genre{
 		Name: "Delete tester",
 	})
 	assert.NoError(t, err)
 
-	newGenreLoc := fmt.Sprintf("/api/v1/genres/%v", newId)
+	newGenreLoc := fmt.Sprintf("/api/v1/genres/%v", newID)
 	execAndCheck(t, "DELETE", newGenreLoc, nil, http.StatusNoContent, nil)
 
-	_, err = database.GetGenre(newId)
+	_, err = database.GetGenre(newID)
 	assert.ErrorIs(t, err, db.ErrNotFound)
 }
 
 func TestDeleteGenre_Error(t *testing.T) {
 	deleteTests := map[string]ErrorTests{
-		"NotFound_BigPathId": {
+		"NotFound_BigPathID": {
 			body:   nil,
 			query:  "/9999",
 			status: http.StatusNotFound,
 		},
-		"BadRequest_StringPathId": {
+		"BadRequest_StringPathID": {
 			body:   nil,
 			query:  "/string",
 			status: http.StatusBadRequest,
@@ -169,7 +169,7 @@ func TestOptionsGenres_Success(t *testing.T) {
 			"",
 			[]string{"GET", "POST", "OPTIONS"},
 		},
-		"PathId": {
+		"PathID": {
 			"/1",
 			[]string{"GET", "PUT", "DELETE", "OPTIONS"},
 		},

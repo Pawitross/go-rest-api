@@ -51,7 +51,7 @@ export function postBook(authToken, minSleep = 0, maxSleep = 0) {
 	};
 }
 
-export function patchBook(authToken, newestBookId, minSleep = 0, maxSleep = 0) {
+export function patchRandomBook(authToken, newestBookId, minSleep = 0, maxSleep = 0) {
 	let patchID = Math.floor(Math.random() * newestBookId + 1);
 	if (patchID > newestBookId) {
 		patchID = newestBookId;

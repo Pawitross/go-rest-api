@@ -22,24 +22,32 @@ export function setup() {
 }
 
 export default function(authToken) {
-	if (!helpers.listBooks(authToken, 0, 2)) {
-		console.warn('Skipping - list books fail');
+	let sleepMinTime = 0;
+	let sleepMaxTime = 2;
+	if (!helpers.listBooks(authToken, sleepMinTime, sleepMaxTime)) {
+		console.warn('Skipping - list books failed');
 		return;
 	}
 
-	const {isOk, id} = helpers.postBook(authToken, 2, 3);
+	sleepMinTime = 2;
+	sleepMaxTime = 3;
+	const {isOk, id} = helpers.postBook(authToken, sleepMinTime, sleepMaxTime);
 	if (!isOk) {
-		console.warn('Skipping - POST book fail');
+		console.warn('Skipping - POST book failed');
 		return;
 	}
 
-	if (!helpers.patchBook(authToken, id, 3, 5)) {
-		console.warn('Skipping - PATCH book fail');
+	sleepMinTime = 3;
+	sleepMaxTime = 5;
+	if (!helpers.patchRandomBook(authToken, id, sleepMinTime, sleepMaxTime)) {
+		console.warn('Skipping - PATCH book failed');
 		return;
 	}
 
-	if (!helpers.listRandomResource(authToken, 2, 4)) {
-		console.warn('Skipping - list random resource fail');
+	sleepMinTime = 2;
+	sleepMaxTime = 4;
+	if (!helpers.listRandomResource(authToken, sleepMinTime, sleepMaxTime)) {
+		console.warn('Skipping - list random resource failed');
 		return;
 	}
 }

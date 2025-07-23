@@ -2,7 +2,6 @@ package db
 
 import (
 	"database/sql"
-	"fmt"
 	"net/url"
 
 	"pawrest/internal/models"
@@ -115,11 +114,6 @@ func (d *Database) GetBooksExt(params url.Values) ([]models.BookExt, error) {
 		allowedParams,
 		bookFunc,
 	)
-}
-
-func (d *Database) bookExists(id int64) error {
-	// TODO
-	return fmt.Errorf("TODO")
 }
 
 func (d *Database) GetBook(id int64) (models.Book, error) {

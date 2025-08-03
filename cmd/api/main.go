@@ -64,7 +64,11 @@ func run(flags serverFlags) error {
 	defer middleware.CloseLogger()
 
 	log.Println("Starting up the server...")
-	//gin.SetMode(gin.ReleaseMode)
+	ginMode := gin.ReleaseMode
+	if os.Getenv("GIN_DEBUG") == "true" {
+		ginMode = gin.DebugMode
+	}
+	gin.SetMode(ginMode)
 	router := gin.Default()
 
 	router.Use(middleware.FileLogger())

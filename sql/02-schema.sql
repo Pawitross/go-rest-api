@@ -29,7 +29,6 @@ CREATE TABLE ksiazka (
     tytul           VARCHAR(256) NOT NULL,
     rok_wydania     DECIMAL(5) NOT NULL,
     liczba_stron    INT,
-    okladka_url     VARCHAR(1024),
     id_autora       INT NOT NULL,
     id_gatunku      INT NOT NULL,
     id_jezyka       INT NOT NULL,

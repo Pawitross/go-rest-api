@@ -156,6 +156,12 @@ DBPASS: "testpass"
 DBNAME: "paw_test"
 ```
 
+> [!NOTE]
+> If you're using HTTPS and/or other port than default, update `BASE_URL` variable in the [`loadtests/utils.js` file](/loadtests/utils.js) or revert the changes.
+
+> [!IMPORTANT]
+> You may need to create tables and insert data from the [`02-schema.sql` file](/sql/02-schema.sql) into the `paw_test` database.
+
 Then, [install Grafana k6](https://grafana.com/docs/k6/latest/set-up/install-k6/),
 and run JS files with the `Test` suffix, located inside [loadtests directory](/loadtests):
 ```sh

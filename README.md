@@ -14,7 +14,7 @@ Supports JWT authentication, includes OpenAPI (Swagger) documentation and provid
 ### Clone the repository
 
 ```sh
-git clone --depth=1 https://github.com/foo/bar
+git clone --depth=1 https://github.com/pawitross/go-rest-api
 cd bar
 ```
 
